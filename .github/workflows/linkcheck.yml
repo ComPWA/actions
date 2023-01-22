@@ -1,0 +1,29 @@
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        default: "3.8"
+        required: false
+        type: string
+
+jobs:
+  linkcheck:
+    name: Check external links
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/cache@v3
+        with:
+          key: |
+            pip-doc-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+          restore-keys: |
+            pip-doc-${{runner.os}}-py${{ inputs.python-version }}
+          path: ~/.cache/pip/
+      - run: pip install .[doc] tox
+        if: hashFiles('.constraints/py3.*.txt') == ''
+      - run: pip install .[doc] tox -c .constraints/py${{ inputs.python-version }}.txt
+        if: hashFiles('.constraints/py3.*.txt') != ''
+      - run: tox -e linkcheck
