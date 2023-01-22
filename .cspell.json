@@ -1,0 +1,20 @@
+{
+  "allowCompoundWords": true,
+  "dictionaries": ["ComPWA", "python"],
+  "dictionaryDefinitions": [
+    {
+      "addWords": true,
+      "name": "ComPWA",
+      "path": "./.cspell/ComPWA.txt"
+    },
+    {
+      "addWords": true,
+      "name": "python",
+      "path": "./.cspell/python.txt"
+    }
+  ],
+  "enableFiletypes": ["git-commit"],
+  "ignorePaths": [".cspell/*.txt", ".editorconfig", ".vscode/*.json"],
+  "language": "en-US",
+  "version": "0.2"
+}
