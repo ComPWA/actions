@@ -1,5 +1,6 @@
 # Commit types
 # https://compwa-org.rtfd.io/develop.html#commit-conventions
 compwa
+docnb
 MAINT
 rtfd

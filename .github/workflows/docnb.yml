@@ -1,0 +1,44 @@
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        default: "3.8"
+        required: false
+        type: string
+
+jobs:
+  docnb:
+    name: Execute and build documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/cache@v3
+        with:
+          key: |
+            pip-doc-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+          restore-keys: |
+            pip-doc-${{runner.os}}-py${{ inputs.python-version }}
+          path: ~/.cache/pip/
+      - name: Fetch Jupyter cache
+        uses: actions/cache@v3
+        with:
+          key: |
+            jupyter-cache-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py')}}-${{hashFiles('docs/**')}}
+          restore-keys: |
+            jupyter-cache-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py')}}
+          path: |
+            ./docs/_build/.jupyter_cache
+      - run: pip install .[doc] tox
+        if: hashFiles('.constraints/py3.*.txt') == ''
+      - run: pip install .[doc] tox -c .constraints/py${{ inputs.python-version }}.txt
+        if: hashFiles('.constraints/py3.*.txt') != ''
+      - name: Build documentation and run notebooks
+        run: tox -e docnb
+      - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: html
+          path: docs/_build/html
