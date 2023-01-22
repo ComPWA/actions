@@ -9,14 +9,14 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.wordWrap": "off"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "cSpell.enabled": true,
   "editor.formatOnSave": true,
+  "editor.wrappingStrategy": "advanced",
   "git.rebaseWhenSync": true,
   "telemetry.telemetryLevel": "off"
 }
