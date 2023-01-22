@@ -1,0 +1,29 @@
+on:
+  workflow_call:
+    inputs:
+      gh-pages:
+        default: false
+        required: false
+        type: boolean
+
+jobs:
+  linkcheck:
+    name: Check external links
+    uses: ./.github/workflows/linkcheck.yml
+
+  docnb:
+    name: Execute and build documentation
+    uses: ./.github/workflows/docnb.yml
+
+  gh-pages:
+    name: Upload to GitHub Pages
+    if: ${{ inputs.gh-pages && github.event_name != 'pull_request' && github.event.repository.default_branch == format('refs/heads/{0}', ) }}
+    needs:
+      - docnb
+      - linkcheck
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/deploy-pages@v1
