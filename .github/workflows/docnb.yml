@@ -36,8 +36,7 @@ jobs:
         if: hashFiles('.constraints/py3.*.txt') != ''
       - name: Build documentation and run notebooks
         run: tox -e docnb
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-pages-artifact@v1
         if: ${{ always() }}
         with:
-          name: html
           path: docs/_build/html
