@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/pip-install
+      - uses: ComPWA/actions/pip-install@linkcheck
         with:
           additional-packages: tox
           extras: test
