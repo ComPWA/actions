@@ -1,0 +1,11 @@
+on:
+  workflow_call:
+    inputs:
+      gh-pages:
+        default: false
+        required: false
+        type: boolean
+
+jobs:
+  style:
+    uses: ./.github/workflows/pre-commit.yml
