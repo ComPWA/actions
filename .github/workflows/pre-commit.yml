@@ -29,6 +29,11 @@ jobs:
             ~/.cache/pip/
             ~/.cache/pre-commit/
 
+      - run: pip install .[sty]
+        if: hashFiles('.constraints/py3.*.txt') == ''
+      - run: pip install .[sty] -c .constraints/py${{ inputs.python-version }}.txt
+        if: hashFiles('.constraints/py3.*.txt') != ''
+
       - name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
           for hook in ${{ inputs.hooks }}; do
