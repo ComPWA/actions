@@ -23,12 +23,19 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: |
-            pip-sty-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', '.pre-commit-config.yaml') }}
+            pip-sty-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
           restore-keys: |
             pip-sty-${{ runner.os }}-py${{ inputs.python-version }}
-          path: |
-            ~/.cache/pip/
-            ~/.cache/pre-commit/
+          path: ~/.cache/pip/
+      - name: Fetch pre-commit cache
+        uses: actions/cache@v3
+        with:
+          key: |
+            pre-commit-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
+            pre-commit-${{ runner.os }}
+          path: ~/.cache/pre-commit/
 
       - run: pip install .[sty]
         if: hashFiles('.constraints/py3.*.txt') == ''
