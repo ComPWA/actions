@@ -18,17 +18,17 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: |
-            pip-doc-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
           restore-keys: |
-            pip-doc-${{runner.os}}-py${{ inputs.python-version }}
+            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pip/
       - name: Fetch Jupyter cache
         uses: actions/cache@v3
         with:
           key: |
-            jupyter-cache-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py')}}-${{hashFiles('docs/**')}}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}-${{ hashFiles('docs/**') }}
           restore-keys: |
-            jupyter-cache-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py')}}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}
           path: |
             ./docs/_build/.jupyter_cache
       - run: pip install .[doc] tox

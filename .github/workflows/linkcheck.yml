@@ -18,9 +18,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: |
-            pip-doc-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
           restore-keys: |
-            pip-doc-${{runner.os}}-py${{ inputs.python-version }}
+            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pip/
       - run: pip install .[doc] tox
         if: hashFiles('.constraints/py3.*.txt') == ''

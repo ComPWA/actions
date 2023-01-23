@@ -31,9 +31,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: |
-            pip-test-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+            pip-test-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
           restore-keys: |
-            pip-test-${{runner.os}}-py${{ inputs.python-version }}
+            pip-test-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pip/
 
       - run: pip install .[test]

@@ -22,9 +22,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: |
-            pip-sty-${{runner.os}}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', '.pre-commit-config.yaml') }}
+            pip-sty-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', '.pre-commit-config.yaml') }}
           restore-keys: |
-            pip-sty-${{runner.os}}-py${{ inputs.python-version }}
+            pip-sty-${{ runner.os }}-py${{ inputs.python-version }}
           path: |
             ~/.cache/pip/
             ~/.cache/pre-commit/
