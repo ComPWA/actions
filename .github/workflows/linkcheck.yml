@@ -12,21 +12,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: ./.github/actions/pip-install
         with:
+          additional-packages: tox
+          extras: doc
           python-version: ${{ inputs.python-version }}
-
-      - uses: actions/cache@v3
-        with:
-          key: |
-            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
-          restore-keys: |
-            pip-doc-${{ runner.os }}-py${{ inputs.python-version }}
-          path: ~/.cache/pip/
-
-      - run: pip install .[doc] tox
-        if: hashFiles('.constraints/py3.*.txt') == ''
-      - run: pip install .[doc] tox -c .constraints/py${{ inputs.python-version }}.txt
-        if: hashFiles('.constraints/py3.*.txt') != ''
-
       - run: tox -e linkcheck
