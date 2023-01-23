@@ -1,0 +1,50 @@
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      multithreaded:
+        default: true
+        required: false
+        type: boolean
+      runs-on:
+        default: ubuntu-22.04
+        required: false
+        type: string
+      test-output-path:
+        required: false
+        type: string
+
+jobs:
+  pytest:
+    name: Unit tests
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/cache@v3
+        with:
+          key: |
+            pip-test-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+          restore-keys: |
+            pip-test-${{runner.os}}-py${{ inputs.python-version }}
+          path: ~/.cache/pip/
+
+      - run: pip install .[test]
+        if: hashFiles('.constraints/py3.*.txt') == ''
+      - run: pip install .[test] -c .constraints/py${{ inputs.python-version }}.txt
+        if: hashFiles('.constraints/py3.*.txt') != ''
+
+      - if: inputs.multithreaded
+        run: pytest -n auto
+      - if: inputs.multithreaded
+        run: pytest -n auto
+
+      - uses: actions/upload-artifact@v3
+        if: input.test-output-path != ''
+        with:
+          name: test-output-${{ inputs.runs-on }}-${{ inputs.python-version }}
+          path: ${{ input.test-output-path }}
