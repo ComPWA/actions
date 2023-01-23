@@ -38,6 +38,6 @@ jobs:
       - name: Build documentation and run notebooks
         run: tox -e docnb
       - uses: actions/upload-pages-artifact@v1
-        if: ${{ always() }}
+        if: always()
         with:
           path: docs/_build/html
