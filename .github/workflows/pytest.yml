@@ -1,13 +1,16 @@
 on:
   workflow_call:
     inputs:
-      python-version:
-        required: true
+      coverage-target:
+        required: false
         type: string
       multithreaded:
         default: true
         required: false
         type: boolean
+      python-version:
+        required: true
+        type: string
       runs-on:
         default: ubuntu-22.04
         required: false
@@ -38,10 +41,18 @@ jobs:
       - run: pip install .[test] -c .constraints/py${{ inputs.python-version }}.txt
         if: hashFiles('.constraints/py3.*.txt') != ''
 
-      - if: inputs.multithreaded
+      - if: inputs.coverage-target == '' && inputs.multithreaded
         run: pytest -n auto
-      - if: ${{ ! inputs.multithreaded }}
+      - if: inputs.coverage-target == '' && ! inputs.multithreaded
         run: pytest
+
+      - if: inputs.coverage-target != ''
+        run: pytest --cov=${{ inputs.coverage-target }} --cov-report=xml
+      - if: inputs.coverage-target != ''
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
 
       - uses: actions/upload-artifact@v3
         if: inputs.test-output-path != ''
