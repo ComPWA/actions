@@ -44,7 +44,7 @@ jobs:
         run: pytest -n auto
 
       - uses: actions/upload-artifact@v3
-        if: input.test-output-path != ''
+        if: inputs.test-output-path != ''
         with:
           name: test-output-${{ inputs.runs-on }}-${{ inputs.python-version }}
-          path: ${{ input.test-output-path }}
+          path: ${{ inputs.test-output-path }}
