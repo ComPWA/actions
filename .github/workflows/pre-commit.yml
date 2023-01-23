@@ -1,0 +1,36 @@
+on:
+  workflow_call:
+    inputs:
+      hooks:
+        description: Pre-commit hooks to run, whitespace-separated
+        required: true
+        type: string
+      python-version:
+        default: "3.8"
+        required: false
+        type: string
+
+jobs:
+  pre-commit:
+    name: Run local pre-commit hooks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/cache@v3
+        with:
+          key: |
+            pip-sty-${{runner.os}}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', '.pre-commit-config.yaml') }}
+          restore-keys: |
+            pip-sty-${{runner.os}}-py${{ inputs.python-version }}
+          path: |
+            ~/.cache/pip/
+            ~/.cache/pre-commit/
+
+      - name: Run pre-commit hooks that don't work on pre-commit.ci
+        run: |-
+          for hook in ${{ inputs.hooks }}; do
+            pre-commit run $hook -a --color always
+          done
