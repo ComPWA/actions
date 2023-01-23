@@ -17,7 +17,6 @@ jobs:
           additional-packages: tox
           extras: doc
           python-version: ${{ inputs.python-version }}
-          path: ~/.cache/pip/
       - name: Fetch Jupyter cache
         uses: actions/cache@v3
         with:
