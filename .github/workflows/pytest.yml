@@ -40,8 +40,8 @@ jobs:
 
       - if: inputs.multithreaded
         run: pytest -n auto
-      - if: inputs.multithreaded
-        run: pytest -n auto
+      - if: ${{ ! inputs.multithreaded }}
+        run: pytest
 
       - uses: actions/upload-artifact@v3
         if: inputs.test-output-path != ''
