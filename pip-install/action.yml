@@ -32,6 +32,6 @@ runs:
     - run: ${{ format('pip install .[{0}] {1}', inputs.extras, inputs.additional-packages ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('pip install .[{0}] {1} -c .constraints/py{2}}.txt', inputs.extras, inputs.additional-packages, inputs.python-version ) }}
+    - run: ${{ format('pip install .[{0}] {1} -c .constraints/py{2}.txt', inputs.extras, inputs.additional-packages, inputs.python-version ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
