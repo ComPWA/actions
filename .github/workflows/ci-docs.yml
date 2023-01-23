@@ -8,11 +8,9 @@ on:
 
 jobs:
   linkcheck:
-    name: Check external links
     uses: ./.github/workflows/linkcheck.yml
 
   docnb:
-    name: Execute and build documentation
     uses: ./.github/workflows/docnb.yml
 
   gh-pages:
