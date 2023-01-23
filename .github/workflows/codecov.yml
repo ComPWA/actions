@@ -33,6 +33,11 @@ jobs:
             pip-test-${{runner.os}}-py${{ inputs.python-version }}
           path: ~/.cache/pip/
 
+      - run: pip install .[test]
+        if: hashFiles('.constraints/py3.*.txt') == ''
+      - run: pip install .[test] -c .constraints/py${{ inputs.python-version }}.txt
+        if: hashFiles('.constraints/py3.*.txt') != ''
+
       - run: pytest --cov=${{ inputs.package-name }} --cov-report=xml
       - uses: codecov/codecov-action@v3
         with:
