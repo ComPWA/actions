@@ -21,7 +21,7 @@ on:
 
 jobs:
   pytest:
-    name: Unit tests
+    name: Run unit tests
     runs-on: ${{ inputs.runs-on }}
     steps:
       - uses: actions/checkout@v3
