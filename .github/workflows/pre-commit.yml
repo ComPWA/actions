@@ -34,7 +34,6 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
-            pre-commit-${{ runner.os }}
           path: ~/.cache/pre-commit/
 
       - run: pip install .[sty]
