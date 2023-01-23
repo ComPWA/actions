@@ -16,7 +16,7 @@ jobs:
     with:
       python-version: ${{ inputs.python-version }}
 
-  docnb:
+  nb:
     uses: ./.github/workflows/docnb.yml
     with:
       python-version: ${{ inputs.python-version }}
