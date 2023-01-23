@@ -5,13 +5,21 @@ on:
         default: false
         required: false
         type: boolean
+      python-version:
+        default: "3.8"
+        required: false
+        type: string
 
 jobs:
   linkcheck:
     uses: ./.github/workflows/linkcheck.yml
+    with:
+      python-version: ${{ inputs.python-version }}
 
   docnb:
     uses: ./.github/workflows/docnb.yml
+    with:
+      python-version: ${{ inputs.python-version }}
 
   gh-pages:
     name: Upload to GitHub Pages
