@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+      python-version:
+        default: "3.8"
+        required: false
+        type: string
+      runs-on:
+        default: ubuntu-22.04
+        required: false
+        type: string
+      test-output-path:
+        required: false
+        type: string
+
+jobs:
+  codecov:
+    name: Unit tests + coverage
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+      - uses: actions/cache@v3
+        with:
+          key: |
+            pip-test-${{runner.os}}-py${{ inputs.python-version }}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+          restore-keys: |
+            pip-test-${{runner.os}}-py${{ inputs.python-version }}
+          path: ~/.cache/pip/
+
+      - run: pytest --cov=${{ inputs.package-name }} --cov-report=xml
+      - uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+
+      - uses: actions/upload-artifact@v3
+        if: input.test-output-path != ''
+        with:
+          name: test-output-${{ inputs.runs-on }}-${{ inputs.python-version }}
+          path: ${{ input.test-output-path }}
