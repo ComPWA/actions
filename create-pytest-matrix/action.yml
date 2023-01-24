@@ -23,11 +23,9 @@ runs:
           shift
           echo "$*"
         }
-        SEPARATOR='", "'
-        echo "${SEPARATOR}"
-        PYTHON_VERSIONS='"'$(join_words $SEPARATOR ${{ inputs.python-versions }})'"'
-        echo "${PYTHON_VERSIONS}"
-        echo "{PYTHON_VERSIONS}=${PYTHON_VERSIONS}" >> $GITHUB_ENV
+        python_versions='["'$(join_words '", "' ${{ inputs.python-versions }})'"]'
+        echo "${python_versions}"
+        echo "{PYTHON_VERSIONS}=${python_versions}" >> $GITHUB_ENV
       shell: bash
     - run: |-
         echo '
