@@ -19,8 +19,9 @@ runs:
     - name: Convert `python-versions` to JSON list
       run: |
         function to_json_list() {
-          local separator='", "'
-          printf "[\"%s\"]" "$separator" "${@/#/$separator}"
+          local separator=' <->'
+          result=$(printf "%s" "$separator" "${@/#/$separator}")
+          echo '["'${result'"]'
         }
         python_versions="$(to_json_list ${{ inputs.python-versions }})""
         echo PYTHON_VERSIONS="${python_versions}"
