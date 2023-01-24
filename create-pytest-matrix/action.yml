@@ -16,12 +16,19 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Convert `python-versions` to JSON list
+      run: |
+        SEPARATOR='", "'
+        PYTHON_VERSIONS="$( printf "${SEPARATOR}%s" "${{ inputs.python-versions }}" )"
+        PYTHON_VERSIONS="${PYTHON_VERSIONS:${#SEPARATOR}}"
+        echo "${PYTHON_VERSIONS}"
+      shell: bash
     - run: |-
         echo '
           {
             "fail-fast": false,
             "matrix": {
-              "python-version": ["${{ join(inputs.python-versions, '", "') }}"],
+              "python-version": [${PYTHON_VERSIONS}],
               "include": [
                 {
                   "coverage-target": "ampform_dpd",
