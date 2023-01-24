@@ -17,7 +17,7 @@ runs:
   using: composite
   steps:
     - name: Convert `python-versions` to JSON list
-      run: $GITHUB_ACTION_PATH/get-json-python-versions.sh
+      run: $GITHUB_ACTION_PATH/get-json-python-versions.sh ${{ inputs.python-versions }}
       shell: bash
     - run: |-
         echo '

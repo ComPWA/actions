@@ -3,6 +3,8 @@ function to_json_list() {
   result=$(printf "%s" "$separator" "${@/#/$separator}")
   echo '["'${result}'"]'
 }
-python_versions="$(to_json_list ${{ inputs.python-versions }})"
-echo "PYTHON_VERSIONS=${python_versions}"
-echo "{PYTHON_VERSIONS}=${python_versions}" >> $GITHUB_ENV
+
+PYTHON_VERSIONS="$@"
+JSON="$(to_json_list ${PYTHON_VERSIONS}})"
+echo "PYTHON_VERSIONS=${JSON}"
+echo "{PYTHON_VERSIONS}=${JSON}" >>$GITHUB_ENV
