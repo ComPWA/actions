@@ -8,29 +8,12 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Create matrix
-        run: |-
-          echo '
-            {
-              "fail-fast": false,
-              "matrix": {
-                "python-version": ["3.8", "3.9", "3.10"],
-                "include": [
-                  {
-                    "coverage-target": "ampform_dpd",
-                    "python-version": "3.7"
-                  }
-                ]
-              }
-            }
-          ' > matrix.json
-      - run: cat matrix.json
-      - id: set-matrix
-        run: |
-          delimiter="$(openssl rand -hex 8)"
-          echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-          cat matrix.json >> $GITHUB_OUTPUT
-          echo "${delimiter}" >> $GITHUB_OUTPUT
+      - uses: ComPWA/actions/create-pytest-matrix@dev
+        with:
+          python-versions: >-
+            3.8
+            3.9
+            3.10
 
   run-matrix:
     needs: create-matrix

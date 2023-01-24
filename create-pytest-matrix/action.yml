@@ -1,0 +1,44 @@
+name: Create run matrix of python versions
+description: >-
+  Create a run matrix of python versions for pytest workflow.
+
+inputs:
+  python-versions:
+    description: Python version used to install the pip packages.
+    required: true
+
+outputs:
+  matrix:
+    description: >-
+      A JSON object that can be used for setting `jobs.<job_id>.strategy`.
+    value: ${{ steps.set-matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - run: |-
+        echo '
+          {
+            "fail-fast": false,
+            "matrix": {
+              "python-version": ["3.8", "3.9", "3.10"],
+              "include": [
+                {
+                  "coverage-target": "ampform_dpd",
+                  "python-version": "3.7"
+                }
+              ]
+            }
+          }
+        ' > matrix.json
+      shell: bash
+
+    - run: cat matrix.json
+      shell: bash
+    - id: set-matrix
+      run: |
+        delimiter="$(openssl rand -hex 8)"
+        echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
+        cat matrix.json >> $GITHUB_OUTPUT
+        echo "${delimiter}" >> $GITHUB_OUTPUT
+      shell: bash
