@@ -1,9 +1,11 @@
 {
   "recommendations": [
     "christian-kohler.path-intellisense",
+    "cschleiden.vscode-github-actions",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
     "esbenp.prettier-vscode",
+    "foxundermoon.shell-format",
     "github.vscode-pull-request-github",
     "mhutchie.git-graph",
     "redhat.vscode-yaml",
@@ -12,7 +14,6 @@
     "travisillig.vscode-json-stable-stringify",
     "trentrand.git-commit-helper-vscode",
     "tyriar.sort-lines",
-    "yzhang.markdown-all-in-one",
-    "cschleiden.vscode-github-actions"
+    "yzhang.markdown-all-in-one"
   ]
 }
