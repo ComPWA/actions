@@ -8,9 +8,9 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - id: set-matrix
+      - name: Create matrix
         run: >-
-          echo 'matrix={
+          echo '
             "strategy": [
               {
                 "fast-fail": false,
@@ -24,7 +24,10 @@ jobs:
                   ]
                 },
               }
-          }' >> $GITHUB_OUTPUT
+          }' > matrix.json
+      - run: cat matrix.json
+      - id: set-matrix
+        run: cat matrix.json >> $GITHUB_OUTPUT
 
   job2:
     needs: create-matrix
