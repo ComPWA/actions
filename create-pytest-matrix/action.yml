@@ -19,8 +19,11 @@ runs:
     - name: Convert `python-versions` to JSON list
       run: |
         function join_words() {
-          local IFS='", "'
-          echo "$*"
+          local separator='", "'
+          shift
+          local first="${separator}"
+          shift
+          printf "%s" "$first" "${@/#/$separator}"
         }
         python_versions='["'$(join_words ${{ inputs.python-versions }})'"]'
         echo "${python_versions}"
