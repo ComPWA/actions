@@ -12,6 +12,7 @@
     "travisillig.vscode-json-stable-stringify",
     "trentrand.git-commit-helper-vscode",
     "tyriar.sort-lines",
-    "yzhang.markdown-all-in-one"
+    "yzhang.markdown-all-in-one",
+    "cschleiden.vscode-github-actions"
   ]
 }

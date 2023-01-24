@@ -1,0 +1,33 @@
+name: Requirements
+
+on: push
+
+jobs:
+  create-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: >-
+          echo 'matrix={
+            "strategy": [
+              {
+                "fast-fail": false,
+                "matrix": {
+                  "python-version": ["3.8", "3.9", "3.10"],
+                  "include": [
+                    {
+                      "coverage-target": "ampform_dpd",
+                      "python-version": "3.7"
+                    }
+                  ]
+                },
+              }
+          }' >> $GITHUB_OUTPUT
+
+  job2:
+    needs: create-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ fromJSON(needs.create-matrix.outputs.matrix) }}"
