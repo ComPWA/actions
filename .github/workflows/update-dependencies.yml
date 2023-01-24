@@ -9,7 +9,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Create matrix
-        run: |
+        run: |-
           echo '
             {
               "fast-fail": false,
@@ -21,7 +21,7 @@ jobs:
                     "python-version": "3.7"
                   }
                 ]
-              },
+              }
             }
           ' > matrix.json
       - run: cat matrix.json
