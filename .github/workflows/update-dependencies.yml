@@ -20,7 +20,8 @@ jobs:
                     "python-version": "3.7"
                   }
                 ]
-              }
+              },
+              "fast-fail": false
             }
           ' > matrix.json
       - run: cat matrix.json
