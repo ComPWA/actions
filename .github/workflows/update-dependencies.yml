@@ -36,4 +36,4 @@ jobs:
     needs: create-matrix
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+      - run: echo ${{ needs.create-matrix.outputs.matrix }}
