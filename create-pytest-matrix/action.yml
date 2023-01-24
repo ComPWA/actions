@@ -24,7 +24,7 @@ runs:
           {
             "fail-fast": false,
             "matrix": {
-              "python-version": [${PYTHON_VERSIONS}],
+              "python-version": ${{ env.PYTHON_VERSIONS }},
               "include": [
                 {
                   "coverage-target": "ampform_dpd",
