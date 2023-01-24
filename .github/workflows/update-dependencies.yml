@@ -9,7 +9,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Create matrix
-        run: >-
+        run: |
           echo '
             "strategy": [
               {
@@ -26,8 +26,15 @@ jobs:
               }
           }' > matrix.json
       - run: cat matrix.json
+      - run: |
+          delimiter="$(openssl rand -hex 8)"
+          sed 's/\n/'${delimiter}'/g' matrix.json
       - id: set-matrix
-        run: cat matrix.json >> $GITHUB_OUTPUT
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
+          sed 's/\n/'${delimiter}'/g' matrix.json >> $GITHUB_OUTPUT
+          echo "${delimiter}" >> $GITHUB_OUTPUT
 
   job2:
     needs: create-matrix
