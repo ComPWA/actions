@@ -11,20 +11,19 @@ jobs:
       - name: Create matrix
         run: |
           echo '
-            "strategy": [
-              {
-                "fast-fail": false,
-                "matrix": {
-                  "python-version": ["3.8", "3.9", "3.10"],
-                  "include": [
-                    {
-                      "coverage-target": "ampform_dpd",
-                      "python-version": "3.7"
-                    }
-                  ]
-                },
-              }
-          }' > matrix.json
+            {
+              "fast-fail": false,
+              "matrix": {
+                "python-version": ["3.8", "3.9", "3.10"],
+                "include": [
+                  {
+                    "coverage-target": "ampform_dpd",
+                    "python-version": "3.7"
+                  }
+                ]
+              },
+            }
+          ' > matrix.json
       - run: cat matrix.json
       - run: |
           delimiter="$(openssl rand -hex 8)"
@@ -36,8 +35,9 @@ jobs:
           sed 's/\n/'${delimiter}'/g' matrix.json >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
 
-  job2:
+  run-matrix:
     needs: create-matrix
+    strategy: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ fromJSON(needs.create-matrix.outputs.matrix) }}"
+      - run: echo Yay
