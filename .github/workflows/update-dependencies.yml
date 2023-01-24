@@ -25,14 +25,11 @@ jobs:
             }
           ' > matrix.json
       - run: cat matrix.json
-      - run: |
-          delimiter="$(openssl rand -hex 8)"
-          sed 's/\n/'${delimiter}'/g' matrix.json
       - id: set-matrix
         run: |
           delimiter="$(openssl rand -hex 8)"
           echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-          sed 's/\n/'${delimiter}'/g' matrix.json >> $GITHUB_OUTPUT
+          cat matrix.json >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
 
   run-matrix:
