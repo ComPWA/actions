@@ -19,11 +19,10 @@ runs:
     - name: Convert `python-versions` to JSON list
       run: |
         function join_words() {
-          local IFS="$1"
-          shift
+          local IFS='", "'
           echo "$*"
         }
-        python_versions='["'$(join_words '", "' ${{ inputs.python-versions }})'"]'
+        python_versions='["'$(join_words ${{ inputs.python-versions }})'"]'
         echo "${python_versions}"
         echo "{PYTHON_VERSIONS}=${python_versions}" >> $GITHUB_ENV
       shell: bash
