@@ -7,4 +7,4 @@ function to_json_list() {
 
 PYTHON_VERSIONS="$@"
 JSON="$(to_json_list ${PYTHON_VERSIONS})"
-echo "{PYTHON_VERSIONS}=${JSON}" >>$GITHUB_ENV
+echo "PYTHON_VERSIONS=${JSON}" >>$GITHUB_ENV
