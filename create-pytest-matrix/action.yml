@@ -18,9 +18,13 @@ runs:
   steps:
     - name: Convert `python-versions` to JSON list
       run: |
+        function join_words() {
+          local IFS="$1"
+          shift
+          echo "$*"
+        }
         SEPARATOR='", "'
-        PYTHON_VERSIONS="$( printf "${SEPARATOR}%s" "${{ inputs.python-versions }}" )"
-        PYTHON_VERSIONS="${PYTHON_VERSIONS:${#SEPARATOR}}"
+        PYTHON_VERSIONS='"'$(join_words $SEPARATOR ${{ inputs.python-versions }})'"'
         echo "${PYTHON_VERSIONS}"
       shell: bash
     - run: |-
