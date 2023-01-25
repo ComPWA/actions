@@ -11,6 +11,11 @@
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -18,6 +23,11 @@
   "editor.formatOnSave": true,
   "editor.wrappingStrategy": "advanced",
   "git.rebaseWhenSync": true,
+  "isort.check": true,
+  "isort.importStrategy": "fromEnvironment",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
   "telemetry.telemetryLevel": "off",
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": ".github/workflows/codecov.yml"

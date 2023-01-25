@@ -1,13 +1,15 @@
 {
   "recommendations": [
+    "bungcip.better-toml",
     "christian-kohler.path-intellisense",
     "cschleiden.vscode-github-actions",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
     "esbenp.prettier-vscode",
-    "foxundermoon.shell-format",
     "github.vscode-pull-request-github",
     "mhutchie.git-graph",
+    "ms-python.isort",
+    "ms-python.python",
     "redhat.vscode-yaml",
     "stkb.rewrap",
     "streetsidesoftware.code-spell-checker",
