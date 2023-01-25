@@ -17,5 +17,6 @@ jobs:
   run-matrix:
     needs: create-matrix
     runs-on: ubuntu-22.04
+    strategy: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - run: echo '${{ needs.create-matrix.outputs.matrix }}'
