@@ -2,7 +2,6 @@
   "recommendations": [
     "bungcip.better-toml",
     "christian-kohler.path-intellisense",
-    "cschleiden.vscode-github-actions",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
     "esbenp.prettier-vscode",

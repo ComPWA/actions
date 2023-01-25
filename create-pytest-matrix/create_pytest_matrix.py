@@ -54,6 +54,7 @@ def create_job_matrix(
         )
     matrix = {
         "python-version": python_versions,
+        "runs-on": "ubuntu-22.04",
     }
     if includes:
         matrix["include"] = includes

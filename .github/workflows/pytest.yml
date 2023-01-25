@@ -1,44 +1,58 @@
 on:
   workflow_call:
     inputs:
+      coverage-python-version:
+        default: "3.8"
+        required: false
+        type: string
       coverage-target:
+        required: false
+        type: string
+      macos-python-version:
         required: false
         type: string
       multithreaded:
         default: true
         required: false
         type: boolean
-      python-version:
-        required: true
-        type: string
-      runs-on:
-        default: ubuntu-22.04
-        required: false
-        type: string
       test-output-path:
         required: false
         type: string
 
 jobs:
+  create-matrix:
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    runs-on: ubuntu-22.04
+    steps:
+      - id: set-matrix
+        uses: ComPWA/actions/create-pytest-matrix@dev
+        with:
+          coverage-python-version: ${{ inputs.coverage-python-version }}
+          coverage-target: ${{ inputs.coverage-target }}
+          macos-python-version: ${{macos-python-version }}
+
   pytest:
     name: Run unit tests
-    runs-on: ${{ inputs.runs-on }}
+    needs: create-matrix
+    runs-on: ${{ matrix.runs-on }}
+    strategy: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v3
       - uses: ComPWA/actions/pip-install@dev
         with:
           additional-packages: tox
           extras: test
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ matrix.python-version }}
 
-      - if: inputs.coverage-target == '' && inputs.multithreaded
+      - if: matrix.coverage-target == '' && inputs.multithreaded
         run: pytest -n auto
-      - if: inputs.coverage-target == '' && ! inputs.multithreaded
+      - if: matrix.coverage-target == '' && ! inputs.multithreaded
         run: pytest
 
-      - if: inputs.coverage-target != ''
-        run: pytest --cov=${{ inputs.coverage-target }} --cov-report=xml
-      - if: inputs.coverage-target != ''
+      - if: matrix.coverage-target != ''
+        run: pytest --cov=${{ matrix.coverage-target }} --cov-report=xml
+      - if: matrix.coverage-target != ''
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
@@ -47,5 +61,5 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: inputs.test-output-path != ''
         with:
-          name: test-output-${{ inputs.runs-on }}-${{ inputs.python-version }}
+          name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
           path: ${{ inputs.test-output-path }}
