@@ -8,6 +8,7 @@ from configparser import ConfigParser
 from typing import Optional, Sequence
 
 DEFAULT_LINUX = "ubuntu-22.04"
+DEFAULT_MACOS = "macos-12"
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -52,7 +53,7 @@ def create_job_matrix(
         includes.append(
             {
                 "python-version": macos_python_version,
-                "runs-on": "macos-12",
+                "runs-on": DEFAULT_MACOS,
             }
         )
     matrix = {
