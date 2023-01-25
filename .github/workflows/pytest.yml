@@ -30,7 +30,7 @@ jobs:
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
-          macos-python-version: ${{macos-python-version }}
+          macos-python-version: ${{ inputs.macos-python-version }}
 
   pytest:
     name: Run unit tests
