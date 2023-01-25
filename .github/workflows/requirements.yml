@@ -74,7 +74,7 @@ jobs:
       - name: Commit and push changes
         if: github.event_name != 'schedule'
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}
           git config --global user.name "GitHub"
           git config --global user.email "noreply@github.com"
           git checkout -b ${GITHUB_HEAD_REF}
