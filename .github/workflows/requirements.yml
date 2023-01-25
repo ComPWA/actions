@@ -1,6 +1,6 @@
 on:
   workflow_call:
-    inputs:
+    secrets:
       token:
         description: >-
           Personal Access Token for GitHub. This needs to be set as a secret by
@@ -11,7 +11,6 @@ on:
           This page tells more about creating a PAT:
           https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
         required: true
-        type: string
 
 jobs:
   create-matrix:
@@ -59,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ inputs.token }}
+          token: ${{ secrets.token }}
       - uses: actions/download-artifact@v3
       - run: ls -A
       - name: Move artifacts to correct location
@@ -74,7 +73,7 @@ jobs:
       - name: Commit and push changes
         if: github.event_name != 'schedule'
         run: |
-          git remote set-url origin https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
           git config --global user.name "GitHub"
           git config --global user.email "noreply@github.com"
           git checkout -b ${GITHUB_HEAD_REF}
