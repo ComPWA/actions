@@ -7,6 +7,8 @@ from argparse import ArgumentParser
 from configparser import ConfigParser
 from typing import Optional, Sequence
 
+DEFAULT_LINUX = "ubuntu-22.04"
+
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = ArgumentParser(__doc__)
@@ -43,6 +45,7 @@ def create_job_matrix(
             {
                 "coverage-target": coverage_target,
                 "python-version": coverage_python_version,
+                "runs-on": DEFAULT_LINUX,
             }
         )
     if macos_python_version:
@@ -54,7 +57,7 @@ def create_job_matrix(
         )
     matrix = {
         "python-version": python_versions,
-        "runs-on": ["ubuntu-22.04"],
+        "runs-on": [DEFAULT_LINUX],
     }
     if includes:
         matrix["include"] = includes
