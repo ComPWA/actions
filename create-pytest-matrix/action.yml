@@ -31,6 +31,8 @@ runs:
   steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
     - id: set-matrix
       run: |-
         delimiter="$(openssl rand -hex 8)"
