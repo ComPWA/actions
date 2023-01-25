@@ -37,7 +37,9 @@ jobs:
     name: Run unit tests
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
-    strategy: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v3
       - uses: ComPWA/actions/pip-install@dev

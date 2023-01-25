@@ -62,10 +62,7 @@ def create_job_matrix(
     }
     if includes:
         matrix["include"] = includes
-    return {
-        "fail-fast": False,
-        "matrix": matrix,
-    }
+    return matrix
 
 
 def get_supported_python_versions() -> list[str]:
