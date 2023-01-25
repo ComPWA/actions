@@ -14,7 +14,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("coverage-target")
     parser.add_argument("macos-python-version")
     args = parser.parse_args(argv)
-    print(args.__dict__)
     matrix = create_job_matrix(
         args.__dict__["coverage-python-version"],
         args.__dict__["coverage-target"],
