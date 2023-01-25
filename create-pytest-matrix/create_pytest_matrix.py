@@ -25,8 +25,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
 
 def create_job_matrix(
-    coverage_target: str,
     coverage_python_version: str,
+    coverage_target: str,
     macos_python_version: str,
 ) -> dict:
     python_versions = get_supported_python_versions()
