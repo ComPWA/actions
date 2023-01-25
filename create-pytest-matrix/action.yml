@@ -45,5 +45,5 @@ runs:
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash
     - name: Print matrix result
-      run: echo ${{ steps.set-matrix.outputs.matrix }}
+      run: echo "${{ steps.set-matrix.outputs.matrix }}"
       shell: bash
