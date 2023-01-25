@@ -1,16 +1,13 @@
 {
   "author": "ComPWA",
-  "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@actions/github": "^5.1.1"
-  },
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
   "main": "main.js",
   "name": "create-pytest-matrix",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  }
 }
