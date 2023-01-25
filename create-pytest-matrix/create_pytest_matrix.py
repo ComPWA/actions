@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from configparser import ConfigParser
-from pathlib import Path
 from typing import Optional, Sequence
 
 
