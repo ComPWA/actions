@@ -2,9 +2,6 @@
   "[git-commit]": {
     "rewrap.wrappingColumn": 72
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
