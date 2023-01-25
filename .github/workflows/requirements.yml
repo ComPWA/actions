@@ -15,6 +15,9 @@ on:
 jobs:
   create-matrix:
     name: Determine Python versions
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     runs-on: ubuntu-22.04
@@ -24,9 +27,6 @@ jobs:
 
   pip-constraints:
     name: Update pip constraints
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     needs:
       - create-matrix
     runs-on: ubuntu-22.04
