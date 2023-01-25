@@ -36,7 +36,7 @@ runs:
       run: |
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-        python3 $GITHUB_ACTION_PATH/create_pytest_matrix.py \
+        python3 $GITHUB_ACTION_PATH/main.py \
           '${{ inputs.coverage-python-version }}' \
           '${{ inputs.coverage-target }}' \
           '${{ inputs.macos-python-version }}' \
