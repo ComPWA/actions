@@ -21,6 +21,7 @@ on:
 
 jobs:
   create-matrix:
+    name: Determine job matrix
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     runs-on: ubuntu-22.04
