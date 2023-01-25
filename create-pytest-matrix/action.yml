@@ -34,6 +34,7 @@ runs:
       with:
         python-version: "3.8"
     - id: set-matrix
+      name: Create run matrix in JSON form
       run: |
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
