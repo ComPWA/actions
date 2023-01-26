@@ -46,6 +46,7 @@ jobs:
         with:
           additional-packages: tox
           extras: test
+          flags: -e
           python-version: ${{ matrix.python-version }}
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
