@@ -7,9 +7,6 @@ from argparse import ArgumentParser
 from configparser import ConfigParser
 from typing import Optional, Sequence
 
-DEFAULT_LINUX = "ubuntu-22.04"
-DEFAULT_MACOS = "macos-12"
-
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = ArgumentParser(__doc__)
@@ -40,29 +37,36 @@ def create_job_matrix(
                 f"Selected Python {coverage_python_version} for the coverage job, "
                 f"but the package only supports Python {', '.join(python_versions)}"
             ) from e
+    linux_version = determine_linux_version(python_versions)
     includes = []
     if coverage_target:
         includes.append(
             {
                 "coverage-target": coverage_target,
                 "python-version": coverage_python_version,
-                "runs-on": DEFAULT_LINUX,
+                "runs-on": linux_version,
             }
         )
     if macos_python_version:
         includes.append(
             {
                 "python-version": macos_python_version,
-                "runs-on": DEFAULT_MACOS,
+                "runs-on": "macos-12",
             }
         )
     matrix = {
         "python-version": python_versions,
-        "runs-on": [DEFAULT_LINUX],
+        "runs-on": [linux_version],
     }
     if includes:
         matrix["include"] = includes
     return matrix
+
+
+def determine_linux_version(python_versions: list[str]) -> str:
+    if "3.6" in python_versions:
+        return "ubuntu-20.04"
+    return "ubuntu-22.04"
 
 
 def get_supported_python_versions() -> list[str]:
