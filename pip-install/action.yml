@@ -5,15 +5,15 @@ description: >-
   directory and uses those to constrain the dependencies.
 
 inputs:
+  editable:
+    description: Install the package in editable mode (`-e` flag).
+    required: false
   extras:
     description: Any optional dependencies that the package specifies.
     required: true
   python-version:
     description: Python version used to install the pip packages.
     required: true
-  flags:
-    description: Flags that should be passed to `pip install`.
-    required: false
   additional-packages:
     default: ""
     description: Any additional packages that need to be installed.
@@ -32,9 +32,17 @@ runs:
         restore-keys: |
           pip-${{ inputs.extras }}-${{ runner.os }}-py${{ inputs.python-version }}
         path: ~/.cache/pip/
-    - run: ${{ format('pip install .[{0}] {1} {2}', inputs.extras, inputs.additional-packages, inputs.flags ) }}
+    - name: Set editable flag
+      run: |
+        if [[ -z '${{ inputs.editable}}' ]]; then
+          echo 'EDITABLE=-e' >> $GITHUB_ENV
+        else
+          echo 'EDITABLE=' >> $GITHUB_ENV
+        fi
+      shell: bash
+    - run: ${{ format('pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('pip install .[{0}] {1} {2} -c .constraints/py{3}.txt', inputs.extras, inputs.additional-packages, inputs.flags, inputs.python-version ) }}
+    - run: ${{ format('pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, inputs.python-version ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
