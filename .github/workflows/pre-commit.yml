@@ -10,10 +10,10 @@ jobs:
   determine-hooks:
     name: Determine sipped pre-commit hooks
     outputs:
-      hooks: ${{ steps.hooks.outputs.skipped-hooks }}
+      skipped-hooks: ${{ steps.set-hooks.outputs.skipped-hooks }}
     runs-on: ubuntu-22.04
     steps:
-      - id: hooks
+      - id: set-hooks
         uses: ComPWA/actions/get-skipped-pre-commit-hooks@dev
 
   pre-commit:
