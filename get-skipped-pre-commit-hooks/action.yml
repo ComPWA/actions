@@ -8,7 +8,7 @@ outputs:
     description: >-
       Space-separated string of pre-commit hooks that are not run on
       pre-commit.ci.
-    value: ${{ steps.hooks.outputs.skipped-hooks }}
+    value: ${{ steps.skipped-hooks.outputs.hooks }}
 
 runs:
   using: composite
@@ -19,8 +19,8 @@ runs:
         python-version: "3.8"
     - run: pip install PyYAML
       shell: bash
-    - id: hooks
-      name: Set `skipped-hooks` output
+    - id: skipped-hooks
+      name: Determine skipped hooks
       run: |
-        echo "skipped-hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" >> $GITHUB_OUTPUT
+        echo "hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" >> $GITHUB_OUTPUT
       shell: bash
