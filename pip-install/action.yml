@@ -32,9 +32,9 @@ runs:
         restore-keys: |
           pip-${{ inputs.extras }}-${{ runner.os }}-py${{ inputs.python-version }}
         path: ~/.cache/pip/
-    - run: ${{ format('pip install .[{0}] {1} {2}', inputs.extras, inputs.additional-packages, inputs-flags ) }}
+    - run: ${{ format('pip install .[{0}] {1} {2}', inputs.extras, inputs.additional-packages, inputs.flags ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('pip install .[{0}] {1} {2} -c .constraints/py{3}.txt', inputs.extras, inputs.additional-packages, inputs-flags, inputs.python-version ) }}
+    - run: ${{ format('pip install .[{0}] {1} {2} -c .constraints/py{3}.txt', inputs.extras, inputs.additional-packages, inputs.flags, inputs.python-version ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
