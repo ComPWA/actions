@@ -37,14 +37,21 @@ def create_job_matrix(
                 f"Selected Python {coverage_python_version} for the coverage job, "
                 f"but the package only supports Python {', '.join(python_versions)}"
             ) from e
-    linux_version = determine_linux_version(python_versions)
     includes = []
+    if "3.6" in python_versions:
+        python_versions.remove("3.6")
+        includes.append(
+            {
+                "python-version": macos_python_version,
+                "runs-on": "ubuntu-20.04",
+            }
+        )
     if coverage_target:
         includes.append(
             {
                 "coverage-target": coverage_target,
                 "python-version": coverage_python_version,
-                "runs-on": linux_version,
+                "runs-on": "ubuntu-22.04",
             }
         )
     if macos_python_version:
@@ -56,17 +63,11 @@ def create_job_matrix(
         )
     matrix = {
         "python-version": python_versions,
-        "runs-on": [linux_version],
+        "runs-on": ["ubuntu-22.04"],
     }
     if includes:
         matrix["include"] = includes
     return matrix
-
-
-def determine_linux_version(python_versions: list[str]) -> str:
-    if "3.6" in python_versions:
-        return "ubuntu-20.04"
-    return "ubuntu-22.04"
 
 
 def get_supported_python_versions() -> list[str]:
