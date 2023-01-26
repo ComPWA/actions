@@ -18,7 +18,8 @@ runs:
       with:
         python-version: "3.8"
         cache: pip
-    - uses: pip install PyYAML
+    - run: pip install PyYAML
+      shell: bash
     - id: hooks
       name: Set `skipped-hooks` output
       run: |
