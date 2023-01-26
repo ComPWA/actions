@@ -36,7 +36,7 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: pre-commit run -a
+        run: pre-commit run -a --color always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
