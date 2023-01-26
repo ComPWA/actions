@@ -42,7 +42,7 @@ def create_job_matrix(
         python_versions.remove("3.6")
         includes.append(
             {
-                "python-version": macos_python_version,
+                "python-version": "3.6",
                 "runs-on": "ubuntu-20.04",
             }
         )
