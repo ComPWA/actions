@@ -17,6 +17,7 @@ jobs:
   linkcheck:
     uses: ./.github/workflows/linkcheck.yml
     with:
+      apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
 
   docnb:

@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      apt-packages:
+        required: false
+        type: string
       python-version:
         default: "3.8"
         required: false
@@ -17,4 +20,6 @@ jobs:
           additional-packages: tox
           extras: doc
           python-version: ${{ inputs.python-version }}
+      - if: inputs.apt-packages
+        run: sudo apt install -y ${{ inputs.apt-packages }}
       - run: tox -e linkcheck
