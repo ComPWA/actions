@@ -35,9 +35,9 @@ runs:
     - name: Set editable flag
       run: |
         if [[ -z '${{ inputs.editable}}' ]]; then
-          echo 'EDITABLE=-e' >> $GITHUB_ENV
+          echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         else
-          echo 'EDITABLE=' >> $GITHUB_ENV
+          echo 'EDITABLE=' | tee -a $GITHUB_ENV
         fi
       shell: bash
     - run: ${{ format('pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
