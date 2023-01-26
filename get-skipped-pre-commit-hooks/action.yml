@@ -7,7 +7,8 @@ outputs:
   skipped-hooks:
     description: >-
       Space-separated string of pre-commit hooks that are not run on
-      pre-commit.ci.
+      pre-commit.ci. Returns "ALL" if there is no pre.commit.ci config section
+      in the `pre-commit-config.yaml`.
     value: ${{ steps.set-hooks.outputs.hooks }}
 
 runs:
