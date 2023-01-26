@@ -22,5 +22,5 @@ runs:
     - id: skipped-hooks
       name: Determine skipped hooks
       run: |
-        echo "hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" >> $GITHUB_OUTPUT
+        echo "hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
       shell: bash
