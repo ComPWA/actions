@@ -1,18 +1,28 @@
 on:
   workflow_call:
     inputs:
-      hooks:
-        description: Pre-commit hooks to run, whitespace-separated
-        required: true
-        type: string
       python-version:
         default: "3.8"
         required: false
         type: string
 
 jobs:
+  determine-hooks:
+    name: Determine which hooks are not run on pre-commit.ci
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    outputs:
+      hooks: ${{ steps.hooks.outputs.skipped-hooks }}
+    runs-on: ubuntu-22.04
+    steps:
+      - id: hooks
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@dev
+
   pre-commit:
     name: Run local pre-commit hooks
+    if: needs.determine-hooks.outputs.skipped-hooks != ''
+    needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -30,6 +40,6 @@ jobs:
           path: ~/.cache/pre-commit/
       - name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
-          for hook in ${{ inputs.hooks }}; do
+          for hook in ${{ needs.determine-hooks.outputs.skipped-hooks }}; do
             pre-commit run $hook -a --color always
           done

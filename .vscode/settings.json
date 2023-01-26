@@ -30,6 +30,8 @@
   "python.formatting.provider": "black",
   "telemetry.telemetryLevel": "off",
   "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow.json": ".github/workflows/codecov.yml"
+    "https://json.schemastore.org/github-workflow.json": [
+      ".github/workflows/requirements.yml"
+    ]
   }
 }

@@ -1,0 +1,26 @@
+name: Find which hooks are skipped on pre-commit.ci
+description: >-
+  Find which hooks are skipped on pre-commit.ci and that have to be run on
+  GitHub Actions instead.
+
+outputs:
+  skipped-hooks:
+    description: >-
+      Space-separated string of pre-commit hooks that are not run on
+      pre-commit.ci.
+    value: ${{ steps.hooks.outputs.skipped-hooks }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+        cache: pip
+    - uses: pip install PyYAML
+    - id: hooks
+      name: Set `skipped-hooks` output
+      run: |
+        echo "skipped-hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" >> $GITHUB_OUTPUT
+      shell: bash
