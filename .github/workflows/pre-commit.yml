@@ -9,9 +9,6 @@ on:
 jobs:
   determine-hooks:
     name: Determine which hooks are not run on pre-commit.ci
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       hooks: ${{ steps.hooks.outputs.skipped-hooks }}
     runs-on: ubuntu-22.04
