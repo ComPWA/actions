@@ -1,7 +1,10 @@
 # Custom Dictionary Words
+bdist
 codecov
 Conda
 isinstance
 isort
 nargs
+PyPI
 pytest
+sdist
