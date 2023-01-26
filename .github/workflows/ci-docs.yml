@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      apt-packages:
+        required: false
+        type: string
       gh-pages:
         default: false
         required: false
@@ -20,6 +23,7 @@ jobs:
     name: nb
     uses: ./.github/workflows/docnb.yml
     with:
+      apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
 
   gh-pages:
