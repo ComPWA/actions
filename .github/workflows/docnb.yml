@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      apt-packages:
+        required: false
+        type: string
       python-version:
         default: "3.8"
         required: false
@@ -26,6 +29,8 @@ jobs:
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}
           path: |
             ./docs/_build/.jupyter_cache
+      - if: inputs.apt-packages
+        run: sudo apt install -y ${{ inputs.apt-packages }}
       - name: Build documentation and run notebooks
         run: tox -e docnb
       - uses: actions/upload-pages-artifact@v1
