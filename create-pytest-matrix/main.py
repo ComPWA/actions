@@ -79,10 +79,12 @@ def create_job_matrix(
                 "runs-on": "macos-12",
             }
         )
-    matrix = {
-        "python-version": python_versions,
-        "runs-on": ["ubuntu-22.04"],
-    }
+    matrix = {}
+    if python_versions:
+        matrix = {
+            "python-version": python_versions,
+            "runs-on": ["ubuntu-22.04"],
+        }
     if includes:
         matrix["include"] = includes
     return matrix
