@@ -42,7 +42,7 @@ jobs:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
           macos-python-version: ${{ inputs.macos-python-version }}
-          skipped-python-versions: ${{ skipped-python-versions }}
+          skipped-python-versions: ${{ inputs.skipped-python-versions }}
 
   pytest:
     name: Run unit tests
