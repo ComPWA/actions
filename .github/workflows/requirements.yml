@@ -71,7 +71,7 @@ jobs:
           fi
       - run: git status -s
       - name: Commit and push changes
-        if: github.event_name != 'schedule'
+        if: github.event_name == 'pull_request'
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
           git config --global user.name "GitHub"
