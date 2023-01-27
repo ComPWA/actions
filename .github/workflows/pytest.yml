@@ -50,7 +50,7 @@ jobs:
         with:
           editable: "yes"
           additional-packages: tox
-          extras: ${{ format('test{0}', inputs.additional-extras) }}
+          extras: ${{ join(',', 'test', inputs.additional-extras) }}
           python-version: ${{ matrix.python-version }}
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
