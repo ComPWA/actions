@@ -27,8 +27,7 @@ runs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
-    - if: runner.os == 'Linux'
-      run: echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
+    - run: echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
       shell: bash
     - if: runner.os == 'macOS'
       run: echo "PIP_CACHE_DIR=~/Library/Caches/pip" >> $GITHUB_ENV
