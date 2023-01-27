@@ -43,6 +43,7 @@ jobs:
           ijulia: true
       - name: Build documentation and run notebooks
         env:
+          GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: tox -e docnb
       - uses: actions/upload-pages-artifact@v1
