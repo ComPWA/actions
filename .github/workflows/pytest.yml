@@ -19,6 +19,9 @@ on:
         default: true
         required: false
         type: boolean
+      specific-pip-packages:
+        required: false
+        type: string
       test-output-path:
         required: false
         type: string
@@ -59,6 +62,7 @@ jobs:
           additional-packages: tox
           extras: ${{ env.TEST_EXTRAS }}
           python-version: ${{ matrix.python-version }}
+          specific-packages: ${{ inputs.specific-pip-packages }}
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
         run: pytest -n auto

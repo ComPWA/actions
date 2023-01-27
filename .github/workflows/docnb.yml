@@ -8,6 +8,9 @@ on:
         default: "3.8"
         required: false
         type: string
+      specific-pip-packages:
+        required: false
+        type: string
 
 jobs:
   docnb:
@@ -20,6 +23,7 @@ jobs:
           additional-packages: tox
           extras: doc
           python-version: ${{ inputs.python-version }}
+          specific-packages: ${{ inputs.specific-pip-packages }}
       - name: Fetch Jupyter cache
         uses: actions/cache@v3
         with:

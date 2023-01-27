@@ -17,6 +17,9 @@ inputs:
   python-version:
     description: Python version used to install the pip packages.
     required: true
+  specific-packages:
+    description: Python version used to install the pip packages.
+    required: false
 
 runs:
   using: composite
@@ -49,4 +52,7 @@ runs:
       shell: bash
     - run: ${{ format('pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, inputs.python-version ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
+      shell: bash
+    - run: pip install ${{ inputs.specific-packages }}
+      if: inputs.specific-packages
       shell: bash
