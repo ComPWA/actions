@@ -38,7 +38,7 @@ jobs:
       - if: inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
-        uses: ComPWA/actions/pip-install@dev
+        uses: ComPWA/actions/install-julia@dev
         with:
           ijulia: true
       - name: Build documentation and run notebooks
