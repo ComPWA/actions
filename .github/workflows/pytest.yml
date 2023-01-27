@@ -1,6 +1,10 @@
 on:
   workflow_call:
     inputs:
+      additional-extras:
+        description: Comma-separated additional extras that need to be installed for the tests.
+        required: false
+        type: string
       coverage-python-version:
         default: "3.8"
         required: false
@@ -46,7 +50,7 @@ jobs:
         with:
           editable: "yes"
           additional-packages: tox
-          extras: test
+          extras: ${{ format('test{0}', inputs.additional-extras) }}
           python-version: ${{ matrix.python-version }}
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
