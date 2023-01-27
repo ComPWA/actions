@@ -37,10 +37,14 @@ jobs:
       - uses: ComPWA/actions/cache-sympy@dev
       - if: inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
+      - if: hashFiles('**/Project.toml')
+        uses: ComPWA/actions/pip-install@dev
+        with:
+          ijulia: true
       - name: Build documentation and run notebooks
-        run: tox -e docnb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: tox -e docnb
       - uses: actions/upload-pages-artifact@v1
         if: always()
         with:

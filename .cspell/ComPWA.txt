@@ -2,5 +2,6 @@
 # https://compwa-org.rtfd.io/develop.html#commit-conventions
 compwa
 docnb
+IJulia
 MAINT
 rtfd
