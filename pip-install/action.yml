@@ -5,6 +5,9 @@ description: >-
   directory and uses those to constrain the dependencies.
 
 inputs:
+  additional-packages:
+    description: Space-separated list of additional packages that need to be installed.
+    required: false
   editable:
     description: Install the package in editable mode (`-e` flag).
     required: false
@@ -14,9 +17,6 @@ inputs:
   python-version:
     description: Python version used to install the pip packages.
     required: true
-  additional-packages:
-    description: Space-separated list of additional packages that need to be installed.
-    required: false
 
 runs:
   using: composite
@@ -24,12 +24,17 @@ runs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
+    - name: Set cache identifier
+      run: |
+        extras="${{ inputs.extras }}"
+        echo "CACHE_IDENTIFIER=${extras//,/-}" >> $GITHUB_ENV
+      shell: bash
     - uses: actions/cache@v3
       with:
         key: |
-          pip-${{ inputs.extras }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
+          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
         restore-keys: |
-          pip-${{ inputs.extras }}-${{ runner.os }}-py${{ inputs.python-version }}
+          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}
         path: ~/.cache/pip/
     - name: Set editable flag
       run: |
