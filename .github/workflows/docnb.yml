@@ -39,6 +39,8 @@ jobs:
         run: sudo apt install -y ${{ inputs.apt-packages }}
       - name: Build documentation and run notebooks
         run: tox -e docnb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-pages-artifact@v1
         if: always()
         with:

@@ -23,3 +23,5 @@ jobs:
       - if: inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
       - run: tox -e linkcheck
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
