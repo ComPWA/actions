@@ -1,4 +1,8 @@
 on:
+  release:
+    types:
+      - prereleased
+      - released
   workflow_call:
 
 jobs:
