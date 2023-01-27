@@ -27,6 +27,12 @@ runs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
+    - if: runner.os == 'Linux'
+      run: echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
+      shell: bash
+    - if: runner.os == 'macOS'
+      run: echo "PIP_CACHE_DIR=~/Library/Caches/pip" >> $GITHUB_ENV
+      shell: bash
     - name: Set cache identifier
       run: |
         extras="${{ inputs.extras }}"
@@ -38,7 +44,7 @@ runs:
           pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
         restore-keys: |
           pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}
-        path: ~/.cache/pip/
+        path: ${{ env.PIP_CACHE_DIR }}
     - name: Set editable flag
       run: |
         if [[ -z '${{ inputs.editable}}' ]]; then
