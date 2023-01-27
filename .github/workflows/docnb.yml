@@ -25,6 +25,7 @@ jobs:
           python-version: ${{ inputs.python-version }}
           specific-packages: ${{ inputs.specific-pip-packages }}
       - name: Fetch Jupyter cache
+        if: inputs.specific-pip-packages == ''
         uses: actions/cache@v3
         with:
           key: |
