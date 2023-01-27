@@ -57,7 +57,7 @@ jobs:
         with:
           editable: "yes"
           additional-packages: tox
-          extras: env.TEST_EXTRAS
+          extras: ${{ env.TEST_EXTRAS }}
           python-version: ${{ matrix.python-version }}
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
