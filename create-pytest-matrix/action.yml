@@ -17,6 +17,10 @@ inputs:
       Run tests on macOS on a specific version of Python. If left empty, the no
       macOS job will be created.
     required: false
+  skipped-python-versions:
+    description: >-
+      Do not run tests on the following supported Python versions.
+    required: false
 
 outputs:
   matrix:
@@ -40,6 +44,7 @@ runs:
           '${{ inputs.coverage-python-version }}' \
           '${{ inputs.coverage-target }}' \
           '${{ inputs.macos-python-version }}' \
+          '${{ inputs.skipped-python-versions }}' \
           | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash

@@ -19,6 +19,9 @@ on:
         default: true
         required: false
         type: boolean
+      skipped-python-versions:
+        required: false
+        type: string
       specific-pip-packages:
         required: false
         type: string
@@ -39,6 +42,7 @@ jobs:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
           macos-python-version: ${{ inputs.macos-python-version }}
+          skipped-python-versions: ${{ skipped-python-versions }}
 
   pytest:
     name: Run unit tests

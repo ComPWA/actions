@@ -13,22 +13,35 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("coverage-python-version")
     parser.add_argument("coverage-target")
     parser.add_argument("macos-python-version")
+    parser.add_argument("skipped-python-versions")
     args = parser.parse_args(argv)
     matrix = create_job_matrix(
         args.__dict__["coverage-python-version"],
         args.__dict__["coverage-target"],
         args.__dict__["macos-python-version"],
+        _format_skipped_version(args.__dict__["skipped-python-versions"]),
     )
     print(json.dumps(matrix, indent=2))
     return 0
+
+
+def _format_skipped_version(skipped_python_versions: str) -> set[str] | None:
+    if skipped_python_versions == "all":
+        return None
+    return set(skipped_python_versions.split(" "))
 
 
 def create_job_matrix(
     coverage_python_version: str,
     coverage_target: str,
     macos_python_version: str,
+    skipped_python_versions: set[str] | None,
 ) -> dict:
     python_versions = get_supported_python_versions()
+    if skipped_python_versions is None:
+        python_versions = []
+    else:
+        python_versions = sorted(set(python_versions) - skipped_python_versions)
     if coverage_target:
         try:
             python_versions.remove(coverage_python_version)
