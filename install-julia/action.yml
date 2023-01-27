@@ -44,5 +44,5 @@ runs:
       name: Install IJulia
       shell: bash
       run: |
-        julia -e 'import Pkg; Pkg.add("IJulia")'
-        julia -e 'import IJulia; IJulia.installkernel("julia")'
+        julia --color=yes -e 'import Pkg; Pkg.add("IJulia")'
+        julia --color=yes -e 'import IJulia; IJulia.installkernel("julia")'
