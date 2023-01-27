@@ -46,6 +46,8 @@ jobs:
 
   pytest:
     name: Run unit tests
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
     strategy:
