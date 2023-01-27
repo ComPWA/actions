@@ -39,18 +39,21 @@ def create_job_matrix(
     macos_python_version: str,
     skipped_python_versions: set[str] | None,
 ) -> dict:
-    python_versions = get_supported_python_versions()
+    supported_python_versions = get_supported_python_versions()
     if skipped_python_versions is None:
         python_versions = []
     else:
-        python_versions = sorted(set(python_versions) - skipped_python_versions)
+        python_versions = sorted(
+            set(supported_python_versions) - skipped_python_versions
+        )
     if coverage_target:
         try:
             python_versions.remove(coverage_python_version)
         except ValueError as e:
             raise ValueError(
-                f"Selected Python {coverage_python_version} for the coverage job, "
-                f"but the package only supports Python {', '.join(python_versions)}"
+                f"Selected Python {coverage_python_version} for the coverage job, but"
+                " the package only supports Python"
+                f" {', '.join(supported_python_versions)}"
             ) from e
     includes = []
     if "3.6" in python_versions:
