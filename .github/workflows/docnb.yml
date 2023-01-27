@@ -34,6 +34,7 @@ jobs:
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}
           path: |
             ./docs/_build/.jupyter_cache
+      - uses: ComPWA/actions/cache-sympy@dev
       - if: inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
       - name: Build documentation and run notebooks

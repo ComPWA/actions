@@ -63,6 +63,7 @@ jobs:
           extras: ${{ env.TEST_EXTRAS }}
           python-version: ${{ matrix.python-version }}
           specific-packages: ${{ inputs.specific-pip-packages }}
+      - uses: ComPWA/actions/cache-sympy@dev
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
         run: pytest -n auto

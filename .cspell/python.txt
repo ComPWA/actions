@@ -8,3 +8,4 @@ nargs
 PyPI
 pytest
 sdist
+SymPy

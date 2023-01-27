@@ -1,0 +1,22 @@
+name: Cache SymPy expressions
+description: >-
+  Upload any SymPy expression objects that have been cached to disk under
+  `~/.sympy-cache*/` folders.
+
+runs:
+  using: composite
+  steps:
+    - name: Determine if SymPy is installed.
+      run: >-
+        pip freeze | grep sympy
+        && echo "HAS_SYMPY=YES" >> $GITHUB_ENV
+        || echo "HAS_SYMPY=NO" >> $GITHUB_ENV
+      shell: bash
+    - name: Fetch SymPy cache
+      uses: actions/cache@v3
+      with:
+        key: |
+          sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}-${{hashFiles('src/**.py')}}
+        restore-keys: |
+          sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
+        path: ~/.sympy-cache*/
