@@ -47,14 +47,14 @@ def create_job_matrix(
             set(supported_python_versions) - skipped_python_versions
         )
     if coverage_target:
-        try:
-            python_versions.remove(coverage_python_version)
-        except ValueError as e:
+        if coverage_python_version not in supported_python_versions:
             raise ValueError(
                 f"Selected Python {coverage_python_version} for the coverage job, but"
                 " the package only supports Python"
                 f" {', '.join(supported_python_versions)}"
-            ) from e
+            )
+        if coverage_python_version in python_versions:
+            python_versions.remove(coverage_python_version)
     includes = []
     if "3.6" in python_versions:
         python_versions.remove("3.6")
