@@ -9,6 +9,9 @@ inputs:
   GH_TOKEN:
     description: Set to `secrets.GITHUB_TOKEN`
     required: true
+  ref:
+    description: Clean caches for this branch name or ref
+    required: false
 
 runs:
   using: composite
@@ -19,7 +22,7 @@ runs:
       shell: bash
     - if: github.event_name == 'workflow_dispatch'
       name: Set branch as ref
-      run: echo 'REF=${{ github.ref }}' | tee -a $GITHUB_ENV
+      run: echo 'REF=${{ inputs.ref || github.ref }}' | tee -a $GITHUB_ENV
       shell: bash
     - if: github.event_name != 'workflow_dispatch'
       name: Set GitHub PR ref as ref
