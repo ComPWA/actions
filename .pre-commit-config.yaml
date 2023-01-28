@@ -30,6 +30,15 @@ repos:
     hooks:
       - id: cspell
 
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: "2.7.1"
+    hooks:
+      - id: editorconfig-checker
+        exclude: >
+          (?x)^(
+            .*\.py
+          )$
+
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:
