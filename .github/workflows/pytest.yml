@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@dev
+        uses: ComPWA/actions/create-pytest-matrix@v1
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
@@ -62,14 +62,14 @@ jobs:
           else
             echo 'TEST_EXTRAS=test,${{ inputs.additional-extras }}' | tee -a $GITHUB_ENV
           fi
-      - uses: ComPWA/actions/pip-install@dev
+      - uses: ComPWA/actions/pip-install@v1
         with:
           editable: "yes"
           additional-packages: tox
           extras: ${{ env.TEST_EXTRAS }}
           python-version: ${{ matrix.python-version }}
           specific-packages: ${{ inputs.specific-pip-packages }}
-      - uses: ComPWA/actions/cache-sympy@dev
+      - uses: ComPWA/actions/cache-sympy@v1
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
         run: pytest -n auto

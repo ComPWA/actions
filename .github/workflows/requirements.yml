@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-python-version-matrix@dev
+        uses: ComPWA/actions/create-python-version-matrix@v1
 
   pip-constraints:
     name: Update pip constraints

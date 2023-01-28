@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - id: set-hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@dev
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v1
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: ComPWA/actions/pip-install@dev
+      - uses: ComPWA/actions/pip-install@v1
         with:
           extras: sty
           python-version: ${{ inputs.python-version }}
