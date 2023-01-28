@@ -15,6 +15,7 @@
   ],
   "enableFiletypes": ["git-commit"],
   "ignorePaths": [".cspell/*.txt", ".editorconfig", ".vscode/*.json"],
+  "ignoreWords": ["mhutchie", "noreply"],
   "language": "en-US",
   "version": "0.2"
 }

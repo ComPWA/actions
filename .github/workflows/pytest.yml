@@ -1,0 +1,91 @@
+on:
+  workflow_call:
+    inputs:
+      additional-extras:
+        description: Comma-separated additional extras that need to be installed for the tests.
+        required: false
+        type: string
+      coverage-python-version:
+        default: "3.8"
+        required: false
+        type: string
+      coverage-target:
+        required: false
+        type: string
+      macos-python-version:
+        required: false
+        type: string
+      multithreaded:
+        default: true
+        required: false
+        type: boolean
+      skipped-python-versions:
+        required: false
+        type: string
+      specific-pip-packages:
+        required: false
+        type: string
+      test-output-path:
+        required: false
+        type: string
+
+jobs:
+  create-matrix:
+    name: Determine job matrix
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    runs-on: ubuntu-22.04
+    steps:
+      - id: set-matrix
+        uses: ComPWA/actions/create-pytest-matrix@v1
+        with:
+          coverage-python-version: ${{ inputs.coverage-python-version }}
+          coverage-target: ${{ inputs.coverage-target }}
+          macos-python-version: ${{ inputs.macos-python-version }}
+          skipped-python-versions: ${{ inputs.skipped-python-versions }}
+
+  pytest:
+    name: Run unit tests
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: create-matrix
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Determine extras to install
+        run: |
+          if [[ -z '${{ inputs.additional-extras }}' ]]; then
+            echo 'TEST_EXTRAS=test' | tee -a $GITHUB_ENV
+          else
+            echo 'TEST_EXTRAS=test,${{ inputs.additional-extras }}' | tee -a $GITHUB_ENV
+          fi
+      - uses: ComPWA/actions/pip-install@v1
+        with:
+          editable: "yes"
+          additional-packages: tox
+          extras: ${{ env.TEST_EXTRAS }}
+          python-version: ${{ matrix.python-version }}
+          specific-packages: ${{ inputs.specific-pip-packages }}
+      - uses: ComPWA/actions/cache-sympy@v1
+
+      - if: matrix.coverage-target == '' && inputs.multithreaded
+        run: pytest -n auto
+      - if: matrix.coverage-target == '' && ! inputs.multithreaded
+        run: pytest
+
+      - if: matrix.coverage-target != ''
+        run: pytest --cov=${{ matrix.coverage-target }} --cov-report=xml
+      - if: matrix.coverage-target != ''
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+
+      - uses: actions/upload-artifact@v3
+        if: inputs.test-output-path != ''
+        with:
+          name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
+          path: ${{ inputs.test-output-path }}

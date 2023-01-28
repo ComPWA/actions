@@ -1,0 +1,48 @@
+name: Install Julia
+description: >-
+  Determine Julia version as pinned in `Manifest.toml` and install it with caching.
+
+inputs:
+  ijulia:
+    description: Install IJulia
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Determine Julia version
+      run: |
+        manifest_file=$(find -type f -name Manifest.toml | head -n1)
+        version=$(sed -n '3p' $manifest_file)
+        version=${version:17:-1}
+        echo "JULIA_VERSION=$version" | tee -a $GITHUB_ENV
+      shell: bash
+    - name: Fetch Julia cache
+      uses: actions/cache@v3
+      with:
+        key: |
+          julia-${{ env.JULIA_VERSION }}-${{hashFiles('**/Manifest.toml')}}-${{hashFiles('./**.jl')}}
+        restore-keys: |
+          julia-${{ env.JULIA_VERSION }}-${{hashFiles('**/Manifest.toml')}}
+          julia-${{ env.JULIA_VERSION }}
+          julia
+        path: |
+          ./julia-*/
+          ~/.julia/
+    - name: Install Julia
+      shell: bash
+      run: |
+        major_version=${JULIA_VERSION:0:-2}
+        filename=julia-${{ env.JULIA_VERSION }}-linux-x86_64.tar.gz
+        if [ ! -d julia-${{ env.JULIA_VERSION }} ]; then
+          wget -q https://julialang-s3.julialang.org/bin/linux/x64/${major_version}/${filename}
+          tar xzf ${filename}
+        fi
+        sudo ln -s $(pwd)/julia-${{ env.JULIA_VERSION }}/bin/julia /usr/local/bin/julia
+        julia --version
+    - if: inputs.ijulia
+      name: Install IJulia
+      shell: bash
+      run: |
+        julia --color=yes -e 'import Pkg; Pkg.add("IJulia")'
+        julia --color=yes -e 'import IJulia; IJulia.installkernel("julia")'

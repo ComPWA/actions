@@ -1,0 +1,10 @@
+on:
+  workflow_call:
+
+jobs:
+  close-milestone:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: mhutchie/update-milestone-on-release@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

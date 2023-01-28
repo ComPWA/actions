@@ -1,0 +1,50 @@
+name: Create run matrix of python versions
+description: >-
+  Create a run matrix of python versions for pytest workflow.
+
+inputs:
+  coverage-python-version:
+    default: "3.8"
+    description: Python version on which to run the test coverage job.
+    required: false
+  coverage-target:
+    description: >-
+      Name of the package over which to compute test coverage. Leave empty if
+      you do not want to compute test coverage.
+    required: false
+  macos-python-version:
+    description: >-
+      Run tests on macOS on a specific version of Python. If left empty, the no
+      macOS job will be created.
+    required: false
+  skipped-python-versions:
+    description: >-
+      Do not run tests on the following supported Python versions.
+    required: false
+
+outputs:
+  matrix:
+    description: >-
+      A JSON object that can be used for setting `jobs.<job_id>.strategy`.
+    value: ${{ steps.set-matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - id: set-matrix
+      name: Create run matrix in JSON form
+      run: |
+        delimiter="$(openssl rand -hex 8)"
+        echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
+        python3 $GITHUB_ACTION_PATH/main.py \
+          '${{ inputs.coverage-python-version }}' \
+          '${{ inputs.coverage-target }}' \
+          '${{ inputs.macos-python-version }}' \
+          '${{ inputs.skipped-python-versions }}' \
+          | tee -a $GITHUB_OUTPUT
+        echo "${delimiter}" >> $GITHUB_OUTPUT
+      shell: bash

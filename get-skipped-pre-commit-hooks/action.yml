@@ -1,0 +1,27 @@
+name: Find which hooks are skipped on pre-commit.ci
+description: >-
+  Find which hooks are skipped on pre-commit.ci and that have to be run on
+  GitHub Actions instead.
+
+outputs:
+  skipped-hooks:
+    description: >-
+      Space-separated string of pre-commit hooks that are not run on
+      pre-commit.ci. Returns "ALL" if there is no pre.commit.ci config section
+      in the `pre-commit-config.yaml`.
+    value: ${{ steps.set-hooks.outputs.hooks }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - run: pip install PyYAML
+      shell: bash
+    - id: set-hooks
+      name: Determine skipped hooks
+      run: |
+        echo "hooks=$(python3 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      shell: bash
