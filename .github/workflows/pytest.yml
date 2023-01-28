@@ -64,8 +64,8 @@ jobs:
           fi
       - uses: ComPWA/actions/pip-install@v1
         with:
-          editable: "yes"
           additional-packages: tox
+          editable: "yes"
           extras: ${{ env.TEST_EXTRAS }}
           python-version: ${{ matrix.python-version }}
           specific-packages: ${{ inputs.specific-pip-packages }}
