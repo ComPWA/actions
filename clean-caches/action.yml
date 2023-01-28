@@ -1,0 +1,39 @@
+name: Clean caches associated to closed PR
+description: >-
+  Remove the caches that were generated to a PR once that PR is closed. These
+  caches cannot be used by the default branch or by other branches and
+  therefore have no use anymore. See also
+  https://github.com/actions/cache/blob/main/tips-and-workarounds.md#force-deletion-of-caches-overriding-default-cache-eviction-policy.
+
+inputs:
+  GH_TOKEN:
+    description: Set to `secrets.GITHUB_TOKEN`
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - run: gh extension install actions/gh-actions-cache
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+      shell: bash
+    - if: github.event_name == 'workflow_dispatch'
+      name: Set branch as ref
+      run: echo 'REF=${{ github.ref }}' | tee -a $GITHUB_ENV
+      shell: bash
+    - if: github.event_name != 'workflow_dispatch'
+      name: Set GitHub PR ref as ref
+      run: echo 'REF=refs/pull/${{ github.event.inputs.pr-number || github.event.number }}/merge' | tee -a $GITHUB_ENV
+      shell: bash
+    - name: Delete caches of latest PR
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        REPO: ${{ github.repository }}
+      run: |
+        set +e
+        echo "Deleting caches..."
+        for CACHE_KEY in $(gh actions-cache list -R $REPO -B $REF | cut -f 1); do
+          gh actions-cache delete $CACHE_KEY -R $REPO -B $REF --confirm
+        done
+        echo "Done"
+      shell: bash
