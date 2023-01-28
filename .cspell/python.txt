@@ -9,3 +9,4 @@ PyPI
 pytest
 sdist
 SymPy
+venv
