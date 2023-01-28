@@ -8,7 +8,7 @@ from configparser import ConfigParser
 from typing import Optional, Sequence
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = ArgumentParser(__doc__)
     parser.add_argument("coverage-python-version")
     parser.add_argument("coverage-target")

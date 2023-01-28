@@ -7,5 +7,7 @@ isort
 nargs
 PyPI
 pytest
+pyupgrade
 sdist
 SymPy
+venv
