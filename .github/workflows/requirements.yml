@@ -17,6 +17,7 @@ jobs:
     name: Determine Python versions
     if: >-
       github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -43,6 +44,7 @@ jobs:
     name: pre-commit autoupdate
     if: >-
       github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-22.04
     steps:
@@ -85,7 +87,9 @@ jobs:
             git push origin HEAD:${GITHUB_HEAD_REF}
           fi
       - name: Create Pull Request
-        if: github.event_name == 'schedule'
+        if: >-
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch'
         uses: peter-evans/create-pull-request@v4
         with:
           commit-message: "MAINT: update pip constraints and pre-commit"
@@ -96,4 +100,4 @@ jobs:
             🔨 Maintenance
           branch-suffix: timestamp
           delete-branch: true
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.token }}
