@@ -100,4 +100,4 @@ jobs:
             🔨 Maintenance
           branch-suffix: timestamp
           delete-branch: true
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.token }}
