@@ -44,8 +44,10 @@ jobs:
           for hook in ${{ needs.determine-hooks.outputs.skipped-hooks }}; do
             pre-commit run $hook -a --color always
           done
-
-      - if: failure() && github.event_name == 'pull_request'
+      - if: >
+          failure()
+          && github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
         name: Push changes
         run: |
           if [[ $(git status -s) ]]; then
