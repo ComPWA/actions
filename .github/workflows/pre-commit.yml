@@ -46,7 +46,7 @@ jobs:
           done
 
       - name: Push changes
-        if: github.event_name == 'pull_request'
+        if: failure() && github.event_name == 'pull_request'
         run: |
           git config user.name 'Github Actions'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
