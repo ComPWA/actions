@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ComPWA/actions/pip-install@v1
         with:
@@ -47,8 +48,8 @@ jobs:
             pre-commit run $hook -a --color always
           done
 
-      - name: Push changes
-        if: failure() && github.event_name == 'pull_request'
+      - if: failure() && github.event_name == 'pull_request'
+        name: Push changes
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
           git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}
