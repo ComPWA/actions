@@ -23,9 +23,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ComPWA/actions/pip-install@v1
         with:
           editable: "yes"
@@ -51,15 +48,11 @@ jobs:
       - if: failure() && github.event_name == 'pull_request'
         name: Push changes
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
-          git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}
-          git config user.name "GitHub"
-          git config user.email "noreply@github.com"
-          git checkout -b ${GITHUB_HEAD_REF}
           if [[ $(git status -s) ]]; then
+            git config user.name "GitHub"
+            git config user.email "noreply@github.com"
             git add -A
             git commit -m "MAINT: implement updates from pre-commit hooks"
-            git config pull.rebase true
-            git pull origin ${GITHUB_HEAD_REF}
-            git push origin HEAD:${GITHUB_HEAD_REF}
+            git pull --rebase
+            git push
           fi
