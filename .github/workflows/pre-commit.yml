@@ -53,6 +53,7 @@ jobs:
           if [[ $(git status -s) ]]; then
             git config user.name "GitHub"
             git config user.email "noreply@github.com"
+            git checkout -b ${GITHUB_HEAD_REF}
             git add -A
             git commit -m "MAINT: implement updates from pre-commit hooks"
             git pull --rebase
