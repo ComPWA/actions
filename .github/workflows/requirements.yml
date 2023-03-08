@@ -78,13 +78,13 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
           git config --global user.name "GitHub"
           git config --global user.email "noreply@github.com"
-          git checkout -b ${GITHUB_HEAD_REF}
+          git checkout -b ${{ github.head_ref }}
           if [[ $(git status -s) ]]; then
             git add -A
             git commit -m "MAINT: update pip constraints and pre-commit"
             git config pull.rebase true
-            git pull origin ${GITHUB_HEAD_REF}
-            git push origin HEAD:${GITHUB_HEAD_REF}
+            git pull origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
           fi
       - name: Create Pull Request
         if: >-
