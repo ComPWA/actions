@@ -64,6 +64,7 @@ jobs:
         name: Push changes
         run: |
           if [[ $(git status -s) ]]; then
+            git diff --color
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
             git config user.name "GitHub"
             git config user.email "noreply@github.com"
