@@ -33,10 +33,7 @@ jobs:
     needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
-      - if: ${{ secrets.token }} == ''
-        uses: actions/checkout@v3
-      - if: ${{ secrets.token }} == ''
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.token }}
       - uses: ComPWA/actions/pip-install@v1
@@ -64,7 +61,6 @@ jobs:
           failure()
           && github.event_name == 'pull_request'
           && github.event.pull_request.head.repo.full_name == github.repository
-          && secrets.token
         name: Push changes
         run: |
           if [[ $(git status -s) ]]; then
