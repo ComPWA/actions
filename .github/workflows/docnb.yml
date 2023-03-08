@@ -35,18 +35,19 @@ jobs:
           path: |
             ./docs/_build/.jupyter_cache
       - uses: ComPWA/actions/cache-sympy@v1
-      - if: inputs.apt-packages
+      - if: github.event_name != 'schedule' && inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
         uses: ComPWA/actions/install-julia@v1
         with:
           ijulia: true
-      - name: Build documentation and run notebooks
+      - if: github.event_name != 'schedule'
+        name: Build documentation and run notebooks
         env:
           GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: tox -e docnb
-      - uses: actions/upload-pages-artifact@v1
-        if: always()
+      - if: always() && github.event_name != 'schedule'
+        uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html

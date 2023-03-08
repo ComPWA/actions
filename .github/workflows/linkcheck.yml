@@ -20,8 +20,9 @@ jobs:
           additional-packages: tox
           extras: doc
           python-version: ${{ inputs.python-version }}
-      - if: inputs.apt-packages
+      - if: github.event_name != 'schedule' && inputs.apt-packages
         run: sudo apt install -y ${{ inputs.apt-packages }}
-      - run: tox -e linkcheck
+      - if: github.event_name != 'schedule'
+        run: tox -e linkcheck
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
