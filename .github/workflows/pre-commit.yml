@@ -70,6 +70,6 @@ jobs:
             git add -A
             git commit -m "MAINT: implement updates from pre-commit hooks"
             git config pull.rebase true
-            git pull origin ${GITHUB_HEAD_REF}
-            git push origin HEAD:${GITHUB_HEAD_REF}
+            git pull origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
           fi
