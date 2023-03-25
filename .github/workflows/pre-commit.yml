@@ -21,21 +21,24 @@ jobs:
   determine-hooks:
     name: Determine skipped pre-commit hooks
     outputs:
-      skipped-hooks: ${{ steps.set-hooks.outputs.skipped-hooks }}
+      skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
+      taplo-version: ${{ steps.taplo.outputs.taplo-version }}
     runs-on: ubuntu-22.04
     steps:
-      - id: set-hooks
+      - id: hooks
         uses: ComPWA/actions/get-skipped-pre-commit-hooks@v1
+      - id: taplo
+        uses: ComPWA/actions/get-pre-commit-taplo-version@v1
 
   pre-commit:
     name: Run local pre-commit hooks
+    env:
+      SKIP: taplo
     if: needs.determine-hooks.outputs.skipped-hooks != ''
     needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
       - uses: ComPWA/actions/pip-install@v1
         with:
           editable: "yes"
@@ -50,21 +53,83 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: pre-commit run -a --color always
+        run: pre-commit run --all-files --color always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
           for hook in ${{ needs.determine-hooks.outputs.skipped-hooks }}; do
-            pre-commit run $hook -a --color always
+            pre-commit run $hook --all-files --color always
           done
-      - if: >
-          failure()
-          && github.event_name == 'pull_request'
-          && github.event.pull_request.head.repo.full_name == github.repository
+      - id: diff
+        if: always()
+        name: Determine changed files
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
+          git diff --name-only | tee -a $GITHUB_OUTPUT
+          echo "${delimiter}" >> $GITHUB_OUTPUT
+        shell: bash
+      - if: always() && steps.diff.outputs.diff != ''
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff
+          path: ${{ steps.diff.outputs.diff }}
+
+  taplo:
+    container:
+      image: ghcr.io/compwa/mirrors-taplo:${{ needs.determine-hooks.outputs.taplo-version }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+    if: needs.determine-hooks.outputs.taplo-version != ''
+    name: Run taplo through pre-commit
+    needs: determine-hooks
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: git config --global --add safe.directory $(pwd)
+      - env:
+          PRE_COMMIT_HOME: /root/.cache/pre-commit
+        run: pre-commit run taplo --all-files --color always
+      - id: diff
+        if: always()
+        name: Determine changed files
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
+          git diff --name-only | tee -a $GITHUB_OUTPUT
+          echo "${delimiter}" >> $GITHUB_OUTPUT
+        shell: bash
+      - if: always() && steps.diff.outputs.diff != ''
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff
+          path: ${{ steps.diff.outputs.diff }}
+
+  push:
+    if: >-
+      always() &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(join(needs.*.result, ','), 'failure')
+    name: Push changes
+    needs:
+      - pre-commit
+      - taplo
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: diff
+          path: .
+      - if: always()
         name: Push changes
         run: |
+          git diff --color
           if [[ $(git status -s) ]]; then
-            git diff --color
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
             git config user.name "GitHub"
             git config user.email "noreply@github.com"
