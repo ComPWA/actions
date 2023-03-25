@@ -1,0 +1,26 @@
+name: Get version of the taplo pre-commit hook
+description: >-
+  Taplo is written in Rust and its pre-commit hook therefore takes a long time
+  to compile. The repository https://github.com/ComPWA/mirrors-taplo provides a
+  Docker container that speeds up the hook. This Action runs gets the version
+  for the Docker container.
+
+outputs:
+  taplo-version:
+    description: Version of taplo as determined from .pre-commit-config.yaml
+    value: ${{ steps.taplo.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - run: pip install PyYAML
+      shell: bash
+    - id: taplo
+      name: Determine taplo version
+      run: |
+        echo "version=$(python3 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      shell: bash
