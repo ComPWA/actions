@@ -18,6 +18,7 @@ vscode:
     - eamodio.gitlens
     - editorconfig.editorconfig
     - esbenp.prettier-vscode
+    - github.vscode-github-actions
     - github.vscode-pull-request-github
     - mhutchie.git-graph
     - ms-python.isort
