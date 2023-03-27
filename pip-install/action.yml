@@ -18,7 +18,7 @@ inputs:
     description: Python version used to install the pip packages.
     required: true
   specific-packages:
-    description: Python version used to install the pip packages.
+    description: Any additional packages that you may want to install.
     required: false
 
 runs:
