@@ -52,12 +52,12 @@ runs:
           echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         fi
       shell: bash
-    - run: ${{ format('pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
+    - run: ${{ format('python3 -m pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, inputs.python-version ) }}
+    - run: ${{ format('python3 -m pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, inputs.python-version ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
-    - run: pip install ${{ inputs.specific-packages }}
+    - run: python3 -m pip install ${{ inputs.specific-packages }}
       if: inputs.specific-packages
       shell: bash
