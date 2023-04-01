@@ -34,7 +34,8 @@ jobs:
     name: Run local pre-commit hooks
     env:
       SKIP: taplo
-    if: needs.determine-hooks.outputs.skipped-hooks != ''
+    if: >-
+      ${{ needs.determine-hooks.outputs.skipped-hooks != '' && needs.determine-hooks.outputs.skipped-hooks != 'taplo' }}
     needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
