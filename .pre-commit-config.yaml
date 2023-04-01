@@ -29,6 +29,7 @@ repos:
       - id: check-dev-files
         args:
           - --allow-deprecated-workflows
+          - --no-pypi
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
       - id: format-setup-cfg
