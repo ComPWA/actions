@@ -13,7 +13,6 @@ github:
 
 vscode:
   extensions:
-    - bungcip.better-toml
     - christian-kohler.path-intellisense
     - eamodio.gitlens
     - editorconfig.editorconfig
@@ -26,7 +25,7 @@ vscode:
     - redhat.vscode-yaml
     - stkb.rewrap
     - streetsidesoftware.code-spell-checker
-    - travisillig.vscode-json-stable-stringify
+    - tamasfe.even-better-toml
     - trentrand.git-commit-helper-vscode
     - tyriar.sort-lines
     - yzhang.markdown-all-in-one

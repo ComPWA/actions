@@ -2,6 +2,9 @@ ci:
   autoupdate_commit_msg: "MAINT: autoupdate pre-commit hooks"
   autoupdate_schedule: quarterly
 
+  skip:
+    - taplo
+
 repos:
   - repo: meta
     hooks:
@@ -21,7 +24,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/ComPWA/repo-maintenance
-    rev: 0.0.168
+    rev: 0.0.174
     hooks:
       - id: check-dev-files
         args:
@@ -31,20 +34,22 @@ repos:
       - id: format-setup-cfg
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.22.0
+    rev: v6.31.0
     hooks:
       - id: cspell
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 2.7.1
+    rev: "2.7.1"
     hooks:
       - id: editorconfig-checker
-        exclude: >
+        name: editorconfig
+        alias: ec
+        exclude: >-
           (?x)^(
             .*\.py
           )$
@@ -55,7 +60,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+    rev: v3.0.0-alpha.6
     hooks:
       - id: prettier
 
@@ -65,3 +70,8 @@ repos:
       - id: pyupgrade
         args:
           - --py37-plus
+
+  - repo: https://github.com/ComPWA/mirrors-taplo
+    rev: v0.8.0
+    hooks:
+      - id: taplo
