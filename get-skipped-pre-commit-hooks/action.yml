@@ -18,7 +18,7 @@ runs:
     - uses: actions/setup-python@v4
       with:
         python-version: "3.8"
-    - run: pip install PyYAML
+    - run: python3 -m pip install PyYAML
       shell: bash
     - id: set-hooks
       name: Determine skipped hooks

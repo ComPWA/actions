@@ -16,17 +16,22 @@ inputs:
     required: true
   python-version:
     description: Python version used to install the pip packages.
-    required: true
+    required: false
   specific-packages:
-    description: Python version used to install the pip packages.
+    description: Any additional packages that you may want to install.
     required: false
 
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v4
+    - if: inputs.python-version
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
+    - name: Determine Python version
+      run: |
+        echo PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))') | tee -a $GITHUB_ENV
+      shell: bash
     - run: echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
       shell: bash
     - if: runner.os == 'macOS'
@@ -40,9 +45,9 @@ runs:
     - uses: actions/cache@v3
       with:
         key: |
-          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
+          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
         restore-keys: |
-          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ inputs.python-version }}
+          pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}
         path: ${{ env.PIP_CACHE_DIR }}
     - name: Set editable flag
       run: |
@@ -52,12 +57,12 @@ runs:
           echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         fi
       shell: bash
-    - run: ${{ format('pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
+    - run: ${{ format('python3 -m pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, inputs.python-version ) }}
+    - run: ${{ format('python3 -m pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, env.PYTHON_VERSION ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
-    - run: pip install ${{ inputs.specific-packages }}
+    - run: python3 -m pip install ${{ inputs.specific-packages }}
       if: inputs.specific-packages
       shell: bash
