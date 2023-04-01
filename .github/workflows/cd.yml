@@ -20,9 +20,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Push to stable branch
-        run: |
-          git push origin HEAD:refs/heads/stable --force
       - name: Push to matching minor version branch
         env:
           TAG: ${{ github.ref_name }}
