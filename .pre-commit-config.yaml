@@ -30,6 +30,7 @@ repos:
         args:
           - --allow-deprecated-workflows
           - --no-pypi
+          - --no-version-branches
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
       - id: format-setup-cfg
