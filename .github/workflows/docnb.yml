@@ -36,7 +36,9 @@ jobs:
             ./docs/_build/.jupyter_cache
       - uses: ComPWA/actions/cache-sympy@v1
       - if: inputs.apt-packages
-        run: sudo apt install -y ${{ inputs.apt-packages }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
         uses: ComPWA/actions/install-julia@v1
         with:
