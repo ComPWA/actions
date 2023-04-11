@@ -24,8 +24,16 @@ def get_taplo_version() -> str | None:
     repos: list[dict] = config["repos"]
     for repo in repos:
         if repo["repo"] == "https://github.com/ComPWA/mirrors-taplo":
-            return repo["rev"]
+            if _has_taplo_hook(repo):
+                return repo["rev"]
     return None
+
+
+def _has_taplo_hook(repo_def: dict) -> bool:
+    for hook in repo_def["hooks"]:
+        if hook["id"] == "taplo":
+            return True
+    return False
 
 
 if __name__ == "__main__":
