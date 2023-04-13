@@ -23,6 +23,7 @@
   "editor.formatOnSave": true,
   "editor.wrappingStrategy": "advanced",
   "git.rebaseWhenSync": true,
+  "github-actions.workflows.pinned.workflows": [".github/workflows/ci.yml"],
   "isort.check": true,
   "isort.importStrategy": "fromEnvironment",
   "python.analysis.diagnosticMode": "workspace",
