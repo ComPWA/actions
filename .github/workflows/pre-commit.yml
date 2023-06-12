@@ -73,6 +73,7 @@ jobs:
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
         with:
+          name: pre-commit-changes
           path: ${{ steps.diff.outputs.diff }}
 
   taplo:
@@ -103,6 +104,7 @@ jobs:
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
         with:
+          name: pre-commit-changes
           path: ${{ steps.diff.outputs.diff }}
 
   push:
@@ -122,6 +124,7 @@ jobs:
           token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v3
         with:
+          name: pre-commit-changes
           path: .
       - if: always()
         name: Push changes
