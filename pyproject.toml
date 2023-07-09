@@ -10,6 +10,11 @@ target-version = [
 ]
 
 [tool.pyright]
+reportMissingTypeArgument = false
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
 typeCheckingMode = "strict"
 
 [tool.ruff]
@@ -56,7 +61,9 @@ ignore = [
     "D407",
     "D416",
     "E501",
+    "INP001",
     "SIM108",
+    "T201",
 ]
 show-fixes = true
 target-version = "py37"

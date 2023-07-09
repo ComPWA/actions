@@ -64,7 +64,7 @@
     "tox.ini",
     "typings"
   ],
-  "ignoreWords": ["mhutchie", "noreply", "taplo"],
+  "ignoreWords": ["mhutchie", "noqa", "noreply", "taplo"],
   "language": "en-US",
   "version": "0.2",
   "words": []

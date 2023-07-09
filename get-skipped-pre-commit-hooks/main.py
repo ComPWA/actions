@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 import os
-from configparser import ConfigParser
 
 import yaml
 
@@ -18,14 +16,14 @@ def main() -> int:
 def get_skipped_precommit_hooks() -> list[str]:
     config_path = ".pre-commit-config.yaml"
     if not os.path.exists(config_path):
-        raise FileExistsError(f"This repository does not have a {config_path}")
+        msg = f"This repository does not have a {config_path}"
+        raise FileExistsError(msg)
     with open(config_path) as f:
         config: dict[str, dict] = yaml.safe_load(f)
     precommit_ci_config = config.get("ci")
     if precommit_ci_config is None:
         return ["ALL"]
-    skipped_hooks = precommit_ci_config.get("skip", [])
-    return skipped_hooks
+    return precommit_ci_config.get("skip", [])
 
 
 if __name__ == "__main__":
