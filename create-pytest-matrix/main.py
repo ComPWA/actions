@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from configparser import ConfigParser
-from typing import Optional, Sequence
+from typing import Sequence
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -48,11 +48,12 @@ def create_job_matrix(
         )
     if coverage_target:
         if coverage_python_version not in supported_python_versions:
-            raise ValueError(
+            msg = (
                 f"Selected Python {coverage_python_version} for the coverage job, but"
                 " the package only supports Python"
                 f" {', '.join(supported_python_versions)}"
             )
+            raise ValueError(msg)
         if coverage_python_version in python_versions:
             python_versions.remove(coverage_python_version)
     includes = []
@@ -94,18 +95,18 @@ def get_supported_python_versions() -> list[str]:
     cfg = ConfigParser()
     cfg.read("setup.cfg")
     if not cfg.has_option("metadata", "classifiers"):
-        raise ValueError(
-            "This package does not have Python version classifiers."
-            " See https://pypi.org/classifiers."
+        msg = (
+            "This package does not have Python version classifiers. See"
+            " https://pypi.org/classifiers."
         )
+        raise ValueError(msg)
     raw = cfg.get("metadata", "classifiers")
     lines = [s.strip() for s in raw.split("\n")]
     identifier = "Programming Language :: Python :: 3."
     classifiers = list(filter(lambda s: s.startswith(identifier), lines))
     if not classifiers:
-        raise ValueError(
-            f'setup.cfg does not have any classifiers of the form "{identifier}*"'
-        )
+        msg = f'setup.cfg does not have any classifiers of the form "{identifier}*"'
+        raise ValueError(msg)
     prefix = identifier[:-2]
     return [s.replace(prefix, "") for s in classifiers]
 

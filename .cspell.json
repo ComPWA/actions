@@ -37,14 +37,11 @@
     "*particle*.*ml",
     ".constraints/*.txt",
     ".editorconfig",
-    ".flake8*",
     ".gitignore",
     ".gitpod.*",
     ".mypy.ini",
     ".pre-commit-config.yaml",
     ".prettierignore",
-    ".pydocstyle*",
-    ".pylintrc",
     ".readthedocs.yml",
     ".vscode/*",
     ".vscode/.gitignore",
@@ -67,7 +64,7 @@
     "tox.ini",
     "typings"
   ],
-  "ignoreWords": ["mhutchie", "noreply", "taplo"],
+  "ignoreWords": ["mhutchie", "noqa", "noreply", "taplo"],
   "language": "en-US",
   "version": "0.2",
   "words": []

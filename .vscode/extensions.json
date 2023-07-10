@@ -1,13 +1,14 @@
 {
   "recommendations": [
+    "charliermarsh.ruff",
     "christian-kohler.path-intellisense",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
     "esbenp.prettier-vscode",
+    "garaioag.garaio-vscode-unwanted-recommendations",
     "github.vscode-github-actions",
     "github.vscode-pull-request-github",
     "mhutchie.git-graph",
-    "ms-python.isort",
     "ms-python.python",
     "redhat.vscode-yaml",
     "stkb.rewrap",
@@ -16,5 +17,13 @@
     "trentrand.git-commit-helper-vscode",
     "tyriar.sort-lines",
     "yzhang.markdown-all-in-one"
+  ],
+  "unwantedRecommendations": [
+    "bungcip.better-toml",
+    "ms-python.flake8",
+    "ms-python.isort",
+    "ms-python.mypy-type-checker",
+    "ms-python.pylint",
+    "travisillig.vscode-json-stable-stringify"
   ]
 }
