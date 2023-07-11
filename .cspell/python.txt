@@ -6,6 +6,7 @@ isinstance
 isort
 nargs
 PyPI
+pyproject
 pytest
 pyupgrade
 sdist
