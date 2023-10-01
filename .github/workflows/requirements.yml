@@ -35,7 +35,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ComPWA/update-pip-constraints@main
         with:
           python-version: ${{ matrix.python-version }}
@@ -48,7 +48,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ComPWA/update-pre-commit@main
 
   push:
@@ -58,7 +58,7 @@ jobs:
       - pip-constraints
       - pre-commit
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.token }}
       - uses: actions/download-artifact@v3
