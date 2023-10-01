@@ -17,7 +17,7 @@ jobs:
     name: Execute and build documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ComPWA/actions/pip-install@v1
         with:
           additional-packages: tox
