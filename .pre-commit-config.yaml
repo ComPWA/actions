@@ -39,6 +39,11 @@ repos:
     rev: 23.9.1
     hooks:
       - id: black
+      - id: black-jupyter
+        args:
+          - --line-length=85
+        types_or:
+          - jupyter
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v7.3.1
