@@ -22,9 +22,13 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
 
   - repo: https://github.com/ComPWA/repo-maintenance
-    rev: 0.0.200
+    rev: 0.0.202
     hooks:
       - id: check-dev-files
         args:
@@ -34,12 +38,6 @@ repos:
           - --no-version-branches
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
-      - id: format-setup-cfg
-
-  - repo: https://github.com/psf/black
-    rev: 23.9.1
-    hooks:
-      - id: black
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v7.3.0
@@ -85,3 +83,10 @@ repos:
     rev: v0.8.1
     hooks:
       - id: taplo
+
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort
+        args:
+          - --in-place

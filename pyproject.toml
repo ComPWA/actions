@@ -1,3 +1,52 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.2"]
+
+[project]
+authors = [{name = "Common Partial Wave Analysis", email = "compwa-admin@ep1.rub.de"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = ["toml"]
+description = "Python scripts used by the ComPWA/actions repository"
+dynamic = ["version"]
+license = {text = "License :: OSI Approved :: MIT License"}
+name = "compwa-actions"
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+dev = [
+    "compwa-actions[sty]",
+]
+format = [
+    "black",
+]
+lint = [
+    "ruff",
+]
+sty = [
+    "compwa-actions[format]",
+    "compwa-actions[lint]",
+    "pre-commit",
+]
+
+[project.readme]
+content-type = "text/markdown"
+file = "README.md"
+
+[tool.setuptools]
+include-package-data = false
+license-files = ["LICENSE"]
+
 [tool.black]
 include = '\.pyi?$'
 preview = true
@@ -71,3 +120,17 @@ task-tags = ["cspell"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.tomlsort]
+all = false
+ignore_case = true
+in_place = true
+sort_first = [
+    "build-system",
+    "project",
+    "tool.setuptools",
+    "tool.setuptools_scm",
+]
+sort_table_keys = true
+spaces_indent_inline_array = 4
+trailing_comma_inline_array = true
