@@ -28,7 +28,7 @@ repos:
       - id: black
 
   - repo: https://github.com/ComPWA/repo-maintenance
-    rev: 0.0.202
+    rev: 0.0.203
     hooks:
       - id: check-dev-files
         args:
@@ -40,7 +40,7 @@ repos:
           - --repo-title=ComPWA actions and shared workflows
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v7.3.0
+    rev: v7.3.1
     hooks:
       - id: cspell
 
@@ -61,19 +61,19 @@ repos:
       - id: prettier
 
   - repo: https://github.com/ComPWA/mirrors-pyright
-    rev: v1.1.329
+    rev: v1.1.330
     hooks:
       - id: pyright
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
       - id: pyupgrade
         args:
           - --py37-plus
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.291
+    rev: v0.0.292
     hooks:
       - id: ruff
         args:
