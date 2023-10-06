@@ -40,11 +40,19 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: ComPWA/actions/pip-install@v1
+      - name: Determine if repository is Python package
+        run: |
+          is_package=$(pip install . &> /dev/null && echo yes || echo no)
+          echo "IS_PYPI_PACKAGE=$is_package" | tee -a "$GITHUB_OUTPUT"
+        id: package
+      - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'yes' }}
+        uses: ComPWA/actions/pip-install@v1
         with:
           editable: "yes"
           extras: sty
           python-version: ${{ inputs.python-version }}
+      - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'no' }}
+        run: pip install pre-commit
       - name: Fetch pre-commit cache
         uses: actions/cache@v3
         with:
