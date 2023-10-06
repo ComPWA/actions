@@ -1,5 +1,6 @@
 {
   "[git-commit]": {
+    "editor.rulers": [72],
     "rewrap.wrappingColumn": 72
   },
   "[json]": {
@@ -15,7 +16,8 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
     },
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.rulers": [88]
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -27,6 +29,7 @@
   "git.rebaseWhenSync": true,
   "github-actions.workflows.pinned.workflows": [".github/workflows/ci.yml"],
   "python.analysis.typeCheckingMode": "basic",
+  "rewrap.wrappingColumn": 88,
   "ruff.enable": true,
   "ruff.organizeImports": true,
   "yaml.schemas": {
