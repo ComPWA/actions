@@ -40,9 +40,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
       - name: Determine if repository is Python package
         run: |
-          is_package=$(pip install . &> /dev/null && echo yes || echo no)
+          is_package=$(pip install -e . > /dev/null && echo yes || echo no)
           echo "IS_PYPI_PACKAGE=$is_package" | tee -a "$GITHUB_OUTPUT"
         id: package
       - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'yes' }}
@@ -77,6 +80,8 @@ jobs:
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
           git diff --name-only | tee -a $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
+          echo
+          git diff --color
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
