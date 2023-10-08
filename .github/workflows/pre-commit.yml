@@ -77,6 +77,8 @@ jobs:
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
           git diff --name-only | tee -a $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
+          echo
+          git diff --color
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
