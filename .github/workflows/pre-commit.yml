@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Determine if repository is Python package
         run: |
-          is_package=$(pip install . &> /dev/null && echo yes || echo no)
+          is_package=$(pip install -e . &> /dev/null && echo yes || echo no)
           echo "IS_PYPI_PACKAGE=$is_package" | tee -a "$GITHUB_OUTPUT"
         id: package
       - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'yes' }}
