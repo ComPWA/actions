@@ -9,6 +9,7 @@
     "github.vscode-github-actions",
     "github.vscode-pull-request-github",
     "mhutchie.git-graph",
+    "ms-python.black-formatter",
     "ms-python.python",
     "redhat.vscode-yaml",
     "stkb.rewrap",
@@ -20,6 +21,7 @@
   ],
   "unwantedRecommendations": [
     "bungcip.better-toml",
+    "davidanson.vscode-markdownlint",
     "ms-python.flake8",
     "ms-python.isort",
     "ms-python.mypy-type-checker",

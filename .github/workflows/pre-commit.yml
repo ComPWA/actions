@@ -39,7 +39,7 @@ jobs:
     needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
@@ -100,7 +100,7 @@ jobs:
     needs: determine-hooks
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git config --global --add safe.directory $(pwd)
       - env:
           PRE_COMMIT_HOME: /root/.cache/pre-commit
@@ -132,7 +132,7 @@ jobs:
       - taplo
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v3
