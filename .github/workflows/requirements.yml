@@ -70,6 +70,9 @@ jobs:
             ls -A
             [[ -f .pre-commit-config.yaml ]] && mv -f .pre-commit-config.yaml ..
             [[ "$(ls)" != "" ]] && mkdir -p ../.constraints/ && mv -f * ../.constraints/
+            cd ../.constraints/
+            [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
+            cd ../
           fi
       - run: git status -s
       - name: Commit and push changes
