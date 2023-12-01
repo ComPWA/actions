@@ -80,12 +80,13 @@ jobs:
         if: always()
         name: Determine changed files
         run: |
+          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+          diff_files="$(git diff --name-only) $some_file_in_root"
           delimiter="$(openssl rand -hex 8)"
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          git diff --name-only | tee -a $GITHUB_OUTPUT
+          echo "$diff_files" | tee -a $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
-          echo
-          git diff --color
+        # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
@@ -113,10 +114,13 @@ jobs:
         if: always()
         name: Determine changed files
         run: |
+          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+          diff_files="$(git diff --name-only) $some_file_in_root"
           delimiter="$(openssl rand -hex 8)"
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          git diff --name-only | tee -a $GITHUB_OUTPUT
+          echo "$diff_files" | tee -a $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
+        # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
