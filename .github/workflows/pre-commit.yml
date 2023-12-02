@@ -69,23 +69,31 @@ jobs:
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
-          for hook in ${{ needs.determine-hooks.outputs.skipped-hooks }}; do
+          export skipped_hooks='${{ needs.determine-hooks.outputs.skipped-hooks }}'
+          if [[ $skipped_hooks == *"prettier"* ]]; then
+            export PRETTIER_LEGACY_CLI=1
+          fi
+          for hook in $skipped_hooks; do
             pre-commit run $hook --all-files --color always
           done
       - id: diff
         if: always()
         name: Determine changed files
         run: |
+          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+          diff_files="$some_file_in_root $(git diff --name-only)"
           delimiter="$(openssl rand -hex 8)"
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          git diff --name-only | tee -a $GITHUB_OUTPUT
+          for file in $diff_files; do
+            echo "$file" | tee -a $GITHUB_OUTPUT
+          done
           echo "${delimiter}" >> $GITHUB_OUTPUT
-          echo
-          git diff --color
+        # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
         with:
+          if-no-files-found: error
           name: pre-commit-changes
           path: ${{ steps.diff.outputs.diff }}
 
@@ -109,14 +117,20 @@ jobs:
         if: always()
         name: Determine changed files
         run: |
+          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+          diff_files="$some_file_in_root $(git diff --name-only)"
           delimiter="$(openssl rand -hex 8)"
           echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          git diff --name-only | tee -a $GITHUB_OUTPUT
+          for file in $diff_files; do
+            echo "$file" | tee -a $GITHUB_OUTPUT
+          done
           echo "${delimiter}" >> $GITHUB_OUTPUT
+        # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
         uses: actions/upload-artifact@v3
         with:
+          if-no-files-found: error
           name: pre-commit-changes
           path: ${{ steps.diff.outputs.diff }}
 
@@ -147,6 +161,7 @@ jobs:
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
             git config user.name "GitHub"
             git config user.email "noreply@github.com"
+            git checkout -b ${{ github.head_ref }}
             git add -A
             git commit -m "MAINT: implement updates from pre-commit hooks"
             git config pull.rebase true
