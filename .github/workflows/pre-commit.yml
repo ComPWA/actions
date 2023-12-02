@@ -161,6 +161,7 @@ jobs:
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
             git config user.name "GitHub"
             git config user.email "noreply@github.com"
+            git checkout -b ${{ github.head_ref }}
             git add -A
             git commit -m "MAINT: implement updates from pre-commit hooks"
             git config pull.rebase true
