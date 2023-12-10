@@ -18,7 +18,8 @@ jobs:
     if: >-
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      (github.event_name == 'issue_comment' && github.event.comment.body == 'update pip constraints')
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     runs-on: ubuntu-22.04
@@ -45,7 +46,8 @@ jobs:
     if: >-
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      (github.event_name == 'issue_comment' && github.event.comment.body == 'update pip constraints')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
