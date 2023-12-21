@@ -1,3 +1,6 @@
+env:
+  PYTHONHASHSEED: "0"
+
 on:
   workflow_call:
     inputs:
