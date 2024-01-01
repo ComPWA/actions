@@ -2,6 +2,7 @@ ci:
   autoupdate_commit_msg: "MAINT: autoupdate pre-commit hooks"
   autoupdate_schedule: quarterly
   skip:
+    - prettier
     - pyright
     - taplo
 
@@ -23,8 +24,8 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
 
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: PLEASE-UPDATE
     hooks:
       - id: black
 
@@ -66,13 +67,6 @@ repos:
     rev: v1.1.344
     hooks:
       - id: pyright
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
-    hooks:
-      - id: pyupgrade
-        args:
-          - --py37-plus
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.9
