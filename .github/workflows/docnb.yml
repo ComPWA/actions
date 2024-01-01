@@ -48,7 +48,7 @@ jobs:
           GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: tox -e docnb
-      - uses: actions/upload-pages-artifact@v2
+      - uses: actions/upload-pages-artifact@v3
         if: always()
         with:
           path: docs/_build/html
