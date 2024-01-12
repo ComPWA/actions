@@ -62,27 +62,21 @@ def create_job_matrix(
     includes = []
     if "3.6" in python_versions:
         python_versions.remove("3.6")
-        includes.append(
-            {
-                "python-version": "3.6",
-                "runs-on": "ubuntu-20.04",
-            }
-        )
+        includes.append({
+            "python-version": "3.6",
+            "runs-on": "ubuntu-20.04",
+        })
     if coverage_target:
-        includes.append(
-            {
-                "coverage-target": coverage_target,
-                "python-version": coverage_python_version,
-                "runs-on": "ubuntu-22.04",
-            }
-        )
+        includes.append({
+            "coverage-target": coverage_target,
+            "python-version": coverage_python_version,
+            "runs-on": "ubuntu-22.04",
+        })
     if macos_python_version:
-        includes.append(
-            {
-                "python-version": macos_python_version,
-                "runs-on": "macos-12",
-            }
-        )
+        includes.append({
+            "python-version": macos_python_version,
+            "runs-on": "macos-12",
+        })
     matrix = {}
     if python_versions:
         matrix = {
