@@ -1,3 +1,4 @@
 # Build files
 *.egg-info/
 .eggs/
+node_modules/
