@@ -99,6 +99,8 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: GitHub <noreply@github.com>
           title: "MAINT: update pip constraints and pre-commit"
+          body: >-
+            This PR updates the [`pip` constraint files](https://github.com/ComPWA/update-pip-constraints?tab=readme-ov-file#update-pip-constraint-files) under the `.constraints/` directory and pre-commit hooks in [`.pre-commit-config.yaml`](https://pre-commit.com). It was created automatically by a scheduled workflow.
           labels: |
             🔨 Maintenance
           branch-suffix: timestamp
