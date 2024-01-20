@@ -1,5 +1,4 @@
-# Commit types
-# https://compwa-org.rtfd.io/develop.html#commit-conventions
+# Commit types https://compwa.github.io/develop#commit-conventions
 compwa
 docnb
 IJulia
