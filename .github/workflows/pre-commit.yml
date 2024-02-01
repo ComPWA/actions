@@ -57,7 +57,7 @@ jobs:
       - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'no' }}
         run: pip install pre-commit
       - name: Fetch pre-commit cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}
