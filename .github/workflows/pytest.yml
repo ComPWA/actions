@@ -82,7 +82,7 @@ jobs:
       - if: matrix.coverage-target != ''
         run: pytest --cov=${{ matrix.coverage-target }} --cov-report=xml
       - if: matrix.coverage-target != ''
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           flags: unittests
