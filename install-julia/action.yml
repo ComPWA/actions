@@ -18,7 +18,7 @@ runs:
         echo "JULIA_VERSION=$version" | tee -a $GITHUB_ENV
       shell: bash
     - name: Fetch Julia cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: |
           julia-${{ env.JULIA_VERSION }}-${{hashFiles('**/Manifest.toml')}}-${{hashFiles('./**.jl')}}
