@@ -55,6 +55,26 @@ runs:
         path: |
           ${{ env.PIP_CACHE_DIR }}
           ${{ env.UV_CACHE_DIR }}
+
+    - name: Form pip install statement
+      run: |
+        if [[ "${{ inputs.python-version }}" == "3.6" || "${{ inputs.python-version }}" == "3.7" ]]; then
+          echo 'PIP_INSTALL=pip install' | tee -a $GITHUB_ENV
+        else
+          pip install uv
+          echo 'PIP_INSTALL=uv pip install --system' | tee -a $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Set constraints flag
+      run: |
+        if [[ -z '${{ hashFiles('.constraints/py3.*.txt') }}' ]]; then
+          echo 'CONSTRAINTS=' | tee -a $GITHUB_ENV
+        else
+          echo 'CONSTRAINTS=-c .constraints/py${{ env.PYTHON_VERSION }}.txt' | tee -a $GITHUB_ENV
+        fi
+      shell: bash
+
     - name: Set editable flag
       run: |
         if [[ -z '${{ inputs.editable}}' ]]; then
@@ -63,14 +83,10 @@ runs:
           echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         fi
       shell: bash
-    - run: pip install uv
+
+    - run: |
+        ${{ env.PIP_INSTALL }} ${{ env.CONSTRAINTS }} ${{ env.EDITABLE }} ${{ format('.[{0}] {1}', inputs.extras, inputs.additional-packages ) }}
       shell: bash
-    - run: ${{ format('uv pip install --system {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
-      if: hashFiles('.constraints/py3.*.txt') == ''
-      shell: bash
-    - run: ${{ format('uv pip install --system {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, env.PYTHON_VERSION ) }}
-      if: hashFiles('.constraints/py3.*.txt') != ''
-      shell: bash
-    - run: uv pip install --system ${{ inputs.specific-packages }}
-      if: inputs.specific-packages
+    - if: inputs.specific-packages
+      run: ${{ env.PIP_INSTALL }} ${{ inputs.specific-packages }}
       shell: bash
