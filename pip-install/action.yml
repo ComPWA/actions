@@ -32,10 +32,14 @@ runs:
       run: |
         echo PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))') | tee -a $GITHUB_ENV
       shell: bash
-    - run: echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
+    - run: |
+        echo "PIP_CACHE_DIR=~/.cache/pip/" >> $GITHUB_ENV
+        echo "UV_CACHE_DIR=~/.cache/uv/" >> $GITHUB_ENV
       shell: bash
     - if: runner.os == 'macOS'
-      run: echo "PIP_CACHE_DIR=~/Library/Caches/pip" >> $GITHUB_ENV
+      run: |
+        echo "PIP_CACHE_DIR=~/Library/Caches/pip" >> $GITHUB_ENV
+        echo "UV_CACHE_DIR=~/Library/Caches/uv" >> $GITHUB_ENV
       shell: bash
     - name: Set cache identifier
       run: |
@@ -48,7 +52,9 @@ runs:
           pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg') }}
         restore-keys: |
           pip-${{ env.CACHE_IDENTIFIER }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}
-        path: ${{ env.PIP_CACHE_DIR }}
+        path: |
+          ${{ env.PIP_CACHE_DIR }}
+          ${{ env.UV_CACHE_DIR }}
     - name: Set editable flag
       run: |
         if [[ -z '${{ inputs.editable}}' ]]; then
@@ -57,12 +63,14 @@ runs:
           echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         fi
       shell: bash
-    - run: ${{ format('python3 -m pip install {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
+    - run: pip install uv
+      shell: bash
+    - run: ${{ format('uv pip install --system {0} .[{1}] {2}', env.EDITABLE, inputs.extras, inputs.additional-packages ) }}
       if: hashFiles('.constraints/py3.*.txt') == ''
       shell: bash
-    - run: ${{ format('python3 -m pip install {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, env.PYTHON_VERSION ) }}
+    - run: ${{ format('uv pip install --system {0} .[{1}] {2} -c .constraints/py{3}.txt', env.EDITABLE, inputs.extras, inputs.additional-packages, env.PYTHON_VERSION ) }}
       if: hashFiles('.constraints/py3.*.txt') != ''
       shell: bash
-    - run: python3 -m pip install ${{ inputs.specific-packages }}
+    - run: uv pip install --system ${{ inputs.specific-packages }}
       if: inputs.specific-packages
       shell: bash
