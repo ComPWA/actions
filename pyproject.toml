@@ -27,16 +27,9 @@ requires-python = ">=3.7"
 dev = [
     "compwa-actions[sty]",
 ]
-format = [
-    "black",
-]
-lint = [
-    "ruff",
-]
 sty = [
-    "compwa-actions[format]",
-    "compwa-actions[lint]",
     "pre-commit",
+    "ruff",
 ]
 
 [project.readme]
@@ -47,17 +40,6 @@ file = "README.md"
 include-package-data = false
 license-files = ["LICENSE"]
 
-[tool.black]
-include = '\.pyi?$'
-preview = true
-target-version = [
-    "py310",
-    "py311",
-    "py37",
-    "py38",
-    "py39",
-]
-
 [tool.pyright]
 reportMissingTypeArgument = false
 reportUnknownArgumentType = false
@@ -67,6 +49,15 @@ reportUnknownVariableType = false
 typeCheckingMode = "strict"
 
 [tool.ruff]
+preview = true
+show-fixes = true
+target-version = "py37"
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+
+[tool.ruff.lint]
 extend-select = [
     "A",
     "B",
@@ -111,14 +102,17 @@ ignore = [
     "D416",
     "E501",
     "INP001",
+    "ISC001",
+    "PLW1514",
     "SIM108",
     "T201",
 ]
-show-fixes = true
-target-version = "py37"
 task-tags = ["cspell"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.tomlsort]

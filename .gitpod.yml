@@ -22,13 +22,11 @@ vscode:
     - github.vscode-github-actions
     - github.vscode-pull-request-github
     - mhutchie.git-graph
-    - ms-python.black-formatter
     - ms-python.python
     - redhat.vscode-yaml
-    - Soulcode.vscode-unwanted-extensions
+    - soulcode.vscode-unwanted-extensions
     - stkb.rewrap
     - streetsidesoftware.code-spell-checker
     - tamasfe.even-better-toml
     - trentrand.git-commit-helper-vscode
-    - tyriar.sort-lines
     - yzhang.markdown-all-in-one
