@@ -56,6 +56,15 @@ runs:
           ${{ env.PIP_CACHE_DIR }}
           ${{ env.UV_CACHE_DIR }}
 
+    - name: Set editable flag
+      run: |
+        if [[ -z '${{ inputs.editable}}' ]]; then
+          echo 'EDITABLE=' | tee -a $GITHUB_ENV
+        else
+          echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
+        fi
+      shell: bash
+
     - name: Form pip install statement
       run: |
         if [[ "${{ inputs.python-version }}" == "3.6" || "${{ inputs.python-version }}" == "3.7" ]]; then
@@ -63,6 +72,7 @@ runs:
         else
           pip install uv
           echo 'PIP_INSTALL=uv pip install --system' | tee -a $GITHUB_ENV
+          echo 'EDITABLE=--editable' | tee -a $GITHUB_ENV
         fi
       shell: bash
 
@@ -72,15 +82,6 @@ runs:
           echo 'CONSTRAINTS=' | tee -a $GITHUB_ENV
         else
           echo 'CONSTRAINTS=-c .constraints/py${{ env.PYTHON_VERSION }}.txt' | tee -a $GITHUB_ENV
-        fi
-      shell: bash
-
-    - name: Set editable flag
-      run: |
-        if [[ -z '${{ inputs.editable}}' ]]; then
-          echo 'EDITABLE=' | tee -a $GITHUB_ENV
-        else
-          echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
         fi
       shell: bash
 
