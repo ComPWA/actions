@@ -31,7 +31,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _format_skipped_version(skipped_python_versions: str) -> set[str] | None:
     if skipped_python_versions == "all":
         return None
-    if skipped_python_versions == "":
+    if not skipped_python_versions:
         return set()
     return set(skipped_python_versions.split(" "))
 
