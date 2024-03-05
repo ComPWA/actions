@@ -56,33 +56,40 @@ runs:
           ${{ env.PIP_CACHE_DIR }}
           ${{ env.UV_CACHE_DIR }}
 
-    - name: Set editable flag
+    - name: Deterimine package configuration file
       run: |
-        if [[ -z '${{ inputs.editable}}' ]]; then
-          echo 'EDITABLE=' | tee -a $GITHUB_ENV
-        else
-          echo 'EDITABLE=-e' | tee -a $GITHUB_ENV
+        if [ -f pyproject.toml ]; then
+          if grep -q "\[project\]" pyproject.toml; then
+            echo 'SETUP_FILE=pyproject.toml' | tee -a $GITHUB_ENV
+          fi
+        elif [ -f setup.cfg ]; then
+          if grep -q "\[metadata\]" setup.cfg && grep -q "\[options\]" setup.cfg; then
+            echo 'SETUP_FILE=setup.cfg' | tee -a $GITHUB_ENV
+          fi
         fi
       shell: bash
 
     - name: Form pip install statement
       run: |
-        if [[ "${{ inputs.python-version }}" == "3.6" || "${{ inputs.python-version }}" == "3.7" ]]; then
+        if [[ $SETUP_FILE == setup.cfg ]]; then
           echo 'PIP_INSTALL=pip install' | tee -a $GITHUB_ENV
         else
-          pip install uv
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          source $HOME/.cargo/env
           echo 'PIP_INSTALL=uv pip install --system' | tee -a $GITHUB_ENV
-          echo 'EDITABLE=--editable' | tee -a $GITHUB_ENV
         fi
       shell: bash
 
-    - name: Set constraints flag
+    - if: hashFiles('.constraints/py3.*.txt')
+      name: Set constraints flag
       run: |
-        if [[ -z '${{ hashFiles('.constraints/py3.*.txt') }}' ]]; then
-          echo 'CONSTRAINTS=' | tee -a $GITHUB_ENV
-        else
-          echo 'CONSTRAINTS=-c .constraints/py${{ env.PYTHON_VERSION }}.txt' | tee -a $GITHUB_ENV
-        fi
+        echo 'CONSTRAINTS=-c .constraints/py${{ env.PYTHON_VERSION }}.txt' | tee -a $GITHUB_ENV
+      shell: bash
+
+    - if: inputs.editable || env.SETUP_FILE == 'pyproject.toml'
+      name: Set editable flag
+      run: |
+        echo 'EDITABLE=--editable' | tee -a $GITHUB_ENV
       shell: bash
 
     - run: |
