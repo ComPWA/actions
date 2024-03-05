@@ -71,7 +71,7 @@ runs:
 
     - name: Form pip install statement
       run: |
-        if [[ $SETUP_FILE == setup.cfg ]]; then
+        if [[ $SETUP_FILE == setup.cfg ]] || [[ "${{ env.PYTHON_VERSION }}" == "3.6" ]]; then
           echo 'PIP_INSTALL=pip install' | tee -a $GITHUB_ENV
         else
           curl -LsSf https://astral.sh/uv/install.sh | sh
