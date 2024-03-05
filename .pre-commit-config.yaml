@@ -54,6 +54,7 @@ repos:
       - id: check-dev-files
         args:
           - --allow-deprecated-workflows
+          - --dependabot=update
           - --no-notebooks
           - --no-prettierrc
           - --no-pypi
