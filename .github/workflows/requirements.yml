@@ -114,7 +114,7 @@ jobs:
           git checkout -b ${{ github.head_ref }}
           if [[ $(git status -s) ]]; then
             git add -A
-            git commit -m ${{ env.COMMIT_TITLE }}
+            git commit -m '${{ env.COMMIT_TITLE }}'
             git config pull.rebase true
             git pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
