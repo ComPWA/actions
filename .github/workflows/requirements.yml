@@ -64,7 +64,13 @@ jobs:
       - name: List open pull requests
         id: list-prs
         run: |
-          echo "prs=$(gh pr list --json title,number --state open --base ${{ github.base_ref }} --title '${{ env.COMMIT_TITLE }}' --json)" | tee -a "$GITHUB_OUTPUT"
+          echo "prs=$(
+            gh pr list \
+              --base ${{ github.base_ref }} \
+              --json title,url \
+              --jq '.[] | select(.title == "${{ env.COMMIT_TITLE }}") | .url' \
+              --state open
+            )" | tee -a "$GITHUB_OUTPUT"
       - name: Check if constraints PR exists
         id: pr-exists
         run: |
