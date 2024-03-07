@@ -12,6 +12,7 @@ on:
 
 jobs:
   check-labels:
+    if: github.event.pull_request.state == 'open'
     name: Check labels
     runs-on: ubuntu-22.04
     steps:
@@ -23,6 +24,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   check-title:
+    if: github.event.pull_request.state == 'open'
     name: Check title
     runs-on: ubuntu-22.04
     steps:
