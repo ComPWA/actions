@@ -64,23 +64,17 @@ jobs:
       - name: List open pull requests
         id: list-prs
         run: |
-          echo "::set-output name=prs::$(gh pr list --json title,number --state open --base ${{ github.base_ref }} --title '${{ env.COMMIT_TITLE }}' --json)"
+          echo "prs=$(gh pr list --json title,number --state open --base ${{ github.base_ref }} --title '${{ env.COMMIT_TITLE }}' --json)" | tee -a "$GITHUB_OUTPUT"
       - name: Check if constraints PR exists
         id: pr-exists
         run: |
           prs="${{ steps.list-prs.outputs.prs }}"
           if [[ -z "$prs" ]]; then
-            echo "::set-output name=exists::false"
-          else
-            echo "::set-output name=exists::true"
-          fi
-      - name: Print PR status
-        run: |
-          pr_exists="${{ steps.pr-exists.outputs.exists }}"
-          if [[ "$pr_exists" == "true" ]]; then
-            echo "PR with title '${{ env.COMMIT_TITLE }}' already exists."
-          else
-            echo "No PR with title '${{ env.COMMIT_TITLE }}' found."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "✅ No PR with title '${{ env.COMMIT_TITLE }}' found."
+            else
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
           fi
 
   push:
