@@ -1,3 +1,6 @@
+env:
+  COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
+
 on:
   workflow_call:
     secrets:
@@ -87,7 +90,7 @@ jobs:
           git checkout -b ${{ github.head_ref }}
           if [[ $(git status -s) ]]; then
             git add -A
-            git commit -m "MAINT: update pip constraints and pre-commit"
+            git commit -m ${{ env.COMMIT_TITLE }}
             git config pull.rebase true
             git pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
@@ -98,10 +101,10 @@ jobs:
           github.event_name == 'workflow_dispatch'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "MAINT: update pip constraints and pre-commit"
+          commit-message: ${{ env.COMMIT_TITLE }}
           committer: GitHub <noreply@github.com>
           author: GitHub <noreply@github.com>
-          title: "MAINT: update pip constraints and pre-commit"
+          title: ${{ env.COMMIT_TITLE }}
           body: >-
             This PR updates the [`pip` constraint files](https://github.com/ComPWA/update-pip-constraints?tab=readme-ov-file#update-pip-constraint-files) under the `.constraints/` directory and pre-commit hooks in [`.pre-commit-config.yaml`](https://pre-commit.com). It was created automatically by a scheduled workflow.
           labels: |
