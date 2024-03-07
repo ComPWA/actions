@@ -1,3 +1,6 @@
+env:
+  COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
+
 on:
   workflow_call:
     secrets:
@@ -51,11 +54,47 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ComPWA/update-pre-commit@main
 
+  pr-exists:
+    name: Check if PR already exists
+    outputs:
+      exists: ${{ steps.pr-exists.outputs.exists }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: List open pull requests
+        id: list-prs
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "prs<<${delimiter}" >> $GITHUB_OUTPUT
+          for pr in $(
+            gh pr list \
+              --json title,url \
+              --jq '.[] | select(.title == "${{ env.COMMIT_TITLE }}") | .url' \
+              --state open
+            ); do
+            echo "$pr" | tee -a $GITHUB_OUTPUT
+          done
+          echo "${delimiter}" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Check if constraints PR exists
+        id: pr-exists
+        run: |
+          prs="${{ steps.list-prs.outputs.prs }}"
+          if [[ -z "$prs" ]]; then
+            echo "exists=false" | tee -a "$GITHUB_OUTPUT"
+            echo "✅ No PR with title '${{ env.COMMIT_TITLE }}' found."
+          else
+            echo "exists=true" | tee -a "$GITHUB_OUTPUT"
+            echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
+          fi
+
   push:
     name: Push changes
     runs-on: ubuntu-22.04
     needs:
       - pip-constraints
+      - pr-exists
       - pre-commit
     steps:
       - uses: actions/checkout@v4
@@ -87,21 +126,21 @@ jobs:
           git checkout -b ${{ github.head_ref }}
           if [[ $(git status -s) ]]; then
             git add -A
-            git commit -m "MAINT: update pip constraints and pre-commit"
+            git commit -m '${{ env.COMMIT_TITLE }}'
             git config pull.rebase true
             git pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           fi
       - name: Create Pull Request
         if: >-
-          github.event_name == 'schedule' ||
-          github.event_name == 'workflow_dispatch'
+          (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+          needs.pr-exists.outputs.exists != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "MAINT: update pip constraints and pre-commit"
+          commit-message: ${{ env.COMMIT_TITLE }}
           committer: GitHub <noreply@github.com>
           author: GitHub <noreply@github.com>
-          title: "MAINT: update pip constraints and pre-commit"
+          title: ${{ env.COMMIT_TITLE }}
           body: >-
             This PR updates the [`pip` constraint files](https://github.com/ComPWA/update-pip-constraints?tab=readme-ov-file#update-pip-constraint-files) under the `.constraints/` directory and pre-commit hooks in [`.pre-commit-config.yaml`](https://pre-commit.com). It was created automatically by a scheduled workflow.
           labels: |
