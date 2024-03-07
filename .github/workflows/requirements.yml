@@ -55,9 +55,6 @@ jobs:
       - uses: ComPWA/update-pre-commit@main
 
   pr-exists:
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch'
     name: Check if PR already exists
     outputs:
       exists: ${{ steps.pr-exists.outputs.exists }}
