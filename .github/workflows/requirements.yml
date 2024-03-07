@@ -71,6 +71,8 @@ jobs:
               --jq '.[] | select(.title == "${{ env.COMMIT_TITLE }}") | .url' \
               --state open
             )" | tee -a "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Check if constraints PR exists
         id: pr-exists
         run: |
