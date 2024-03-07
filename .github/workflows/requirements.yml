@@ -82,10 +82,10 @@ jobs:
         run: |
           prs="${{ steps.list-prs.outputs.prs }}"
           if [[ -z "$prs" ]]; then
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "exists=false" | tee -a "$GITHUB_OUTPUT"
             echo "✅ No PR with title '${{ env.COMMIT_TITLE }}' found."
-            else
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=true" | tee -a "$GITHUB_OUTPUT"
             echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
           fi
 
