@@ -54,11 +54,44 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ComPWA/update-pre-commit@main
 
+  pr-exists:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+    name: Check if PR already exists
+    outputs:
+      exists: ${{ steps.pr-exists.outputs.exists }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: List open pull requests
+        id: list-prs
+        run: |
+          echo "::set-output name=prs::$(gh pr list --json title,number --state open --base ${{ github.base_ref }} --title '${{ env.COMMIT_TITLE }}' --json)"
+      - name: Check if constraints PR exists
+        id: pr-exists
+        run: |
+          prs="${{ steps.list-prs.outputs.prs }}"
+          if [[ -z "$prs" ]]; then
+            echo "::set-output name=exists::false"
+          else
+            echo "::set-output name=exists::true"
+          fi
+      - name: Print PR status
+        run: |
+          pr_exists="${{ steps.pr-exists.outputs.exists }}"
+          if [[ "$pr_exists" == "true" ]]; then
+            echo "PR with title '${{ env.COMMIT_TITLE }}' already exists."
+          else
+            echo "No PR with title '${{ env.COMMIT_TITLE }}' found."
+          fi
+
   push:
     name: Push changes
     runs-on: ubuntu-22.04
     needs:
       - pip-constraints
+      - pr-exists
       - pre-commit
     steps:
       - uses: actions/checkout@v4
@@ -97,8 +130,8 @@ jobs:
           fi
       - name: Create Pull Request
         if: >-
-          github.event_name == 'schedule' ||
-          github.event_name == 'workflow_dispatch'
+          (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+          needs.pr-exists.outputs.exists != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: ${{ env.COMMIT_TITLE }}
