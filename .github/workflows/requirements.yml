@@ -64,12 +64,17 @@ jobs:
       - name: List open pull requests
         id: list-prs
         run: |
-          echo "prs=$(
+          delimiter="$(openssl rand -hex 8)"
+          echo "prs<<${delimiter}" >> $GITHUB_OUTPUT
+          for pr in $(
             gh pr list \
               --json title,url \
               --jq '.[] | select(.title == "${{ env.COMMIT_TITLE }}") | .url' \
               --state open
-            )" | tee -a "$GITHUB_OUTPUT"
+            ); do
+            echo "$pr" | tee -a $GITHUB_OUTPUT
+          done
+          echo "${delimiter}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Check if constraints PR exists
