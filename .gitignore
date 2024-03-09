@@ -3,4 +3,5 @@
 .eggs/
 
 # Temporary files
+condaenv.*.requirements.txt
 node_modules/
