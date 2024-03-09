@@ -42,7 +42,7 @@
     ".vscode/*",
     "pyproject.toml"
   ],
-  "ignoreWords": ["elif", "mhutchie", "noqa", "noreply", "taplo"],
+  "ignoreWords": ["elif", "mhutchie", "noqa", "noreply", "taplo", "tomlkit"],
   "language": "en-US",
   "version": "0.2",
   "words": []
