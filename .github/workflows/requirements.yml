@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pre-commit@main
+      - uses: ComPWA/update-pre-commit@v1
 
   pr-exists:
     name: Check if PR already exists
@@ -116,7 +116,12 @@ jobs:
             [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
             cd ../
           fi
-      - run: git status -s
+      - name: Show changed files
+        run: |
+          git config --global color.ui always
+          git status --short
+      - name: Show changes
+        run: git diff --color --unified=0
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
         run: |
