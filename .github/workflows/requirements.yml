@@ -1,6 +1,5 @@
 env:
   COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
-  TERM: xterm-256color
 
 on:
   workflow_call:
