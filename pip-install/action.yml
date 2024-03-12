@@ -76,7 +76,7 @@ runs:
         else
           curl -LsSf https://astral.sh/uv/install.sh | sh
           source $HOME/.cargo/env
-          echo 'PIP_INSTALL=uv pip install --system' | tee -a $GITHUB_ENV
+          echo 'PIP_INSTALL=uv pip install --color=always --system' | tee -a $GITHUB_ENV
         fi
       shell: bash
 
