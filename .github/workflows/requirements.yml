@@ -116,9 +116,10 @@ jobs:
             [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
             cd ../
           fi
-      - run: git config --global color.ui true
       - name: Show changed files
-        run: git status --short
+        run: |
+          unset NO_COLOR
+          git status --short
       - name: Show changes
         run: git diff --unified=0
       - name: Commit and push changes
