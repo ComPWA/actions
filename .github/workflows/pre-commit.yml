@@ -33,6 +33,7 @@ jobs:
   pre-commit:
     name: Run local pre-commit hooks
     env:
+      FORCE_COLOR: 1
       SKIP: taplo
     if: >-
       ${{ needs.determine-hooks.outputs.skipped-hooks != '' && needs.determine-hooks.outputs.skipped-hooks != 'taplo' }}
