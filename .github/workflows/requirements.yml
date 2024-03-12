@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pre-commit@main
+      - uses: ComPWA/update-pre-commit@v1
 
   pr-exists:
     name: Check if PR already exists
