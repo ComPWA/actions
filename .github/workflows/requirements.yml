@@ -90,6 +90,8 @@ jobs:
           fi
 
   push:
+    env:
+      TERM: xterm-256color
     name: Push changes
     runs-on: ubuntu-22.04
     needs:
@@ -117,9 +119,7 @@ jobs:
             cd ../
           fi
       - name: Show changed files
-        run: |
-          unset NO_COLOR
-          git status --short
+        run: git status --short
       - name: Show changes
         run: git diff --unified=0
       - name: Commit and push changes
