@@ -28,8 +28,12 @@ dev = [
     "compwa-actions[sty]",
 ]
 sty = [
+    "compwa-actions[types]",
     "pre-commit",
     "ruff",
+]
+types = [
+    "tomlkit",
 ]
 
 [project.readme]

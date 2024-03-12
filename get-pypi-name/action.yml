@@ -1,0 +1,25 @@
+name: Get PyPI package name
+description: >-
+  Get the name of the package to publish on PyPI from the `pyproject.toml` or
+  `setup.cfg` file.
+
+outputs:
+  name:
+    description: >-
+      Python package name as extracted from the `pyproject.toml` or `setup.cfg`.
+    value: ${{ steps.determine-name.outputs.package-name }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+    - run: pip install tomlkit
+      shell: bash
+    - id: determine-name
+      name: Determine Python package name
+      run: |
+        echo "package-name=$(python3 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      shell: bash
