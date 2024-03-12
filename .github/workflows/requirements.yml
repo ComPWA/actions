@@ -117,8 +117,11 @@ jobs:
             [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
             cd ../
           fi
-      - run: git status -s
-      - run: git diff --color --unified=0
+      - run: git config --global color.ui true
+      - name: Show changed files
+        run: git status --short
+      - name: Show changes
+        run: git diff --unified=0
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
         run: |
