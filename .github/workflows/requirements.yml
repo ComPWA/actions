@@ -118,7 +118,7 @@ jobs:
             cd ../
           fi
       - run: git status -s
-      - run: git diff --unified=0
+      - run: git diff --color --unified=0
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
         run: |
