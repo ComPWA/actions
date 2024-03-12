@@ -1,5 +1,6 @@
 env:
   COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
+  TERM: xterm-256color
 
 on:
   workflow_call:
@@ -117,6 +118,7 @@ jobs:
             cd ../
           fi
       - run: git status -s
+      - run: git diff --unified=0
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
         run: |
