@@ -1,0 +1,27 @@
+name: Build Python distribution package
+description: >-
+  Build a [distribution
+  package](https://packaging.python.org/en/latest/glossary/#term-Distribution-Package)
+  (`dist/`) before publishing it to PyPI. Once this action has completed, you can
+  publish it with the
+  [`pypa/gh-action-pypi-publish`](https://github.com/pypa/gh-action-pypi-publish) action.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+    - name: Install uv
+      run: |-
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        source $HOME/.cargo/env
+      shell: bash
+    - run: uv pip install --color=always --system build
+      shell: bash
+    - run: python3 -m build
+      shell: bash
+    - uses: actions/upload-artifact@v4
+      with:
+        path: dist/
