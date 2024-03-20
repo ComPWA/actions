@@ -1,0 +1,18 @@
+on:
+  workflow_call:
+    outputs:
+      name:
+        description: >-
+          Name of the Python package as determined from setup.cfg or pyproject.toml
+        value: ${{ jobs.package-name.outputs.name }}
+
+jobs:
+  package-name:
+    if: startsWith(github.ref, 'refs/tags')
+    name: Determine package name
+    runs-on: ubuntu-22.04
+    outputs:
+      name: ${{ steps.package-name.outputs.name }}
+    steps:
+      - run: ComPWA/actions/get-package-name@v1
+        id: package-name
