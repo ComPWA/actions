@@ -8,8 +8,8 @@ jobs:
     outputs:
       name: ${{ steps.package-name.outputs.name }}
     steps:
-      - run: ComPWA/actions/get-pypi-name@v1
-        id: package-name
+      - id: package-name
+        uses: ComPWA/actions/get-pypi-name@v1
 
   pypi:
     environment:
