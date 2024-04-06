@@ -4,7 +4,8 @@
     "rewrap.wrappingColumn": 72
   },
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -40,10 +41,5 @@
   "ruff.enable": true,
   "ruff.importStrategy": "fromEnvironment",
   "ruff.organizeImports": true,
-  "telemetry.telemetryLevel": "off",
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow.json": [
-      ".github/workflows/requirements.yml"
-    ]
-  }
+  "telemetry.telemetryLevel": "off"
 }
