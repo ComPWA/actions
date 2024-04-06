@@ -49,7 +49,7 @@ repos:
           - --in-place
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.3.3
+    rev: 0.3.4
     hooks:
       - id: check-dev-files
         args:
