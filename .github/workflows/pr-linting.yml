@@ -34,3 +34,6 @@ jobs:
         run: |
           echo "module.exports = {extends: ['@compwa/commitlint-config']}" > commitlint.config.js
       - uses: JulienKode/pull-request-name-linter-action@v0.5.0 # cspell:ignore kode
+      - if: failure()
+        run: >
+          echo "::error::Please use a conventional commit message for the pull request title. See https://compwa.github.io/develop.html#commit-conventions for examples."
