@@ -19,4 +19,8 @@ runs:
           sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}-${{hashFiles('src/**.py')}}
         restore-keys: |
           sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'setup.cfg')}}
-        path: ~/.sympy-cache*/
+        path: |
+          ~/.cache/ampform/
+          ~/.cache/ampform-dpd/
+          ~/.cache/tensorwaves/
+          ~/.sympy-cache*/
