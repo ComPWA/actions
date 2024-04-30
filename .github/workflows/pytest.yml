@@ -75,12 +75,12 @@ jobs:
       - uses: ComPWA/actions/cache-sympy@v1
 
       - if: matrix.coverage-target == '' && inputs.multithreaded
-        run: pytest -n auto
+        run: pytest -m "not slow or slow" -n auto
       - if: matrix.coverage-target == '' && ! inputs.multithreaded
-        run: pytest
+        run: pytest -m "not slow or slow"
 
       - if: matrix.coverage-target != ''
-        run: pytest --cov=${{ matrix.coverage-target }} --cov-report=xml
+        run: pytest -m "not slow or slow" --cov=${{ matrix.coverage-target }} --cov-report=xml
       - if: matrix.coverage-target != ''
         uses: codecov/codecov-action@v4
         with:
