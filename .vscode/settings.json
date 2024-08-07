@@ -36,6 +36,7 @@
   },
   "notebook.formatOnSave.enabled": true,
   "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": false,
   "redhat.telemetry.enabled": false,
   "rewrap.wrappingColumn": 88,
   "ruff.enable": true,
