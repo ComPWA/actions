@@ -13,14 +13,14 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.5
+    rev: v0.5.6
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
@@ -49,7 +49,7 @@ repos:
           - --in-place
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.3.4
+    rev: 0.3.18
     hooks:
       - id: check-dev-files
         args:
@@ -64,7 +64,7 @@ repos:
           - --repo-title=ComPWA actions and shared workflows
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.6.1
+    rev: v8.13.1
     hooks:
       - id: cspell
 
@@ -80,6 +80,6 @@ repos:
           )$
 
   - repo: https://github.com/ComPWA/mirrors-pyright
-    rev: v1.1.357
+    rev: v1.1.374
     hooks:
       - id: pyright
