@@ -48,6 +48,7 @@ jobs:
           EXECUTE_NB: yes
           GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONWARNINGS: ""
         run: tox -e doc
       - uses: actions/upload-pages-artifact@v3
         if: always()
