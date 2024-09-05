@@ -82,14 +82,16 @@ jobs:
         if: always()
         name: Determine changed files
         run: |
-          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
-          diff_files="$some_file_in_root $(git diff --name-only)"
-          delimiter="$(openssl rand -hex 8)"
-          echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          for file in $diff_files; do
-            echo "$file" | tee -a $GITHUB_OUTPUT
-          done
-          echo "${delimiter}" >> $GITHUB_OUTPUT
+          if [[ $(git diff --name-only) ]]; then
+            some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+            diff_files="$some_file_in_root $(git diff --name-only)"
+            delimiter="$(openssl rand -hex 8)"
+            echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
+            for file in $diff_files; do
+              echo "$file" | tee -a $GITHUB_OUTPUT
+            done
+            echo "${delimiter}" >> $GITHUB_OUTPUT
+          fi
         # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
@@ -119,14 +121,16 @@ jobs:
         if: always()
         name: Determine changed files
         run: |
-          some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
-          diff_files="$some_file_in_root $(git diff --name-only)"
-          delimiter="$(openssl rand -hex 8)"
-          echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
-          for file in $diff_files; do
-            echo "$file" | tee -a $GITHUB_OUTPUT
-          done
-          echo "${delimiter}" >> $GITHUB_OUTPUT
+          if [[ $(git diff --name-only) ]]; then
+            some_file_in_root=$(git ls-files --directory | grep -E '^[^/]+$' | head -n1)
+            diff_files="$some_file_in_root $(git diff --name-only)"
+            delimiter="$(openssl rand -hex 8)"
+            echo "diff<<${delimiter}" >> $GITHUB_OUTPUT
+            for file in $diff_files; do
+              echo "$file" | tee -a $GITHUB_OUTPUT
+            done
+            echo "${delimiter}" >> $GITHUB_OUTPUT
+          fi
         # https://github.com/actions/upload-artifact/issues/174#issuecomment-934330651
         shell: bash
       - if: always() && steps.diff.outputs.diff != ''
