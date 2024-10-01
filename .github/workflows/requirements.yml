@@ -140,7 +140,7 @@ jobs:
         if: >-
           (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
           needs.pr-exists.outputs.exists != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: ${{ env.COMMIT_TITLE }}
           committer: GitHub <noreply@github.com>
