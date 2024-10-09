@@ -36,7 +36,7 @@ def _format_skipped_version(skipped_python_versions: str) -> set[str] | None:
     return set(skipped_python_versions.split(" "))
 
 
-def create_job_matrix(
+def create_job_matrix(  # noqa: C901
     coverage_python_version: str,
     coverage_target: str,
     macos_python_version: str,
@@ -66,11 +66,17 @@ def create_job_matrix(
             "python-version": "3.6",
             "runs-on": "ubuntu-20.04",
         })
+    if "3.7" in python_versions:
+        python_versions.remove("3.7")
+        includes.append({
+            "python-version": "3.7",
+            "runs-on": "ubuntu-22.04",
+        })
     if coverage_target:
         includes.append({
             "coverage-target": coverage_target,
             "python-version": coverage_python_version,
-            "runs-on": "ubuntu-22.04",
+            "runs-on": "ubuntu-24.04",
         })
     if macos_python_version:
         includes.append({
@@ -81,7 +87,7 @@ def create_job_matrix(
     if python_versions:
         matrix = {
             "python-version": python_versions,
-            "runs-on": ["ubuntu-22.04"],
+            "runs-on": ["ubuntu-24.04"],
         }
     if includes:
         matrix["include"] = includes
