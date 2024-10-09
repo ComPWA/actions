@@ -17,6 +17,9 @@ on:
           https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
         required: false
 
+env:
+  DISABLE_PRE_COMMIT_UV_PATCH: True
+
 jobs:
   determine-hooks:
     name: Determine skipped pre-commit hooks
