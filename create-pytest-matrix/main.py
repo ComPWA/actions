@@ -75,7 +75,7 @@ def create_job_matrix(
     if macos_python_version:
         includes.append({
             "python-version": macos_python_version,
-            "runs-on": "macos-12",
+            "runs-on": "macos-14",
         })
     matrix = {}
     if python_versions:
