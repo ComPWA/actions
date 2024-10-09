@@ -15,7 +15,7 @@ on:
 jobs:
   docnb:
     name: Execute and build documentation
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ComPWA/actions/pip-install@v1

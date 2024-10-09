@@ -70,7 +70,7 @@ def create_job_matrix(
         includes.append({
             "coverage-target": coverage_target,
             "python-version": coverage_python_version,
-            "runs-on": "ubuntu-22.04",
+            "runs-on": "ubuntu-24.04",
         })
     if macos_python_version:
         includes.append({
@@ -81,7 +81,7 @@ def create_job_matrix(
     if python_versions:
         matrix = {
             "python-version": python_versions,
-            "runs-on": ["ubuntu-22.04"],
+            "runs-on": ["ubuntu-24.04"],
         }
     if includes:
         matrix["include"] = includes

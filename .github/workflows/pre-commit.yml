@@ -26,7 +26,7 @@ jobs:
     outputs:
       skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
       taplo-version: ${{ steps.taplo.outputs.taplo-version }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - id: hooks
         uses: ComPWA/actions/get-skipped-pre-commit-hooks@v1
@@ -42,7 +42,7 @@ jobs:
     if: >-
       ${{ needs.determine-hooks.outputs.skipped-hooks != '' && needs.determine-hooks.outputs.skipped-hooks != 'taplo' }}
     needs: determine-hooks
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -113,7 +113,7 @@ jobs:
     if: needs.determine-hooks.outputs.taplo-version != ''
     name: Run taplo through pre-commit
     needs: determine-hooks
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: git config --global --add safe.directory $(pwd)
@@ -153,7 +153,7 @@ jobs:
     needs:
       - pre-commit
       - taplo
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
