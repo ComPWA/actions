@@ -4,7 +4,7 @@ description: >-
 
 inputs:
   coverage-python-version:
-    default: "3.9"
+    default: "3.12"
     description: Python version on which to run the test coverage job.
     required: false
   coverage-target:
@@ -30,7 +30,7 @@ runs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.9"
+        python-version: "3.12"
     - run: pip install toml
       shell: bash
     - id: set-matrix
