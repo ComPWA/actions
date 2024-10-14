@@ -6,9 +6,12 @@ import json
 import os
 from argparse import ArgumentParser
 from configparser import ConfigParser
-from typing import Sequence
+from typing import TYPE_CHECKING
 
 import toml
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -54,7 +57,7 @@ def create_job_matrix(  # noqa: C901
             msg = (
                 f"Selected Python {coverage_python_version} for the coverage job, but"
                 " the package only supports Python"
-                f" {', '.join(supported_python_versions)}"
+                f" {", ".join(supported_python_versions)}"
             )
             raise ValueError(msg)
         if coverage_python_version in python_versions:

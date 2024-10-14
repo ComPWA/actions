@@ -32,3 +32,5 @@ jobs:
     secrets:
       token: ${{ secrets.PAT }}
     uses: ComPWA/actions/.github/workflows/pre-commit.yml@v1
+    with:
+      python-version: "3.12"
