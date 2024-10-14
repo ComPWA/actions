@@ -5,3 +5,4 @@
 # Temporary files
 condaenv.*.requirements.txt
 node_modules/
+uv.lock
