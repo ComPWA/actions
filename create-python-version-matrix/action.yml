@@ -31,11 +31,14 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - id: set-matrix
+    - uses: astral-sh/setup-uv@v3
+    - env:
+        UV_SYSTEM_PYTHON: 1
+      id: set-matrix
       name: Create run matrix in JSON form
       run: |
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-        python3 $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
+        uv run $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash
