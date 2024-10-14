@@ -48,7 +48,6 @@
     "noreply",
     "pyright",
     "taplo",
-    "tomlkit",
     "tomllib"
   ],
   "language": "en-US",
