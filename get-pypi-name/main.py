@@ -1,9 +1,8 @@
 """Print job matrix for a GitHub Actions workflow that runs `pytest`."""
 
 import os
+import tomllib
 from configparser import ConfigParser
-
-import tomlkit
 
 
 def main() -> int:
@@ -29,8 +28,8 @@ def _get_package_name_setup_cfg() -> str | None:
 def _get_package_name_pyproject_toml() -> str | None:
     if not os.path.exists("pyproject.toml"):
         return None
-    with open("pyproject.toml") as f:
-        pyproject = tomlkit.load(f)
+    with open("pyproject.toml", "rb") as f:
+        pyproject = tomllib.load(f)
     return pyproject.get("project", {}).get("name")
 
 
