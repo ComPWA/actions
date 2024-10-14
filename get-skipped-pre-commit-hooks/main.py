@@ -1,4 +1,7 @@
-"""Print job matrix for a GitHub Actions workflow that runs `pytest`."""
+"""Determine which pre-commit hooks should be skipped."""
+# /// script
+# dependencies = ["PyYAML"]
+# ///
 
 import os
 

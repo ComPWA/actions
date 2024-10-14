@@ -1,4 +1,7 @@
-"""Print job matrix for a GitHub Actions workflow that runs `pytest`."""
+"""Get version of Taplo in :file:`.pre-commit-config.yml`."""
+# /// script
+# dependencies = ["PyYAML"]
+# ///
 
 import os
 
