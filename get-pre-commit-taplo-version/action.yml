@@ -17,10 +17,11 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - run: python3 -m pip install PyYAML
-      shell: bash
-    - id: taplo
+    - uses: astral-sh/setup-uv@v3
+    - env:
+        UV_SYSTEM_PYTHON: 1
+      id: taplo
       name: Determine taplo version
       run: |
-        echo "version=$(python3 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+        echo "version=$(uv run $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
       shell: bash
