@@ -55,7 +55,9 @@ repos:
         args:
           - --allow-deprecated-workflows
           - --dependabot=update
+          - --dev-python-version=3.12
           - --keep-pr-linting
+          - --no-gitpod
           - --no-notebooks
           - --no-prettierrc
           - --no-pypi

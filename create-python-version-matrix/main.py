@@ -1,7 +1,5 @@
 """Print job matrix for a GitHub Actions workflow that runs `pytest`."""
 
-from __future__ import annotations
-
 import json
 import os
 from configparser import ConfigParser
