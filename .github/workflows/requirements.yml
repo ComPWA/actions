@@ -39,7 +39,8 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pip-constraints@v1
+      - if: hashFiles('.constraints/py3.*.txt')
+        uses: ComPWA/update-pip-constraints@v1
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -52,7 +53,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pre-commit@v1
+      - if: hashFiles('.pre-commit-config.yaml')
+        uses: ComPWA/update-pre-commit@v1
 
   pr-exists:
     name: Check if PR already exists
