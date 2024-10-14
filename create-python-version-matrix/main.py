@@ -2,9 +2,8 @@
 
 import json
 import os
+import tomllib
 from configparser import ConfigParser
-
-import toml
 
 PYPROJECT_TOML = "pyproject.toml"
 SETUP_CFG = "setup.cfg"
@@ -52,8 +51,8 @@ def __get_classifiers_from_cfg(path: str) -> list[str]:
 
 
 def __get_classifiers_from_toml(path: str) -> list[str]:
-    with open(path) as f:
-        cfg = toml.load(f)
+    with open(path, "rb") as f:
+        cfg = tomllib.load(f)
     classifiers = cfg.get("project", {}).get("classifiers")
     if classifiers is None:
         raise ValueError(CLASSIFIERS_ERROR_MSG)

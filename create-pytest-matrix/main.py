@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import json
 import os
+import tomllib
 from argparse import ArgumentParser
 from configparser import ConfigParser
 from typing import TYPE_CHECKING
-
-import toml
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -130,8 +129,8 @@ def __get_classifiers_from_cfg(path: str) -> list[str]:
 
 
 def __get_classifiers_from_toml(path: str) -> list[str]:
-    with open(path) as f:
-        cfg = toml.load(f)
+    with open(path, "rb") as f:
+        cfg = tomllib.load(f)
     classifiers = cfg.get("project", {}).get("classifiers")
     if classifiers is None:
         raise ValueError(CLASSIFIERS_ERROR_MSG)

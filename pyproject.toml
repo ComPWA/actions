@@ -12,7 +12,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python",
 ]
-dependencies = ["toml"]
 description = "Python scripts used by the ComPWA/actions repository"
 dynamic = ["version"]
 license = {text = "License :: OSI Approved :: MIT License"}

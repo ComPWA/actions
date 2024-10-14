@@ -31,8 +31,6 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - run: pip install toml
-      shell: bash
     - id: set-matrix
       name: Create run matrix in JSON form
       run: |
