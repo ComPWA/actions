@@ -1,5 +1,5 @@
 env:
-  COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
+  COMMIT_TITLE: "MAINT: update lock files"
 
 on:
   workflow_call:
@@ -39,7 +39,8 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pip-constraints@v1
+      - if: hashFiles('.constraints/py3.*.txt')
+        uses: ComPWA/update-pip-constraints@v1
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -52,7 +53,27 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/update-pre-commit@v1
+      - if: hashFiles('.pre-commit-config.yaml')
+        uses: ComPWA/update-pre-commit@v1
+
+  uv-lock:
+    name: Update uv.lock
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - if: hashFiles('uv.lock')
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - if: hashFiles('uv.lock')
+        run: uv lock --upgrade
+      - if: hashFiles('uv.lock')
+        uses: actions/upload-artifact@v4
+        with:
+          name: uv-lock
+          path: uv.lock
 
   pr-exists:
     name: Check if PR already exists
@@ -94,8 +115,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - pip-constraints
-      - pr-exists
       - pre-commit
+      - uv-lock
+      - pr-exists
     steps:
       - uses: actions/checkout@v4
         with:
@@ -105,17 +127,18 @@ jobs:
           merge-multiple: true
           path: artifact
       - run: ls -A
-      - name: Move artifacts to correct location
+      - if: hashFiles('artifact/')
+        name: Move artifacts to correct location
         run: |
-          if [[ -d artifact ]]; then
-            cd artifact
-            ls -A
-            [[ -f .pre-commit-config.yaml ]] && mv -f .pre-commit-config.yaml ..
-            [[ "$(ls)" != "" ]] && mkdir -p ../.constraints/ && mv -f * ../.constraints/
+          ls -A
+          [[ -f .pre-commit-config.yaml ]] && mv -f .pre-commit-config.yaml ..
+          [[ -f uv.lock ]] && mv -f uv.lock ..
+          if [[ -d .constraints/ ]]; then
+            mkdir -p ../.constraints/ && mv -f * ../.constraints/
             cd ../.constraints/
             [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
-            cd ../
           fi
+        working-directory: artifact/
       - name: Show changed files
         run: |
           git config --global color.ui always
