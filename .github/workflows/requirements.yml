@@ -1,5 +1,5 @@
 env:
-  COMMIT_TITLE: "MAINT: update pip constraints and pre-commit"
+  COMMIT_TITLE: "MAINT: update lock files"
 
 on:
   workflow_call:
