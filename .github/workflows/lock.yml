@@ -23,11 +23,18 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.version-matrix.outputs.matrix || steps.empty.outputs.matrix }}
     runs-on: ubuntu-24.04
     steps:
-      - id: set-matrix
+      - id: version-matrix
+        if: hashFiles('.constraints/')
         uses: ComPWA/actions/create-python-version-matrix@v2
+      - id: empty
+        if: hashFiles('.constraints/') == ''
+        name: Set empty Python version matrix
+        run: |
+          echo 'matrix={"python-version": ["skipped"]}' >> $GITHUB_OUTPUT
+        shell: bash
 
   pip-constraints:
     name: Update pip constraints
@@ -38,8 +45,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
-      - if: hashFiles('.constraints/py3.*.txt')
+      - if: matrix.python-version != 'skipped'
         uses: ComPWA/update-pip-constraints@v1
         with:
           python-version: ${{ matrix.python-version }}
