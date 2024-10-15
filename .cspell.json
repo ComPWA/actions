@@ -46,6 +46,7 @@
     "mhutchie",
     "noqa",
     "noreply",
+    "numprocesses",
     "pyright",
     "taplo",
     "tomllib"
