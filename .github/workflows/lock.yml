@@ -46,8 +46,6 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - if: matrix.python-version != 'skipped'
-        uses: actions/checkout@v4
-      - if: matrix.python-version != 'skipped'
         uses: ComPWA/update-pip-constraints@v1
         with:
           python-version: ${{ matrix.python-version }}

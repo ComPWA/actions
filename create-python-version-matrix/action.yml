@@ -27,6 +27,7 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@v4
     - if: hashFiles('pyproject.toml')
       uses: actions/setup-python@v5
       with:
