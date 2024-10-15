@@ -39,6 +39,7 @@ jobs:
       FORCE_COLOR: 1
       SKIP: taplo
       TERM: xterm-256color
+      UV_SYSTEM_PYTHON: 1
     if: >-
       ${{ needs.determine-hooks.outputs.skipped-hooks != '' && needs.determine-hooks.outputs.skipped-hooks != 'taplo' }}
     needs: determine-hooks
@@ -55,9 +56,7 @@ jobs:
             **/pyproject.toml
             **/uv.lock
           enable-cache: true
-      - env:
-          UV_SYSTEM_PYTHON: 1
-        name: Determine if repository is Python package
+      - name: Determine if repository is Python package
         run: |
           uv_command=$(uv pip install -e '.[sty]' > /dev/null && echo "uv run --extra sty" || echo uvx)
           echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
@@ -69,13 +68,9 @@ jobs:
           restore-keys: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
-      - env:
-          UV_SYSTEM_PYTHON: 1
-        if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
+      - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
         run: ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run --all-files --color always
-      - env:
-          UV_SYSTEM_PYTHON: 1
-        if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
+      - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
           export skipped_hooks='${{ needs.determine-hooks.outputs.skipped-hooks }}'
