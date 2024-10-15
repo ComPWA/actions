@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@v1
+        uses: ComPWA/actions/create-pytest-matrix@v2
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
@@ -64,7 +64,7 @@ jobs:
       - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      - uses: ComPWA/actions/cache-sympy@v1
+      - uses: ComPWA/actions/cache-sympy@v2
       - name: Determine extras to install
         run: |
           test_extras='--extra test'

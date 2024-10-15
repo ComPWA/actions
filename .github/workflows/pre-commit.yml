@@ -29,9 +29,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v1
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v2
       - id: taplo
-        uses: ComPWA/actions/get-pre-commit-taplo-version@v1
+        uses: ComPWA/actions/get-pre-commit-taplo-version@v2
 
   pre-commit:
     name: Run local pre-commit hooks
