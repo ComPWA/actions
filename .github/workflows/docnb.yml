@@ -46,6 +46,7 @@ jobs:
       - name: Build documentation and run notebooks
         env:
           EXECUTE_NB: yes
+          FORCE_COLOR: yes
           GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTHONWARNINGS: ""
