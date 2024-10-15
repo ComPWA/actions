@@ -50,6 +50,10 @@ jobs:
           python-version: ${{ inputs.python-version }}
       - uses: astral-sh/setup-uv@v3
         with:
+          cache-dependency-glob: |
+            **/.pre-commit-config.yaml
+            **/pyproject.toml
+            **/uv.lock
           enable-cache: true
       - name: Determine if repository is Python package
         run: |

@@ -63,6 +63,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v3
         with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
           enable-cache: true
       - uses: ComPWA/actions/cache-sympy@v2
       - name: Determine extras to install

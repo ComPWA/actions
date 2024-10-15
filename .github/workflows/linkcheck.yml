@@ -20,6 +20,9 @@ jobs:
           python-version: ${{ inputs.python-version }}
       - uses: astral-sh/setup-uv@v3
         with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
           enable-cache: true
       - if: inputs.apt-packages
         run: |
