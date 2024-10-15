@@ -12,7 +12,6 @@ import json
 import os
 import tomllib
 from argparse import ArgumentParser
-from configparser import ConfigParser
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -109,7 +108,6 @@ def _is_version_allowed(version: str, supported_versions: list[str]) -> None:
 
 
 PYPROJECT_TOML = "pyproject.toml"
-SETUP_CFG = "setup.cfg"
 VERSION_IDENTIFIER = "Programming Language :: Python :: 3."
 
 
@@ -125,39 +123,11 @@ class VersionInfo:
 
 
 def _get_version_info() -> VersionInfo:
-    if os.path.exists(SETUP_CFG):
-        return _get_version_info_from_cfg(SETUP_CFG)
-    if os.path.exists(PYPROJECT_TOML):
-        return _get_version_info_from_toml(PYPROJECT_TOML)
-    msg = f"This project does not contain a {SETUP_CFG} or {PYPROJECT_TOML}"
-    raise FileNotFoundError(msg)
-
-
-def _get_version_info_from_cfg(path: str) -> VersionInfo:
-    cfg = ConfigParser()
-    cfg.read(path)
-    return VersionInfo(
-        classifiers=__get(cfg, "metadata", "classifiers", typ=list),
-        requires_python=__get(cfg, "options", "python_requires"),
-    )
-
-
-def __get[T](
-    cfg: ConfigParser, section: str, option: str, typ: type[T] = str
-) -> T | None:
-    if not cfg.has_option(section, option):
-        return None
-    raw = cfg.get("metadata", "classifiers")
-    if typ is str:
-        return raw  # pyright: ignore[reportReturnType]
-    if typ is list:
-        return [s.strip() for s in raw.split("\n") if s.strip()]  # pyright: ignore[reportReturnType]
-    msg = f"Unsupported cast type: {typ}"
-    raise NotImplementedError(msg)
-
-
-def _get_version_info_from_toml(path: str) -> VersionInfo:
-    with open(path, "rb") as f:
+    pyproject_toml_path = "pyproject.toml"
+    if not os.path.exists(pyproject_toml_path):
+        msg = f"This project does not contain a {pyproject_toml_path}"
+        raise FileNotFoundError(msg)
+    with open(pyproject_toml_path, "rb") as f:
         cfg = tomllib.load(f)
     project_table: dict = cfg.get("project", {})
     return VersionInfo(
@@ -181,10 +151,11 @@ def _determine_python_versions_from_classifiers(
 ) -> list[str] | None:
     if version_info.classifiers is None:
         return None
-    versions = [s for s in version_info.classifiers if s.startswith(VERSION_IDENTIFIER)]
+    version_identifier = "Programming Language :: Python :: 3."
+    versions = [s for s in version_info.classifiers if s.startswith(version_identifier)]
     if not versions:
         return None
-    prefix = VERSION_IDENTIFIER[:-2]
+    prefix = version_identifier[:-2]
     return [s.replace(prefix, "") for s in versions]
 
 

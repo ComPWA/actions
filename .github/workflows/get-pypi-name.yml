@@ -3,7 +3,7 @@ on:
     outputs:
       name:
         description: >-
-          Name of the Python package as determined from setup.cfg or pyproject.toml
+          Name of the Python package as determined from pyproject.toml
         value: ${{ jobs.package-name.outputs.name }}
 
 jobs:

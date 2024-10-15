@@ -29,9 +29,9 @@ jobs:
         uses: actions/cache@v4
         with:
           key: |
-            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}-${{ hashFiles('docs/**') }}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py') }}-${{ hashFiles('docs/**') }}
           restore-keys: |
-            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'setup.cfg', 'src/**.py') }}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py') }}
           path: |
             ./docs/_build/.jupyter_cache
       - uses: ComPWA/actions/cache-sympy@v1

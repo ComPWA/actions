@@ -1,12 +1,10 @@
 name: Get PyPI package name
-description: >-
-  Get the name of the package to publish on PyPI from the `pyproject.toml` or
-  `setup.cfg` file.
+description: Get the name of the package to publish on PyPI from pyproject.toml
 
 outputs:
   name:
     description: >-
-      Python package name as extracted from the `pyproject.toml` or `setup.cfg`.
+      Python package name as extracted from the pyproject.toml.
     value: ${{ steps.determine-name.outputs.package-name }}
 
 runs:
