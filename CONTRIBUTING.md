@@ -1,11 +1,26 @@
-# Help developing
+# How to contribute?
 
-## Local set-up
+[![Open in Visual Studio Code](https://img.shields.io/badge/vscode-open-blue?logo=visualstudiocode)](https://github.dev/ComPWA/actions)
 
-Please install `pre-commit`, for example [through Conda](https://anaconda.org/conda-forge/pre_commit). For more information, see [Help developing](https://compwa.github.io/develop) on [compwa.github.io](https://compwa.github.io).
+> [!TIP]
+> This package is part of the [ComPWA Organization](https://github.com/ComPWA). For more information about how to contribute to the packages, go to **[compwa.github.io/develop](https://compwa.github.io/develop)**!
 
-## Conventions
+To contribute to the project, you need to install the package in a virtual environment. This can be done best with [`uv`](https://docs.astral.sh/uv) (see installation instructions [here](https://docs.astral.sh/uv/getting-started/installation)). For this, you first need to get the source code with [Git](https://git-scm.com):
 
-- It is assumed that repositories that use shared workflows from this repository can run their CI jobs locally with [`tox`](https://tox.wiki). Names of the workflow files should therefore be the same as the name of the corresponding `tox` job. For example, a common job is `docnb`, which builds HTML pages with [Sphinx](https://www.sphinx-doc.org) using the [`myst-nb`](https://myst-nb.rtfd.io) extension. The corresponding job file for this job is [`docnb.yml`](./.github/workflows/docnb.yml).
-- Workflow definitions are located under [`.github/workflows`](./.github/workflows/): GitHub Actions [does not yet support sharing workflows in subdirectories](https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow).
-- Actions are located under directories in the root folder, for example [`pip-install/action.yml`](./pip-install/action.yml).
+```shell
+git clone https://github.com/ComPWA/actions
+cd actions
+```
+
+Now it's simply a matter of creating and activating the [virtual environment](https://docs.astral.sh/uv/pip/environments) with [`uv sync`](https://docs.astral.sh/uv/reference/cli/#uv-sync). The dependencies for the project are 'pinned' in each commit through the [`uv.lock` file](https://docs.astral.sh/uv/concepts/projects/#project-lockfile).
+
+```shell
+uv sync
+source .venv/bin/activate
+```
+
+Formatting and linting checks are automatically performed when committing changes. This is done with [pre-commit](https://pre-commit.com). To install the hooks in your local repository, run [`pre-commit install`](https://pre-commit.com/#3-install-the-git-hook-scripts) **once**:
+
+```shell
+pre-commit install --install-hooks
+```

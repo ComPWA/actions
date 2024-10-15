@@ -1,7 +1,15 @@
+name: Update
+
 env:
   COMMIT_TITLE: "MAINT: update lock files"
 
 on:
+  pull_request:
+    branches:
+      - main
+      - epic/*
+    paths:
+      - .pre-commit-config.yaml
   workflow_call:
     secrets:
       token:
@@ -14,6 +22,7 @@ on:
           This page tells more about creating a PAT:
           https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
         required: true
+  workflow_dispatch:
 
 jobs:
   find-lock-files:
@@ -134,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.token }}
+          token: ${{ secrets.token || github.token}}
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true

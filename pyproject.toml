@@ -4,14 +4,6 @@ requires = ["setuptools>=61.2"]
 
 [project]
 authors = [{name = "Common Partial Wave Analysis", email = "compwa-admin@ep1.rub.de"}]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python",
-]
 dependencies = ["packaging"]
 description = "Python scripts used by the ComPWA/actions repository"
 dynamic = ["version"]
@@ -24,7 +16,7 @@ dev = [
     "compwa-actions[sty]",
 ]
 sty = [
-    "pre-commit",
+    "pre-commit-uv",
     "ruff",
 ]
 
@@ -37,6 +29,9 @@ include-package-data = false
 license-files = ["LICENSE"]
 
 [tool.pyright]
+exclude = [
+    "**/.venv/",
+]
 reportMissingTypeArgument = false
 reportUnknownArgumentType = false
 reportUnknownMemberType = false
@@ -47,7 +42,6 @@ typeCheckingMode = "strict"
 [tool.ruff]
 preview = true
 show-fixes = true
-target-version = "py312"
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -100,6 +94,5 @@ sort_first = [
     "tool.setuptools",
     "tool.setuptools_scm",
 ]
-sort_table_keys = true
 spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
