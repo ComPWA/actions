@@ -2,27 +2,14 @@
 
 import os
 import tomllib
-from configparser import ConfigParser
 
 
 def main() -> int:
-    for getter in (
-        _get_package_name_setup_cfg,
-        _get_package_name_pyproject_toml,
-    ):
-        package_name = getter()
-        if package_name is not None:
-            print(package_name)
-            return 0
-    return 1
-
-
-def _get_package_name_setup_cfg() -> str | None:
-    if not os.path.exists("setup.cfg"):
-        return None
-    cfg = ConfigParser()
-    cfg.read("setup.cfg")
-    return cfg.get("metadata", "name", fallback=None)
+    package_name = _get_package_name_pyproject_toml()
+    if package_name is None:
+        return 1
+    print(package_name)
+    return 0
 
 
 def _get_package_name_pyproject_toml() -> str | None:
