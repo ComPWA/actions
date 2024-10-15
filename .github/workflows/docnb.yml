@@ -54,7 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UV_SYSTEM_PYTHON: 1
         run: >-
-          uv run
+          uv run \
             --extra doc \
             --with tox \
             tox -e doc
