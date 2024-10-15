@@ -29,9 +29,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v1
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v2
       - id: taplo
-        uses: ComPWA/actions/get-pre-commit-taplo-version@v1
+        uses: ComPWA/actions/get-pre-commit-taplo-version@v2
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -39,6 +39,7 @@ jobs:
       FORCE_COLOR: 1
       SKIP: taplo
       TERM: xterm-256color
+      UV_SYSTEM_PYTHON: 1
     if: >-
       ${{ needs.determine-hooks.outputs.skipped-hooks != '' && needs.determine-hooks.outputs.skipped-hooks != 'taplo' }}
     needs: determine-hooks
@@ -48,19 +49,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          cache-dependency-glob: |
+            **/.pre-commit-config.yaml
+            **/pyproject.toml
+            **/uv.lock
+          enable-cache: true
       - name: Determine if repository is Python package
         run: |
-          is_package=$(pip install -e . > /dev/null && echo yes || echo no)
-          echo "IS_PYPI_PACKAGE=$is_package" | tee -a "$GITHUB_OUTPUT"
-        id: package
-      - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'yes' }}
-        uses: ComPWA/actions/pip-install@v1
-        with:
-          editable: "yes"
-          extras: sty
-          python-version: ${{ inputs.python-version }}
-      - if: ${{ steps.package.outputs.IS_PYPI_PACKAGE == 'no' }}
-        run: pip install pre-commit
+          uv_command=$(uv pip install -e '.[sty]' > /dev/null && echo "uv run --extra sty" || echo uvx)
+          echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
       - name: Fetch pre-commit cache
         uses: actions/cache@v4
         with:
@@ -70,7 +69,7 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: pre-commit run --all-files --color always
+        run: ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run --all-files --color always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -79,7 +78,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            pre-commit run $hook --all-files --color always
+            ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run $hook --all-files --color always
           done
       - id: diff
         if: always()

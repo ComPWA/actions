@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       additional-extras:
-        description: Comma-separated additional extras that need to be installed for the tests.
+        description: Space-separated additional extras that need to be installed for the tests.
         required: false
         type: string
       coverage-python-version:
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@v1
+        uses: ComPWA/actions/create-pytest-matrix@v2
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
@@ -58,29 +58,36 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+          enable-cache: true
+      - uses: ComPWA/actions/cache-sympy@v2
       - name: Determine extras to install
         run: |
-          if [[ -z '${{ inputs.additional-extras }}' ]]; then
-            echo 'TEST_EXTRAS=test' | tee -a $GITHUB_ENV
-          else
-            echo 'TEST_EXTRAS=test,${{ inputs.additional-extras }}' | tee -a $GITHUB_ENV
+          test_extras='--extra test'
+          for extra in ${{ inputs.specific-pip-packages }}; do
+            test_extras="$test_extras --extra $extra"
+          done
+          echo "TEST_EXTRAS=$test_extras" | tee -a $GITHUB_ENV
+      - name: Determine pytest flags
+        run: |
+          pytest_flags='-m "not slow or slow"'
+          if [[ ! -z '${{ inputs.coverage-target }}' ]]; then
+            pytest_flags="$pytest_flags --cov-report=xml --cov=${{ matrix.coverage-target }}"
           fi
-      - uses: ComPWA/actions/pip-install@v1
-        with:
-          additional-packages: tox
-          editable: "yes"
-          extras: ${{ env.TEST_EXTRAS }}
-          python-version: ${{ matrix.python-version }}
-          specific-packages: ${{ inputs.specific-pip-packages }}
-      - uses: ComPWA/actions/cache-sympy@v1
-
-      - if: matrix.coverage-target == '' && inputs.multithreaded
-        run: pytest -m "not slow or slow" -n auto
-      - if: matrix.coverage-target == '' && ! inputs.multithreaded
-        run: pytest -m "not slow or slow"
-
-      - if: matrix.coverage-target != ''
-        run: pytest -m "not slow or slow" --cov=${{ matrix.coverage-target }} --cov-report=xml
+          if [[ ! -z '${{ inputs.multithreaded }}' ]]; then
+            pytest_flags="$pytest_flags --numprocesses=auto"
+          fi
+          echo "PYTEST_FLAGS=$pytest_flags" | tee -a $GITHUB_ENV
+      - env:
+          UV_SYSTEM_PYTHON: 1
+        run: uv run ${{ env.TEST_EXTRAS }} pytest ${{ env.PYTEST_FLAGS }}
       - if: matrix.coverage-target != ''
         uses: codecov/codecov-action@v4
         with:

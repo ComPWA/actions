@@ -18,29 +18,32 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/actions/pip-install@v1
+      - uses: actions/setup-python@v5
         with:
-          additional-packages: tox
-          extras: doc
           python-version: ${{ inputs.python-version }}
-          specific-packages: ${{ inputs.specific-pip-packages }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+          enable-cache: true
       - name: Fetch Jupyter cache
         if: inputs.specific-pip-packages == ''
         uses: actions/cache@v4
         with:
           key: |
-            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py') }}-${{ hashFiles('docs/**') }}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}-${{ hashFiles('docs/**') }}
           restore-keys: |
-            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py') }}
+            jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}
           path: |
             ./docs/_build/.jupyter_cache
-      - uses: ComPWA/actions/cache-sympy@v1
+      - uses: ComPWA/actions/cache-sympy@v2
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
-        uses: ComPWA/actions/install-julia@v1
+        uses: ComPWA/actions/install-julia@v2
         with:
           ijulia: true
       - name: Build documentation and run notebooks
@@ -49,9 +52,13 @@ jobs:
           FORCE_COLOR: yes
           GITHUB_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PYTHONWARNINGS: ""
-        run: tox -e doc
-      - uses: actions/upload-pages-artifact@v3
-        if: always()
+          UV_SYSTEM_PYTHON: 1
+        run: >-
+          uv run \
+            --extra doc \
+            --with tox \
+            tox -e doc
+      - if: hashFiles('docs/_build/html')
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs/_build/html

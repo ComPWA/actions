@@ -15,16 +15,25 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: ComPWA/actions/pip-install@v1
+      - uses: actions/setup-python@v5
         with:
-          additional-packages: tox
-          extras: doc
           python-version: ${{ inputs.python-version }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+          enable-cache: true
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
-      - run: tox -e linkcheck
-        env:
+      - env:
           FORCE_COLOR: yes
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UV_SYSTEM_PYTHON: 1
+        run: >-
+          uv run \
+            --extra doc \
+            --with tox \
+            tox -e linkcheck
