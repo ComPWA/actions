@@ -57,11 +57,8 @@ jobs:
           enable-cache: true
       - name: Determine if repository is Python package
         run: |
-          uv_command=$(uv pip install -e . > /dev/null && echo uv || echo uvx)
-          echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_OUTPUT"
-        id: package
-      - if: ${{ steps.package.outputs.UV_COMMAND == 'uv' }}
-        run: echo 'EXTRAS="--extra sty"' | tee -a "$GITHUB_ENV"
+          uv_command=$(uv pip install -e '.[sty]' > /dev/null && echo "uv run --with sty" || echo uvx)
+          echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
       - name: Fetch pre-commit cache
         uses: actions/cache@v4
         with:
@@ -71,7 +68,7 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ env.UV_COMMAND }} ${{ env.EXTRAS }} --with pre-commit-uv pre-commit run --all-files --color always
+        run: ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run --all-files --color always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -80,7 +77,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            ${{ env.UV_COMMAND }} ${{ env.EXTRAS }} --with pre-commit-uv pre-commit run $hook --all-files --color always
+            ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run $hook --all-files --color always
           done
       - id: diff
         if: always()
