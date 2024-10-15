@@ -28,13 +28,16 @@ runs:
   using: composite
   steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - if: hashFiles('pyproject.toml')
+      uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - uses: astral-sh/setup-uv@v3
+    - if: hashFiles('pyproject.toml')
+      uses: astral-sh/setup-uv@v3
     - env:
         UV_SYSTEM_PYTHON: 1
       id: set-matrix
+      if: hashFiles('pyproject.toml')
       name: Create run matrix in JSON form
       run: |
         delimiter="$(openssl rand -hex 8)"
