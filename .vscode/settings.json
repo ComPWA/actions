@@ -35,12 +35,14 @@
     "notebook.source.organizeImports": "explicit"
   },
   "notebook.formatOnSave.enabled": true,
-  "python.analysis.typeCheckingMode": "basic",
   "python.terminal.activateEnvironment": false,
   "redhat.telemetry.enabled": false,
   "rewrap.wrappingColumn": 88,
   "ruff.enable": true,
   "ruff.importStrategy": "fromEnvironment",
   "ruff.organizeImports": true,
+  "search.exclude": {
+    "**/uv.lock": true
+  },
   "telemetry.telemetryLevel": "off"
 }
