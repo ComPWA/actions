@@ -55,7 +55,9 @@ jobs:
             **/pyproject.toml
             **/uv.lock
           enable-cache: true
-      - name: Determine if repository is Python package
+      - env:
+          UV_SYSTEM_PYTHON: 1
+        name: Determine if repository is Python package
         run: |
           uv_command=$(uv pip install -e '.[sty]' > /dev/null && echo "uv run --with sty" || echo uvx)
           echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
