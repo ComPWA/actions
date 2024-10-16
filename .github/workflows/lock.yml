@@ -37,7 +37,7 @@ jobs:
         shell: bash
 
   pip-constraints:
-    name: Update pip constraints
+    name: pip constraint files
     needs:
       - create-matrix
     runs-on: ubuntu-20.04
@@ -51,7 +51,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
   pre-commit:
-    name: pre-commit autoupdate
+    name: .pre-commit-config.yaml
     if: >-
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
@@ -63,7 +63,7 @@ jobs:
         uses: ComPWA/update-pre-commit@v1
 
   uv-lock:
-    name: Update uv.lock
+    name: uv.lock
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
