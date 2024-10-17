@@ -9,3 +9,6 @@ trim_trailing_whitespace = true
 
 [*.{py,toml}]
 indent_size = 4
+
+[uv.lock]
+indent_size = 4

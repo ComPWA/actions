@@ -35,6 +35,7 @@
   "ignorePaths": [
     "**/.cspell.json",
     ".editorconfig",
+    ".envrc",
     ".gitignore",
     ".pre-commit-config.yaml",
     ".prettierignore",
