@@ -68,34 +68,51 @@ jobs:
             **/uv.lock
           enable-cache: true
       - uses: ComPWA/actions/cache-sympy@v2
-      - name: Determine extras to install
+      - id: extra
+        if: inputs.additional-extras
+        name: Determine extras to install
         run: |
-          test_extras='--extra test'
-          for extra in ${{ inputs.specific-pip-packages }}; do
+          test_extras=''
+          for extra in ${{ inputs.additional-extras }}; do
             test_extras="$test_extras --extra $extra"
           done
-          echo "TEST_EXTRAS=$test_extras" | tee -a $GITHUB_ENV
-      - name: Determine pytest flags
+          echo "extras=$test_extras" | tee -a $GITHUB_OUTPUT
+      - id: with
+        if: inputs.specific-pip-packages
+        name: Determine additional packages to install
         run: |
-          pytest_flags='-m "not slow or slow"'
-          if [[ ! -z '${{ inputs.coverage-target }}' ]]; then
-            pytest_flags="$pytest_flags --cov-report=xml --cov=${{ matrix.coverage-target }}"
-          fi
-          if [[ ! -z '${{ inputs.multithreaded }}' ]]; then
-            pytest_flags="$pytest_flags --numprocesses=auto"
-          fi
-          echo "PYTEST_FLAGS=$pytest_flags" | tee -a $GITHUB_ENV
+          additional_packages=''
+          for package in ${{ inputs.specific-pip-packages }}; do
+            additional_packages="$additional_packages --with $package"
+          done
+          echo "packages=$additional_packages" | tee -a $GITHUB_OUTPUT
+      - id: coverage
+        if: matrix.coverage-target
+        name: Determine pytest coverage flags
+        run: echo "flags=--cov-report=xml --cov=${{ matrix.coverage-target }}" | tee -a $GITHUB_OUTPUT
+      - id: multithreaded
+        if: inputs.multithreaded
+        name: Determine pytest multithreading flags
+        run: echo "flags=--numprocesses=auto" | tee -a $GITHUB_OUTPUT
       - env:
           UV_SYSTEM_PYTHON: 1
-        run: uv run ${{ env.TEST_EXTRAS }} pytest ${{ env.PYTEST_FLAGS }}
-      - if: matrix.coverage-target != ''
+        name: Run tests with pytest
+        run: >-
+          uv run \
+            --extra test \
+            ${{ steps.extra.outputs.extras }} \
+            ${{ steps.with.outputs.packages }} \
+            pytest \
+              ${{ steps.coverage.outputs.flags }} \
+              ${{ steps.multithreaded.outputs.flags }} \
+              -m "not slow or slow"
+      - if: matrix.coverage-target
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           flags: unittests
-
       - uses: actions/upload-artifact@v4
-        if: inputs.test-output-path != ''
+        if: inputs.test-output-path
         with:
           name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
           path: ${{ inputs.test-output-path }}
