@@ -50,6 +50,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+  pixi-lock:
+    name: pixi.lock
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - if: hashFiles('pixi.lock')
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          run-install: false
+      - if: hashFiles('pixi.lock')
+        name: Update lock files
+        run: pixi update
+      - if: hashFiles('pixi.lock')
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixi-lock
+          path: pixi.lock
+
   pre-commit:
     name: .pre-commit-config.yaml
     if: >-
@@ -121,6 +139,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - pip-constraints
+      - pixi-lock
       - pre-commit
       - uv-lock
       - pr-exists
@@ -138,6 +157,7 @@ jobs:
         run: |
           ls -A
           [[ -f .pre-commit-config.yaml ]] && mv -f .pre-commit-config.yaml ..
+          [[ -f pixi.lock ]] && mv -f pixi.lock ..
           [[ -f uv.lock ]] && mv -f uv.lock ..
           if [[ -d .constraints/ ]]; then
             mkdir -p ../.constraints/ && mv -f * ../.constraints/
