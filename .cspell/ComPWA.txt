@@ -3,4 +3,5 @@ compwa
 docnb
 IJulia
 MAINT
+Pixi
 rtfd
