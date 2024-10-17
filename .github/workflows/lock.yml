@@ -16,30 +16,51 @@ on:
         required: true
 
 jobs:
+  find-lock-files:
+    name: Find lock files
+    runs-on: ubuntu-24.04
+    outputs:
+      lock-files: ${{ steps.check.outputs.lock-files }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        name: Determine available lock files
+        run: |
+          lock_file_patterns=(
+            .constraints/
+            pixi.lock
+            uv.lock
+            .pre-commit-config.yaml
+          )
+          files=()
+          for file in "${lock_file_patterns[@]}"; do
+            [[ -e $file ]] && files+=("$file")
+          done
+          echo "lock-files=${files[*]}" >> $GITHUB_OUTPUT
+
   create-matrix:
     name: Determine Python versions
     if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      contains( needs.find-lock-files.outputs.lock-files, '.constraints/' ) && (
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+    needs:
+      - find-lock-files
     outputs:
-      matrix: ${{ steps.version-matrix.outputs.matrix || steps.empty.outputs.matrix }}
+      matrix: ${{ steps.versions.outputs.matrix }}
     runs-on: ubuntu-24.04
     steps:
-      - id: version-matrix
-        if: hashFiles('.constraints/')
+      - id: versions
         uses: ComPWA/actions/create-python-version-matrix@v2
-      - id: empty
-        if: hashFiles('.constraints/') == ''
-        name: Set empty Python version matrix
-        run: |
-          echo 'matrix={"python-version": ["skipped"]}' >> $GITHUB_OUTPUT
-        shell: bash
 
   pip-constraints:
     name: pip constraint files
+    if: contains( needs.find-lock-files.outputs.lock-files, '.constraints/' )
     needs:
       - create-matrix
+      - find-lock-files
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -52,18 +73,18 @@ jobs:
 
   pixi-lock:
     name: pixi.lock
+    if: contains( needs.find-lock-files.outputs.lock-files, 'pixi.lock' )
+    needs:
+      - find-lock-files
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.8.1
+      - uses: prefix-dev/setup-pixi@v0.8.1
         with:
           run-install: false
-      - if: hashFiles('pixi.lock')
-        name: Update lock files
+      - name: Update lock files
         run: pixi update
-      - if: hashFiles('pixi.lock')
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: pixi-lock
           path: pixi.lock
@@ -71,36 +92,76 @@ jobs:
   pre-commit:
     name: .pre-commit-config.yaml
     if: >-
+      contains( needs.find-lock-files.outputs.lock-files, '.pre-commit-config.yaml' ) ||
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
+    needs:
+      - find-lock-files
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - if: hashFiles('.pre-commit-config.yaml')
-        uses: ComPWA/update-pre-commit@v1
+      - uses: ComPWA/update-pre-commit@v1
 
   uv-lock:
     name: uv.lock
+    if: contains( needs.find-lock-files.outputs.lock-files, 'uv.lock' )
+    needs:
+      - find-lock-files
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - if: hashFiles('uv.lock')
-        uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      - if: hashFiles('uv.lock')
-        run: uv lock --upgrade
-      - if: hashFiles('uv.lock')
-        uses: actions/upload-artifact@v4
+      - run: uv lock --upgrade
+      - uses: actions/upload-artifact@v4
         with:
           name: uv-lock
           path: uv.lock
 
+  push:
+    name: Push changes
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    needs:
+      - pip-constraints
+      - pixi-lock
+      - pre-commit
+      - uv-lock
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: .
+      - name: Show changed files
+        run: |
+          git config --global color.ui always
+          git status --short
+      - name: Show changes
+        run: git diff --color --unified=0
+      - name: Commit and push changes
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
+          git config --global user.name "GitHub"
+          git config --global user.email "noreply@github.com"
+          git checkout -b ${{ github.head_ref }}
+          if [[ $(git status -s) ]]; then
+            git add -A
+            git commit -m '${{ env.COMMIT_TITLE }}'
+            git config pull.rebase true
+            git pull origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+
   pr-exists:
     name: Check if PR already exists
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     outputs:
       exists: ${{ steps.pr-exists.outputs.exists }}
     runs-on: ubuntu-24.04
@@ -134,9 +195,13 @@ jobs:
             echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
           fi
 
-  push:
-    name: Push changes
+  create-pr:
+    name: Create PR
     runs-on: ubuntu-24.04
+    if: >-
+      always() &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      needs.pr-exists.outputs.exists != 'true'
     needs:
       - pip-constraints
       - pixi-lock
@@ -150,45 +215,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-          path: artifact
-      - run: ls -A
-      - if: hashFiles('artifact/')
-        name: Move artifacts to correct location
-        run: |
-          ls -A
-          [[ -f .pre-commit-config.yaml ]] && mv -f .pre-commit-config.yaml ..
-          [[ -f pixi.lock ]] && mv -f pixi.lock ..
-          [[ -f uv.lock ]] && mv -f uv.lock ..
-          if [[ -d .constraints/ ]]; then
-            mkdir -p ../.constraints/ && mv -f * ../.constraints/
-            cd ../.constraints/
-            [[ ! -f .gitignore ]] && echo '!py3.*.txt' > .gitignore
-          fi
-        working-directory: artifact/
+          path: .
       - name: Show changed files
         run: |
           git config --global color.ui always
           git status --short
       - name: Show changes
         run: git diff --color --unified=0
-      - name: Commit and push changes
-        if: github.event_name == 'pull_request'
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
-          git config --global user.name "GitHub"
-          git config --global user.email "noreply@github.com"
-          git checkout -b ${{ github.head_ref }}
-          if [[ $(git status -s) ]]; then
-            git add -A
-            git commit -m '${{ env.COMMIT_TITLE }}'
-            git config pull.rebase true
-            git pull origin ${{ github.head_ref }}
-            git push origin HEAD:${{ github.head_ref }}
-          fi
       - name: Create Pull Request
-        if: >-
-          (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
-          needs.pr-exists.outputs.exists != 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: ${{ env.COMMIT_TITLE }}
@@ -196,7 +230,7 @@ jobs:
           author: GitHub <noreply@github.com>
           title: ${{ env.COMMIT_TITLE }}
           body: >-
-            This PR updates the [`pip` constraint files](https://github.com/ComPWA/update-pip-constraints?tab=readme-ov-file#update-pip-constraint-files) under the `.constraints/` directory and pre-commit hooks in [`.pre-commit-config.yaml`](https://pre-commit.com). It was created automatically by a scheduled workflow.
+            This PR updates the all lock files. It was created automatically by a scheduled workflow.
           labels: |
             🔨 Maintenance
           branch-suffix: timestamp
