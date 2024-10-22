@@ -146,7 +146,7 @@ jobs:
       - name: Update all Manifest.toml files
         run: |-
           for manifest in $(find . -type f -name 'Manifest.toml'); do
-            julia --project="$(dirname $manifest)" -e 'using Pkg; Pkg.resolve(); Pkg.update()'
+            julia --project="$(dirname $manifest)" -e 'using Pkg; Pkg.update()'
           done
       - uses: actions/upload-artifact@v4
         with:
