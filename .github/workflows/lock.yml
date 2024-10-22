@@ -9,7 +9,11 @@ on:
       - main
       - epic/*
     paths:
+      - .constraints/
       - .pre-commit-config.yaml
+      - "**/Manifest.toml"
+      - pixi.lock
+      - uv.lock
   workflow_call:
     secrets:
       token:
@@ -37,9 +41,9 @@ jobs:
         run: |
           lock_file_patterns=(
             .constraints/
+            .pre-commit-config.yaml
             pixi.lock
             uv.lock
-            .pre-commit-config.yaml
           )
           files=()
           for file in "${lock_file_patterns[@]}"; do
