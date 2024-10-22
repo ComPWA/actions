@@ -9,7 +9,11 @@ on:
       - main
       - epic/*
     paths:
+      - .constraints/
       - .pre-commit-config.yaml
+      - "**/Manifest.toml"
+      - pixi.lock
+      - uv.lock
   workflow_call:
     secrets:
       token:
@@ -37,15 +41,16 @@ jobs:
         run: |
           lock_file_patterns=(
             .constraints/
+            .pre-commit-config.yaml
             pixi.lock
             uv.lock
-            .pre-commit-config.yaml
           )
           files=()
           for file in "${lock_file_patterns[@]}"; do
             [[ -e $file ]] && files+=("$file")
           done
-          echo "lock-files=${files[*]}" >> $GITHUB_OUTPUT
+          files+=($(find . -type f -name 'Manifest.toml'))
+          echo "lock-files=${files[*]}" | tee -a $GITHUB_OUTPUT
 
   create-matrix:
     name: Determine Python versions
@@ -98,6 +103,56 @@ jobs:
           name: pixi-lock
           path: pixi.lock
 
+  has-julia:
+    name: Check if Julia is used
+    needs:
+      - find-lock-files
+    runs-on: ubuntu-24.04
+    outputs:
+      has-julia: ${{ steps.julia.outputs.has-julia }}
+    steps:
+      - name: Check if Julia is used
+        id: julia
+        run: |
+          lock_files="${{ needs.find-lock-files.outputs.lock-files }}"
+          has_julia=false
+          for file in $lock_files; do
+            if [[ $file == *Manifest.toml ]]; then
+              has_julia=true
+              break
+            fi
+          done
+          echo "has-julia=$has_julia" | tee -a $GITHUB_OUTPUT
+
+  julia:
+    name: Manifest.toml
+    if: >-
+      needs.has-julia.outputs.has-julia == 'true' && (
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+    needs:
+      - has-julia
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - if: hashFiles('pixi.lock') == ''
+        uses: julia-actions/setup-julia@v2
+      - if: hashFiles('pixi.lock')
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          activate-environment: true
+      - name: Update all Manifest.toml files
+        run: |-
+          for manifest in $(find . -type f -name 'Manifest.toml'); do
+            julia --project="$(dirname $manifest)" -e 'using Pkg; Pkg.update()'
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Manifest-toml
+          path: "**/Manifest.toml"
+
   pre-commit:
     name: .pre-commit-config.yaml
     if: >-
@@ -136,6 +191,7 @@ jobs:
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     needs:
+      - julia
       - pip-constraints
       - pixi-lock
       - pre-commit
