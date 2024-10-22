@@ -125,7 +125,7 @@ jobs:
           echo "has-julia=$has_julia" | tee -a $GITHUB_OUTPUT
 
   julia:
-    name: Julia Manifest.toml
+    name: Manifest.toml
     if: >-
       needs.has-julia.outputs.has-julia == 'true' && (
         github.event_name == 'schedule' ||
