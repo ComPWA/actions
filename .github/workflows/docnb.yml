@@ -56,6 +56,7 @@ jobs:
         run: >-
           uv run \
             --group doc \
+            --no-dev \
             --with tox \
             tox -e doc
       - if: hashFiles('docs/_build/html')

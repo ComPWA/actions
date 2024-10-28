@@ -53,7 +53,7 @@ jobs:
           enable-cache: true
       - name: Determine if repository is Python package
         run: |
-          uv_command=$(uv pip install -e '.[sty]' > /dev/null && uv sync --group style && echo "uv run --group style" || echo uvx)
+          uv_command=$(uv pip install -e '.[sty]' > /dev/null && uv sync --group style --no-dev && echo "uv run --group style --no-dev" || echo uvx)
           echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
       - name: Fetch pre-commit cache
         uses: actions/cache@v4
