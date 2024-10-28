@@ -15,7 +15,10 @@ content-type = "text/markdown"
 file = "README.md"
 
 [dependency-groups]
-dev = ["ruff"]
+dev = [
+    "ruff",
+    {include-group = "style"},
+]
 style = ["packaging"]
 
 [tool.setuptools]
