@@ -10,18 +10,12 @@ license = {text = "License :: OSI Approved :: MIT License"}
 name = "compwa-actions"
 requires-python = ">=3.12"
 
-[project.optional-dependencies]
-dev = [
-    "compwa-actions[sty]",
-]
-sty = [
-    "pre-commit-uv",
-    "ruff",
-]
-
 [project.readme]
 content-type = "text/markdown"
 file = "README.md"
+
+[dependency-groups]
+dev = ["ruff"]
 
 [tool.setuptools]
 include-package-data = false
@@ -79,6 +73,8 @@ task-tags = ["cspell"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
