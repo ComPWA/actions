@@ -55,7 +55,7 @@ jobs:
           UV_SYSTEM_PYTHON: 1
         run: >-
           uv run \
-            --extra doc \
+            --group doc \
             --with tox \
             tox -e doc
       - if: hashFiles('docs/_build/html')

@@ -74,7 +74,7 @@ jobs:
         run: |
           test_extras=''
           for extra in ${{ inputs.additional-extras }}; do
-            test_extras="$test_extras --extra $extra"
+            test_extras="$test_extras --group $extra"
           done
           echo "extras=$test_extras" | tee -a $GITHUB_OUTPUT
       - id: with
@@ -99,7 +99,7 @@ jobs:
         name: Run tests with pytest
         run: >-
           uv run \
-            --extra test \
+            --group test \
             ${{ steps.extra.outputs.extras }} \
             ${{ steps.with.outputs.packages }} \
             pytest \
