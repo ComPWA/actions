@@ -101,6 +101,7 @@ jobs:
           uv run \
             --group test \
             ${{ steps.extra.outputs.extras }} \
+            --no-dev \
             ${{ steps.with.outputs.packages }} \
             pytest \
               ${{ steps.coverage.outputs.flags }} \

@@ -36,5 +36,6 @@ jobs:
         run: >-
           uv run \
             --group doc \
+            --no-dev \
             --with tox \
             tox -e linkcheck
