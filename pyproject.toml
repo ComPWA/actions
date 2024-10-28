@@ -35,6 +35,8 @@ reportUnknownMemberType = false
 reportUnknownParameterType = false
 reportUnknownVariableType = false
 typeCheckingMode = "strict"
+venv = ".venv"
+venvPath = "."
 
 [tool.ruff]
 preview = true
