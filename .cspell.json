@@ -49,6 +49,7 @@
     "noreply",
     "numprocesses",
     "pyright",
+    "rtoml",
     "taplo",
     "tomllib"
   ],
