@@ -27,11 +27,14 @@ def _get_uv_run_command() -> str:
             for group in candidate_groups:
                 if group in dependency_groups:
                     return f"uv run --group {group} --no-dev"
-        extras = pyproject.get("project", {}).get("optional-dependencies")
+        project_table = pyproject.get("project", {})
+        extras = project_table.get("optional-dependencies")
         if extras is not None:
             for extra in candidate_groups:
                 if extra in extras:
                     return f"uv run --extra {extra} --no-dev"
+        if "dependencies" in project_table:
+            return "uv run --no-dev"
     return "uvx"
 
 
