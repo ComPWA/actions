@@ -35,6 +35,6 @@ jobs:
         name: Run Sphinx linkcheck
         run: >-
           uv run \
-            --extra doc \
+            --group doc \
             --with tox \
             tox -e linkcheck
