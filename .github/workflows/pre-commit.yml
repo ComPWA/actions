@@ -19,6 +19,7 @@ on:
 
 env:
   DISABLE_PRE_COMMIT_UV_PATCH: True
+  FORCE_COLOR: true
 
 jobs:
   determine-hooks:
@@ -51,10 +52,6 @@ jobs:
             **/pyproject.toml
             **/uv.lock
           enable-cache: true
-      - name: Determine if repository is Python package
-        run: |
-          uv_command=$(uv pip install -e '.[sty]' > /dev/null && uv sync --group style --no-dev && echo "uv run --group style --no-dev" || echo uvx)
-          echo "UV_COMMAND=$uv_command" | tee -a "$GITHUB_ENV"
       - name: Fetch pre-commit cache
         uses: actions/cache@v4
         with:
@@ -63,8 +60,10 @@ jobs:
           restore-keys: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
+      - id: uv-run
+        uses: ComPWA/actions/run-pre-commit@v2
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run --all-files --color always
+        run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -73,7 +72,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            ${{ env.UV_COMMAND }} --with pre-commit-uv pre-commit run $hook --all-files --color always
+            ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run $hook --all-files
           done
       - id: diff
         if: always()

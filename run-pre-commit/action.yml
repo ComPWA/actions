@@ -1,0 +1,19 @@
+name: Run pre-commit hooks with style environment
+description: >-
+  Run local pre-commit hooks that may require the installation of a virtual environment.
+
+outputs:
+  cmd:
+    description: >-
+      The uv run command to use for `pre-commit`
+    value: ${{ steps.uv-run.outputs.cmd }}
+
+runs:
+  using: composite
+  steps:
+    - env:
+        UV_SYSTEM_PYTHON: 1
+      id: uv-run
+      name: Determine skipped hooks
+      run: echo "cmd=$(uv run -p3.12 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      shell: bash
