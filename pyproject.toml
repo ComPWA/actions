@@ -16,6 +16,7 @@ file = "README.md"
 
 [dependency-groups]
 dev = ["ruff"]
+style = ["packaging"]
 
 [tool.setuptools]
 include-package-data = false
