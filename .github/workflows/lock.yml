@@ -266,7 +266,7 @@ jobs:
           author: GitHub <noreply@github.com>
           title: ${{ env.COMMIT_TITLE }}
           body: >-
-            This PR updates the all lock files. It was created automatically by a scheduled workflow.
+            This PR updates all lock files. It was created automatically by a scheduled workflow.
           labels: |
             🔨 Maintenance
           branch-suffix: timestamp
