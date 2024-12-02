@@ -61,7 +61,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
         with:
           cache-dependency-glob: |
             **/pyproject.toml
@@ -108,7 +108,7 @@ jobs:
               ${{ steps.multithreaded.outputs.flags }} \
               -m "not slow or slow"
       - if: matrix.coverage-target
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
           flags: unittests
