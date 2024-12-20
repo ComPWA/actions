@@ -34,6 +34,8 @@ runs:
         python-version: "3.12"
     - if: hashFiles('pyproject.toml')
       uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: false
     - env:
         UV_SYSTEM_PYTHON: 1
       id: set-matrix
