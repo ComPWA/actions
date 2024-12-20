@@ -23,7 +23,6 @@ jobs:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
-          enable-cache: true
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y

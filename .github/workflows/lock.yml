@@ -149,8 +149,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
       - run: uv lock --upgrade
       - uses: actions/upload-artifact@v4
         with:

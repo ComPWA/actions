@@ -26,7 +26,6 @@ jobs:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
-          enable-cache: true
       - name: Fetch Jupyter cache
         if: inputs.specific-pip-packages == ''
         uses: actions/cache@v4

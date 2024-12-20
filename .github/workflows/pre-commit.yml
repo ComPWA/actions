@@ -51,7 +51,6 @@ jobs:
             **/.pre-commit-config.yaml
             **/pyproject.toml
             **/uv.lock
-          enable-cache: true
       - name: Fetch pre-commit cache
         uses: actions/cache@v4
         with:
