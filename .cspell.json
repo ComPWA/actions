@@ -55,5 +55,6 @@
   ],
   "language": "en-US",
   "version": "0.2",
-  "words": []
+  "words": [],
+  "useGitignore": true
 }
