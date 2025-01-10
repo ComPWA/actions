@@ -31,6 +31,10 @@ on:
       test-output-path:
         required: false
         type: string
+    secrets:
+      CODECOV_TOKEN:
+        description: Token for uploading reports to Codecov. See https://docs.codecov.com/docs/codecov-uploader.
+        required: false
 
 jobs:
   create-matrix:
@@ -109,8 +113,9 @@ jobs:
       - if: matrix.coverage-target
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v4
         if: inputs.test-output-path
         with:
