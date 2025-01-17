@@ -55,6 +55,7 @@ jobs:
     name: Run unit tests
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      UV_SYSTEM_PYTHON: 1
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
     strategy:
@@ -97,9 +98,7 @@ jobs:
         if: inputs.multithreaded
         name: Determine pytest multithreading flags
         run: echo "flags=--numprocesses=auto" | tee -a $GITHUB_OUTPUT
-      - env:
-          UV_SYSTEM_PYTHON: 1
-        name: Run tests with pytest
+      - name: Run tests with pytest
         run: >-
           uv run \
             --group test \
