@@ -55,6 +55,7 @@ jobs:
     name: Run unit tests
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      UV_PYTHON: ${{ matrix.python-version }}
       UV_PYTHON_DOWNLOADS: never
       UV_PYTHON_PREFERENCE: only-system
       UV_SYSTEM_PYTHON: 1
