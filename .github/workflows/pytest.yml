@@ -56,9 +56,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       UV_PYTHON: ${{ matrix.python-version }}
-      UV_PYTHON_DOWNLOADS: never
-      UV_PYTHON_PREFERENCE: only-system
-      UV_SYSTEM_PYTHON: 1
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
     strategy:
@@ -66,9 +63,6 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v5
         with:
           cache-dependency-glob: |
