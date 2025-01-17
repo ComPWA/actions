@@ -55,6 +55,7 @@ jobs:
     name: Run unit tests
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      UV_PYTHON: ${{ matrix.python-version }}
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
     strategy:
@@ -62,9 +63,6 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v5
         with:
           cache-dependency-glob: |
@@ -97,9 +95,7 @@ jobs:
         if: inputs.multithreaded
         name: Determine pytest multithreading flags
         run: echo "flags=--numprocesses=auto" | tee -a $GITHUB_OUTPUT
-      - env:
-          UV_SYSTEM_PYTHON: 1
-        name: Run tests with pytest
+      - name: Run tests with pytest
         run: >-
           uv run \
             --group test \

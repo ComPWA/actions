@@ -11,13 +11,13 @@ on:
 
 jobs:
   linkcheck:
+    env:
+      FORCE_COLOR: yes
+      UV_PYTHON: ${{ inputs.python-version }}
     name: Check external links
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
       - uses: astral-sh/setup-uv@v5
         with:
           cache-dependency-glob: |
@@ -28,9 +28,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - env:
-          FORCE_COLOR: yes
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UV_SYSTEM_PYTHON: 1
         name: Run Sphinx linkcheck
         run: >-
           uv run \
