@@ -56,6 +56,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       UV_PYTHON_DOWNLOADS: never
+      UV_PYTHON_PREFERENCE: only-system
       UV_SYSTEM_PYTHON: 1
     needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
