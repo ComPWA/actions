@@ -53,7 +53,7 @@ jobs:
           uv run \
             --group doc \
             --no-dev \
-            --with tox \
+            --with tox-uv \
             tox -e doc
       - if: hashFiles('docs/_build/html')
         uses: actions/upload-pages-artifact@v3
