@@ -29,173 +29,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  find-lock-files:
-    name: Find lock files
-    runs-on: ubuntu-24.04
-    outputs:
-      lock-files: ${{ steps.check.outputs.lock-files }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: check
-        name: Determine available lock files
-        run: |
-          lock_file_patterns=(
-            .constraints/
-            .pre-commit-config.yaml
-            Manifest.toml
-            pixi.lock
-            uv.lock
-          )
-          files=()
-          for file in "${lock_file_patterns[@]}"; do
-            [[ -e $file ]] && files+=("$file")
-          done
-          echo "lock-files=${files[*]}" | tee -a $GITHUB_OUTPUT
-
-  create-matrix:
-    name: Determine Python versions
-    if: >-
-      contains( needs.find-lock-files.outputs.lock-files, '.constraints/' ) && (
-        github.event_name == 'schedule' ||
-        github.event_name == 'workflow_dispatch' ||
-        github.event.pull_request.head.repo.full_name == github.repository
-      )
-    needs:
-      - find-lock-files
-    outputs:
-      matrix: ${{ steps.versions.outputs.matrix }}
-    runs-on: ubuntu-24.04
-    steps:
-      - id: versions
-        uses: ComPWA/actions/create-python-version-matrix@v2
-
-  pip-constraints:
-    name: pip constraint files
-    if: contains( needs.find-lock-files.outputs.lock-files, '.constraints/' )
-    needs:
-      - create-matrix
-      - find-lock-files
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
-    steps:
-      - if: matrix.python-version != 'skipped'
-        uses: ComPWA/update-pip-constraints@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-
-  pixi-lock:
-    name: pixi.lock
-    if: contains( needs.find-lock-files.outputs.lock-files, 'pixi.lock' )
-    needs:
-      - find-lock-files
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.1
-        with:
-          run-install: false
-      - name: Update lock files
-        run: pixi update
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pixi-lock
-          path: pixi.lock
-
-  julia:
-    name: Manifest.toml
-    if: contains( needs.find-lock-files.outputs.lock-files, 'Manifest.toml' )
-    needs:
-      - find-lock-files
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - if: hashFiles('pixi.lock') == ''
-        uses: julia-actions/setup-julia@v2
-      - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.8.1
-        with:
-          activate-environment: true
-      - name: Update Julia Manifest.toml
-        run: julia -e 'using Pkg; Pkg.update()'
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Manifest-toml
-          path: Manifest.toml
-
-  pre-commit:
-    name: .pre-commit-config.yaml
-    if: >-
-      contains( needs.find-lock-files.outputs.lock-files, '.pre-commit-config.yaml' ) ||
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
-    needs:
-      - find-lock-files
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ComPWA/update-pre-commit@v1
-
-  uv-lock:
-    name: uv.lock
-    if: contains( needs.find-lock-files.outputs.lock-files, 'uv.lock' )
-    needs:
-      - find-lock-files
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: astral-sh/setup-uv@v5
-      - run: uv lock --upgrade
-      - uses: actions/upload-artifact@v4
-        with:
-          name: uv-lock
-          path: uv.lock
-
-  push:
-    name: Push changes
-    if: always() && github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
-    needs:
-      - julia
-      - pip-constraints
-      - pixi-lock
-      - pre-commit
-      - uv-lock
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.token || github.token}}
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: .
-      - name: Show changed files
-        run: |
-          git config --global color.ui always
-          git status --short
-      - name: Show changes
-        run: git diff --color --unified=0
-      - name: Commit and push changes
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
-          git config --global user.name "GitHub"
-          git config --global user.email "noreply@github.com"
-          git checkout -b ${{ github.head_ref }}
-          if [[ $(git status -s) ]]; then
-            git add -A
-            git commit -m '${{ env.COMMIT_TITLE }}'
-            git config pull.rebase true
-            git pull origin ${{ github.head_ref }}
-            git push origin HEAD:${{ github.head_ref }}
-          fi
-
   pr-exists:
     name: Check if PR already exists
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
     outputs:
       exists: ${{ steps.pr-exists.outputs.exists }}
     runs-on: ubuntu-24.04
@@ -228,14 +66,218 @@ jobs:
             echo "exists=true" | tee -a "$GITHUB_OUTPUT"
             echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
           fi
+      - name: Emit warning if 'no-lock-upgrade' comment is found
+        if: steps.pr-exists.outputs.exists == 'true'
+        run: >-
+          echo "::notice::There is already a PR that is updating the lock files, see ${{ steps.list-prs.outputs.prs }}."
+
+  pr-has-no-lock-upgrade:
+    name: Check PR description
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    outputs:
+      no-lock-upgrade: ${{ steps.check.outputs.no-lock-upgrade }}
+    steps:
+      - name: Get PR description
+        id: pr-description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return pr.data.body || '';
+          result-encoding: string
+      - name: Check for 'no-lock-upgrade'
+        id: check
+        run: |
+          if echo '${{ steps.pr-description.outputs.result }}' | grep -q 'no-lock-upgrade'; then
+            echo "no-lock-upgrade=true" | tee -a $GITHUB_OUTPUT
+          else
+            echo "no-lock-upgrade=false" | tee -a $GITHUB_OUTPUT
+          fi
+      - name: Emit warning if 'no-lock-upgrade' comment is found
+        if: steps.check.outputs.no-lock-upgrade == 'true'
+        run: >-
+          echo "::notice::The PR description contains the words 'no-lock-upgrade', so the lock files will not be upgraded."
+
+  find-lock-files:
+    if: >-
+      always() &&
+      (
+        needs.pr-exists.outputs.exists == 'false' ||
+        needs.pr-has-no-lock-upgrade.outputs.no-lock-upgrade == 'false'
+      )
+    name: Find lock files
+    needs:
+      - pr-has-no-lock-upgrade
+      - pr-exists
+    runs-on: ubuntu-24.04
+    outputs:
+      lock-files: ${{ steps.check.outputs.lock-files }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        name: Determine available lock files
+        run: |
+          lock_file_patterns=(
+            .constraints/
+            .pre-commit-config.yaml
+            Manifest.toml
+            pixi.lock
+            uv.lock
+          )
+          files=()
+          for file in "${lock_file_patterns[@]}"; do
+            [[ -e $file ]] && files+=("$file")
+          done
+          echo "lock-files=${files[*]}" | tee -a $GITHUB_OUTPUT
+
+  create-matrix:
+    name: Determine Python versions
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, '.constraints/' )
+    needs:
+      - find-lock-files
+    outputs:
+      matrix: ${{ steps.versions.outputs.matrix }}
+    runs-on: ubuntu-24.04
+    steps:
+      - id: versions
+        uses: ComPWA/actions/create-python-version-matrix@v2
+
+  pip-constraints:
+    name: pip constraint files
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, '.constraints/' )
+    needs:
+      - create-matrix
+      - find-lock-files
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+    steps:
+      - if: matrix.python-version != 'skipped'
+        uses: ComPWA/update-pip-constraints@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+  pixi-lock:
+    name: pixi.lock
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, 'pixi.lock' )
+    needs:
+      - find-lock-files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          run-install: false
+      - name: Update lock files
+        run: pixi update
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixi-lock
+          path: pixi.lock
+
+  julia:
+    name: Manifest.toml
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, 'Manifest.toml' )
+    needs:
+      - find-lock-files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - if: hashFiles('pixi.lock') == ''
+        uses: julia-actions/setup-julia@v2
+      - if: hashFiles('pixi.lock')
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          activate-environment: true
+      - name: Update Julia Manifest.toml
+        run: julia -e 'using Pkg; Pkg.update()'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Manifest-toml
+          path: Manifest.toml
+
+  pre-commit:
+    name: .pre-commit-config.yaml
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, '.pre-commit-config.yaml' )
+    needs:
+      - find-lock-files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ComPWA/update-pre-commit@v1
+
+  uv-lock:
+    name: uv.lock
+    if: always() && contains( needs.find-lock-files.outputs.lock-files, 'uv.lock' )
+    needs:
+      - find-lock-files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+      - run: uv lock --upgrade
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uv-lock
+          path: uv.lock
+
+  push:
+    name: Push changes
+    if: >-
+      always() &&
+      needs.pr-has-no-lock-upgrade.outputs.no-lock-upgrade == 'false'
+    runs-on: ubuntu-24.04
+    needs:
+      - julia
+      - pip-constraints
+      - pixi-lock
+      - pre-commit
+      - uv-lock
+      - pr-has-no-lock-upgrade
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.token || github.token}}
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: .
+      - name: Show changed files
+        run: |
+          git config --global color.ui always
+          git status --short
+      - name: Show changes
+        run: git diff --color --unified=0
+      - name: Commit and push changes
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
+          git config --global user.name "GitHub"
+          git config --global user.email "noreply@github.com"
+          git checkout -b ${{ github.head_ref }}
+          if [[ $(git status -s) ]]; then
+            git add -A
+            git commit -m '${{ env.COMMIT_TITLE }}'
+            git config pull.rebase true
+            git pull origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
+          fi
 
   create-pr:
     name: Create PR
     runs-on: ubuntu-24.04
     if: >-
       always() &&
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
-      needs.pr-exists.outputs.exists != 'true'
+      needs.pr-exists.outputs.exists == 'false'
     needs:
       - pip-constraints
       - pixi-lock
