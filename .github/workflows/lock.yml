@@ -2,6 +2,7 @@ name: Update
 
 env:
   COMMIT_TITLE: "MAINT: update lock files"
+  FORCE_COLOR: yes
 
 on:
   pull_request:
