@@ -2,6 +2,7 @@ name: Update
 
 env:
   COMMIT_TITLE: "MAINT: update lock files"
+  FORCE_COLOR: yes
 
 on:
   pull_request:
@@ -173,7 +174,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.1
+      - uses: prefix-dev/setup-pixi@v0.8.3
         with:
           run-install: false
       - name: Update lock files
@@ -194,7 +195,7 @@ jobs:
       - if: hashFiles('pixi.lock') == ''
         uses: julia-actions/setup-julia@v2
       - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.8.1
+        uses: prefix-dev/setup-pixi@v0.8.3
         with:
           activate-environment: true
       - name: Update Julia Manifest.toml
