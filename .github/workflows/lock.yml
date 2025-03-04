@@ -91,12 +91,15 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            return pr.data.body || '';
+            const description = pr.data.body || '';
+            const fs = require('fs');
+            fs.writeFileSync('pr-description.txt', description);
+            return description;
           result-encoding: string
       - name: Check for 'no-lock-upgrade'
         id: check
         run: |
-          if echo '${{ steps.pr-description.outputs.result }}' | grep -q 'no-lock-upgrade'; then
+          if grep -q no-lock-upgrade pr-description.txt; then
             echo "no-lock-upgrade=true" | tee -a $GITHUB_OUTPUT
           else
             echo "no-lock-upgrade=false" | tee -a $GITHUB_OUTPUT
