@@ -19,6 +19,8 @@ runs:
           sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'uv.lock')}}-${{hashFiles('src/**.py')}}
         restore-keys: |
           sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'uv.lock')}}
+          sympy-${{github.job}}
+          sympy
         path: |
           ~/.cache/ampform/
           ~/.cache/ampform-dpd/
