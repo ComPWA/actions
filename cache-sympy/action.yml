@@ -8,7 +8,7 @@ runs:
   steps:
     - name: Determine if SymPy is installed.
       run: >-
-        pip freeze | grep sympy
+        uv export --no-hashes --no-header | grep 'sympy=='
         && echo "HAS_SYMPY=YES" >> $GITHUB_ENV
         || echo "HAS_SYMPY=NO" >> $GITHUB_ENV
       shell: bash
