@@ -1,4 +1,5 @@
 env:
+  FORCE_COLOR: "1"
   PYTHONHASHSEED: "0"
 
 on:
