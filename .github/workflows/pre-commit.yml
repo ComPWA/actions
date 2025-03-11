@@ -61,7 +61,7 @@ jobs:
       - id: uv-run
         uses: ComPWA/actions/run-pre-commit@v2
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files
+        run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files --color=always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -70,7 +70,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run $hook --all-files
+            ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run $hook --all-files --color=always
           done
       - id: diff
         if: always()
