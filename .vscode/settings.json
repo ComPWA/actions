@@ -35,6 +35,7 @@
     "notebook.source.organizeImports": "explicit"
   },
   "notebook.formatOnSave.enabled": true,
+  "python.defaultInterpreterPath": ".venv/bin/python",
   "python.terminal.activateEnvironment": false,
   "redhat.telemetry.enabled": false,
   "rewrap.wrappingColumn": 88,

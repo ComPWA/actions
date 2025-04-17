@@ -30,9 +30,6 @@ include-package-data = false
 license-files = ["LICENSE"]
 
 [tool.pyright]
-exclude = [
-    "**/.venv/",
-]
 reportMissingTypeArgument = false
 reportUnknownArgumentType = false
 reportUnknownMemberType = false
