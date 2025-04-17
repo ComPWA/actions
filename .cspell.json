@@ -45,6 +45,7 @@
   ],
   "ignoreWords": [
     "elif",
+    "ipynb",
     "mhutchie",
     "noqa",
     "noreply",

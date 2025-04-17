@@ -16,7 +16,7 @@ runs:
       uses: actions/cache@v4
       with:
         key: |
-          sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'uv.lock')}}-${{hashFiles('src/**.py')}}
+          sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'uv.lock')}}-${{hashFiles('**/*.ipynb', '**/*.py')}}
         restore-keys: |
           sympy-${{github.job}}-${{hashFiles('.constraints/py3.*.txt', 'uv.lock')}}
           sympy-${{github.job}}
