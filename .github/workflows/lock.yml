@@ -85,6 +85,7 @@ jobs:
         id: pr-description
         uses: actions/github-script@v7
         with:
+          result-encoding: string
           script: |
             const pr = await github.rest.pulls.get({
               owner: context.repo.owner,
@@ -95,7 +96,6 @@ jobs:
             const fs = require('fs');
             fs.writeFileSync('pr-description.txt', description);
             return description;
-          result-encoding: string
       - name: Check for 'no-lock-upgrade'
         id: check
         run: |
