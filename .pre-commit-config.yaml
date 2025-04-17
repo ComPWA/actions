@@ -25,7 +25,7 @@ repos:
           - --update-lock-files=no
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.11.5
     hooks:
       - id: ruff
         args: [--fix]
@@ -77,6 +77,6 @@ repos:
           )$
 
   - repo: https://github.com/ComPWA/pyright-pre-commit
-    rev: v1.1.398
+    rev: v1.1.399
     hooks:
       - id: pyright
