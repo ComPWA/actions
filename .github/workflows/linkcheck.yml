@@ -30,9 +30,9 @@ jobs:
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         name: Run Sphinx linkcheck
-        run: >-
+        run: |-
+          uv tool install --with tox-uv tox
           uv run \
             --group doc \
             --no-dev \
-            --with tox-uv \
             tox -e linkcheck
