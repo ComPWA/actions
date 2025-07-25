@@ -64,7 +64,7 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           cache-dependency-glob: |
             **/pyproject.toml
