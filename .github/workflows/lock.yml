@@ -67,7 +67,7 @@ jobs:
             echo "exists=true" | tee -a "$GITHUB_OUTPUT"
             echo "❌ PR with title '${{ env.COMMIT_TITLE }}' already exists."
           fi
-      - name: Emit warning if 'no-lock-upgrade' comment is found
+      - name: Emit warning if there is already a PR that updates the lock files
         if: steps.pr-exists.outputs.exists == 'true'
         run: >-
           echo "::notice::There is already a PR that is updating the lock files, see ${{ steps.list-prs.outputs.prs }}."
