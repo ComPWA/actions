@@ -72,17 +72,17 @@ jobs:
         run: >-
           echo "::notice::There is already a PR that is updating the lock files, see ${{ steps.list-prs.outputs.prs }}."
 
-  pr-has-no-lock-upgrade:
+  pr-has-lock-label:
     name: Check PR description
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     outputs:
-      no-lock-upgrade: ${{ steps.check.outputs.no-lock-upgrade }}
+      lock-upgrade: ${{ steps.check.outputs.lock-upgrade }}
     steps:
       - name: Get PR description
-        id: pr-description
+        id: pr-labels
         uses: actions/github-script@v7
         with:
           script: |
@@ -91,34 +91,36 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            const description = pr.data.body || '';
+            const labels = pr.data.labels.map(label => label.name).join(', ');
             const fs = require('fs');
-            fs.writeFileSync('pr-description.txt', description);
-            return description;
+            fs.writeFileSync('pr-labels.txt', labels);
+            return labels;
           result-encoding: string
-      - name: Check for 'no-lock-upgrade'
+      - name: Show PR labels
+        run: cat pr-labels.txt
+      - name: Check for PR label "⬆️ Lock"
         id: check
         run: |
-          if grep -q no-lock-upgrade pr-description.txt; then
-            echo "no-lock-upgrade=true" | tee -a $GITHUB_OUTPUT
+          if grep -q '⬆️ Lock' pr-labels.txt; then
+            echo "lock-upgrade=true" | tee -a $GITHUB_OUTPUT
           else
-            echo "no-lock-upgrade=false" | tee -a $GITHUB_OUTPUT
+            echo "lock-upgrade=false" | tee -a $GITHUB_OUTPUT
           fi
-      - name: Emit warning if 'no-lock-upgrade' comment is found
-        if: steps.check.outputs.no-lock-upgrade == 'true'
+      - name: Emit warning if PR label "⬆️ Lock" is not found
+        if: steps.check.outputs.lock-upgrade == 'false'
         run: >-
-          echo "::notice::The PR description contains the words 'no-lock-upgrade', so the lock files will not be upgraded."
+          echo "::notice::This PR does not have the label "⬆️ Lock", so the lock files will not be upgraded."
 
   find-lock-files:
     if: >-
       always() &&
       (
         needs.pr-exists.outputs.exists == 'false' ||
-        needs.pr-has-no-lock-upgrade.outputs.no-lock-upgrade == 'false'
+        needs.pr-has-lock-label.outputs.lock-upgrade == 'true'
       )
     name: Find lock files
     needs:
-      - pr-has-no-lock-upgrade
+      - pr-has-lock-label
       - pr-exists
     runs-on: ubuntu-24.04
     outputs:
@@ -239,7 +241,7 @@ jobs:
     name: Push changes
     if: >-
       always() &&
-      needs.pr-has-no-lock-upgrade.outputs.no-lock-upgrade == 'false'
+      needs.pr-has-lock-label.outputs.lock-upgrade == 'true'
     runs-on: ubuntu-24.04
     needs:
       - julia
@@ -247,7 +249,7 @@ jobs:
       - pixi-lock
       - pre-commit
       - uv-lock
-      - pr-has-no-lock-upgrade
+      - pr-has-lock-label
     steps:
       - uses: actions/checkout@v4
         with:
@@ -312,7 +314,7 @@ jobs:
           body: >-
             This PR updates all lock files. It was created automatically by a scheduled workflow.
           labels: |
-            🔨 Maintenance
+            ⬆️ Lock
           branch-suffix: timestamp
           delete-branch: true
           token: ${{ secrets.token }}
