@@ -31,8 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         name: Run Sphinx linkcheck
         run: |-
-          uv tool install --with tox-uv tox
           uv run \
             --group doc \
-            --no-dev \
-            tox -e linkcheck
+            --with poethepoet \
+            poe linkcheck

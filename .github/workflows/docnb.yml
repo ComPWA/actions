@@ -50,11 +50,10 @@ jobs:
           ijulia: true
       - name: Build documentation and run notebooks
         run: |-
-          uv tool install --with tox-uv tox
           uv run \
             --group doc \
-            --no-dev \
-            tox -e doc
+            --with poethepoet \
+            poe doc
       - if: hashFiles('docs/_build/html')
         uses: actions/upload-pages-artifact@v3
         with:
