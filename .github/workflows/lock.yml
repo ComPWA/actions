@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: versions
-        uses: ComPWA/actions/create-python-version-matrix@v2
+        uses: ComPWA/actions/create-python-version-matrix@v3
 
   pip-constraints:
     name: pip constraint files

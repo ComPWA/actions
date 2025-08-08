@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@v2
+        uses: ComPWA/actions/create-pytest-matrix@v3
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           coverage-target: ${{ inputs.coverage-target }}
@@ -69,7 +69,7 @@ jobs:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
-      - uses: ComPWA/actions/cache-sympy@v2
+      - uses: ComPWA/actions/cache-sympy@v3
       - id: extra
         if: inputs.additional-extras
         name: Determine extras to install
