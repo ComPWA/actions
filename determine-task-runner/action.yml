@@ -1,0 +1,27 @@
+name: Determine task runner
+description: Determine which task runner the repository is using.
+
+outputs:
+  value:
+    description: Short string that describes the task runner. For example "pixi" or "poe".
+    value: ${{ steps.task-runner.outputs.value }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - if: hashFiles('pyproject.toml')
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - if: hashFiles('pyproject.toml')
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: false
+    - env:
+        UV_SYSTEM_PYTHON: 1
+      id: task-runner
+      if: hashFiles('pyproject.toml')
+      name: Determine task runner
+      run: echo "value=$(uv run -p3.12 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      shell: bash
