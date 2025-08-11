@@ -27,12 +27,23 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
+      - id: task-runner
+        uses: ComPWA/actions/determine-task-runner@v3
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        name: Run Sphinx linkcheck
+        if: steps.task-runner.outputs.value == 'poe'
+        name: Run Sphinx linkcheck (poe)
         run: |-
-          uv tool install --with tox-uv tox
           uv run \
             --group doc \
-            --no-dev \
-            tox -e linkcheck
+            --with poethepoet \
+            poe linkcheck
+      - uses: prefix-dev/setup-pixi@v0.8.14
+        if: steps.task-runner.outputs.value == 'pixi'
+        with:
+          cache: true
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: Run Sphinx linkcheck (Pixi)
+        if: steps.task-runner.outputs.value == 'pixi'
+        run: pixi run linkcheck

@@ -28,4 +28,4 @@ jobs:
     if: inputs.specific-pip-packages == ''
     secrets:
       token: ${{ secrets.PAT }}
-    uses: ComPWA/actions/.github/workflows/pre-commit.yml@v2.1
+    uses: ComPWA/actions/.github/workflows/pre-commit.yml@v3.0
