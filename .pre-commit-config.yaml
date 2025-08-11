@@ -12,7 +12,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ComPWA/policy
-    rev: 29b2d36f0f1d4f1762f08fb05a0461ed2744b0af
+    rev: 0.7.0
     hooks:
       - id: check-dev-files
         args:
@@ -33,7 +33,7 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
