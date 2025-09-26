@@ -166,7 +166,7 @@ def __get_allowed_versions(version_range: str) -> list[str]:
     ['3.9', '3.10', '3.11', '3.12']
     """
     specifier = SpecifierSet(version_range)
-    allowed_versions = [f"3.{v}" for v in range(6, 14)]
+    allowed_versions = [f"3.{v}" for v in range(6, 15)]
     versions_to_check = [Version(v) for v in sorted(allowed_versions)]
     return [str(v) for v in versions_to_check if v in specifier]
 
