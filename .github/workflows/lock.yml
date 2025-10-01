@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Get PR description
         id: pr-labels
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const pr = await github.rest.pulls.get({
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - uses: prefix-dev/setup-pixi@v0.9.0
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           run-install: false
       - name: Update lock files
@@ -200,7 +200,7 @@ jobs:
       - if: hashFiles('pixi.lock') == ''
         uses: julia-actions/setup-julia@v2
       - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.9.0
+        uses: prefix-dev/setup-pixi@v0.9.1
         with:
           activate-environment: true
       - name: Update Julia Manifest.toml
