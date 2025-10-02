@@ -57,7 +57,7 @@ jobs:
             --group doc \
             --with poethepoet \
             poe doc
-      - uses: prefix-dev/setup-pixi@v0.9.0
+      - uses: prefix-dev/setup-pixi@v0.9.1
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
