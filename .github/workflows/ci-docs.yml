@@ -9,7 +9,7 @@ on:
         required: false
         type: boolean
       python-version:
-        default: "3.12"
+        default: "3.13"
         required: false
         type: string
       specific-pip-packages:

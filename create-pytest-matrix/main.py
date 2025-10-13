@@ -3,7 +3,7 @@
 # dependencies = [
 #   "packaging",
 # ]
-# requires-python = ">=3.12"
+# requires-python = ">=3.13"
 # ///
 
 from __future__ import annotations

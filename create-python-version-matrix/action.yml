@@ -4,7 +4,7 @@ description: >-
 
 inputs:
   coverage-python-version:
-    default: "3.12"
+    default: "3.13"
     description: Python version on which to run the test coverage job.
     required: false
   coverage-target:
@@ -31,7 +31,7 @@ runs:
     - if: hashFiles('pyproject.toml')
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
     - if: hashFiles('pyproject.toml')
       uses: astral-sh/setup-uv@v6
       with:
