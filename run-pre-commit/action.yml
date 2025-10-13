@@ -15,5 +15,5 @@ runs:
         UV_SYSTEM_PYTHON: 1
       id: uv-run
       name: Determine skipped hooks
-      run: echo "cmd=$(uv run -p3.12 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      run: echo "cmd=$(uv run -p3.13 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
       shell: bash
