@@ -10,7 +10,7 @@ on:
         required: false
         type: string
       coverage-python-version:
-        default: "3.12"
+        default: "3.13"
         required: false
         type: string
       coverage-target:

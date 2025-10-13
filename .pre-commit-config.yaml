@@ -18,6 +18,7 @@ repos:
         args:
           - --allow-deprecated-workflows
           - --dependabot=update
+          - --dev-python-version=3.13
           - --keep-pr-linting
           - --no-pypi
           - --no-version-branches

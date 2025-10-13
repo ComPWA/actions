@@ -3,7 +3,7 @@
 # dependencies = [
 #   "rtoml",
 # ]
-# requires-python = ">=3.12"
+# requires-python = ">=3.13"
 # ///
 
 import os

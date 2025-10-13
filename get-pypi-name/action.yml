@@ -13,7 +13,7 @@ runs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
     - id: determine-name
       name: Determine Python package name
       run: |
