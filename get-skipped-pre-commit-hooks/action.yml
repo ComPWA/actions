@@ -19,7 +19,7 @@ runs:
         sparse-checkout: .pre-commit-config.yaml
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
     - uses: astral-sh/setup-uv@v6
       with:
         enable-cache: false
