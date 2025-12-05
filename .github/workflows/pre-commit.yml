@@ -41,7 +41,7 @@ jobs:
     needs: determine-hooks
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
@@ -106,7 +106,7 @@ jobs:
       - pre-commit
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
