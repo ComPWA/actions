@@ -30,3 +30,21 @@ and [`pre-commit install`](https://pre-commit.com/#3-install-the-git-hook-script
 ```shell
 pre-commit install --install-hooks
 ```
+
+[Poe the Poet](https://poethepoet.natn.io) is used as a task runner. Install it globally (within your home folder) with `uv`:
+
+```shell
+uv tool install poethepoet --force-reinstall --python=3.13
+```
+
+You can see which local CI checks it defines by running
+
+```shell
+poe
+```
+
+For instance, all style checks can be run with
+
+```shell
+poe style
+```
