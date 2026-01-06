@@ -31,7 +31,7 @@ jobs:
             **/uv.lock
       - name: Fetch Jupyter cache
         if: inputs.specific-pip-packages == ''
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: |
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}-${{ hashFiles('docs/**') }}
