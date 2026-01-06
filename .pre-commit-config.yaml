@@ -12,7 +12,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.7.5
+    rev: 0.8.0
     hooks:
       - id: check-dev-files
         args:
@@ -23,6 +23,7 @@ repos:
           - --no-version-branches
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
+          - --type-checker=pyright
           - --update-lock-files=no
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
