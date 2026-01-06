@@ -3,7 +3,7 @@ ci:
   autoupdate_commit_msg: "MAINT: upgrade lock files"
   autoupdate_schedule: quarterly
   skip:
-    - pyright
+    - ty
 
 repos:
   - repo: meta
@@ -23,7 +23,7 @@ repos:
           - --no-version-branches
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
-          - --type-checker=pyright
+          - --type-checker=ty
           - --update-lock-files=no
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -78,7 +78,12 @@ repos:
             .*\.py
           )$
 
-  - repo: https://github.com/ComPWA/pyright-pre-commit
-    rev: v1.1.407
+  - repo: local
     hooks:
-      - id: pyright
+      - id: ty
+        name: ty
+        entry: ty check
+        args: [--output-format=concise]
+        require_serial: true
+        language: system
+        types_or: [python, pyi, jupyter]
