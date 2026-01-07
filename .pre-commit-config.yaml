@@ -3,7 +3,7 @@ ci:
   autoupdate_commit_msg: "MAINT: upgrade lock files"
   autoupdate_schedule: quarterly
   skip:
-    - pyright
+    - ty
 
 repos:
   - repo: meta
@@ -12,7 +12,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.7.3
+    rev: 0.8.0
     hooks:
       - id: check-dev-files
         args:
@@ -23,10 +23,11 @@ repos:
           - --no-version-branches
           - --repo-name=actions
           - --repo-title=ComPWA actions and shared workflows
+          - --type-checker=ty
           - --update-lock-files=no
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.0
+    rev: v0.14.10
     hooks:
       - id: ruff-check
         args: [--fix]
@@ -62,12 +63,12 @@ repos:
           - --in-place
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v9.2.0
+    rev: v9.4.0
     hooks:
       - id: cspell
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.4.0
+    rev: 3.6.0
     hooks:
       - id: editorconfig-checker
         name: editorconfig
@@ -77,7 +78,12 @@ repos:
             .*\.py
           )$
 
-  - repo: https://github.com/ComPWA/pyright-pre-commit
-    rev: v1.1.406
+  - repo: local
     hooks:
-      - id: pyright
+      - id: ty
+        name: ty
+        entry: ty check
+        args: [--output-format=concise]
+        require_serial: true
+        language: system
+        types_or: [python, pyi, jupyter]

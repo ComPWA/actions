@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "astral-sh.ty",
     "charliermarsh.ruff",
     "christian-kohler.path-intellisense",
     "eamodio.gitlens",
@@ -25,6 +26,7 @@
     "ms-python.isort",
     "ms-python.mypy-type-checker",
     "ms-python.pylint",
+    "ms-python.vscode-pylance",
     "travisillig.vscode-json-stable-stringify",
     "tyriar.sort-lines"
   ]

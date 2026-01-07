@@ -113,7 +113,7 @@ jobs:
           files: ./coverage.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: inputs.test-output-path
         with:
           name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
