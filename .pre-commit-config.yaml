@@ -12,7 +12,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.8.0
+    rev: 0.8.2rc1
     hooks:
       - id: check-dev-files
         args:
@@ -27,7 +27,7 @@ repos:
           - --update-lock-files=no
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
+    rev: v0.14.11
     hooks:
       - id: ruff-check
         args: [--fix]
@@ -83,7 +83,7 @@ repos:
       - id: ty
         name: ty
         entry: ty check
-        args: [--output-format=concise]
+        args: [--no-progress, --output-format=concise]
         require_serial: true
         language: system
         types_or: [python, pyi, jupyter]

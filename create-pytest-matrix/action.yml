@@ -1,31 +1,25 @@
 name: Create run matrix of python versions
-description: >-
-  Create a run matrix of python versions for pytest workflow.
+description: Create a run matrix of python versions for pytest workflow.
 
 inputs:
   coverage-python-version:
-    default: "3.13"
-    description: Python version on which to run the test coverage job.
-    required: false
-  coverage-target:
-    description: >-
-      Name of the package over which to compute test coverage. Leave empty if
-      you do not want to compute test coverage.
+    default: ""
+    description:
+      Python version on which to run the test coverage job. Leave empty to
+      skip creating a coverage job.
     required: false
   macos-python-version:
-    description: >-
+    description:
       Run tests on macOS on a specific version of Python. If left empty, the no
       macOS job will be created.
     required: false
   skipped-python-versions:
-    description: >-
-      Do not run tests on the following supported Python versions.
+    description: Do not run tests on the following supported Python versions.
     required: false
 
 outputs:
   matrix:
-    description: >-
-      A JSON object that can be used for setting `jobs.<job_id>.strategy`.
+    description: A JSON object that can be used for setting `jobs.<job_id>.strategy`.
     value: ${{ steps.set-matrix.outputs.matrix }}
 
 runs:
@@ -46,10 +40,9 @@ runs:
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
         uv run -p3.13 $GITHUB_ACTION_PATH/main.py \
-          '${{ inputs.coverage-python-version }}' \
-          '${{ inputs.coverage-target }}' \
-          '${{ inputs.macos-python-version }}' \
-          '${{ inputs.skipped-python-versions }}' \
+          --coverage-python-version=${{ inputs.coverage-python-version }} \
+          --macos-python-version=${{ inputs.macos-python-version }} \
+          --skipped-python-versions='${{ inputs.skipped-python-versions }}' \
           | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash

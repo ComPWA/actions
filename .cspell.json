@@ -44,6 +44,7 @@
     "pyproject.toml"
   ],
   "ignoreWords": [
+    "PYTEST_XDIST_WORKER_COUNT",
     "elif",
     "ipynb",
     "mhutchie",

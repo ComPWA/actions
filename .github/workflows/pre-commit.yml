@@ -20,6 +20,7 @@ on:
 env:
   DISABLE_PRE_COMMIT_UV_PATCH: True
   FORCE_COLOR: true
+  PRE_COMMIT_COLOR: always
 
 jobs:
   determine-hooks:
@@ -29,7 +30,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v3
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v4
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -50,6 +51,7 @@ jobs:
             **/.pre-commit-config.yaml
             **/pyproject.toml
             **/uv.lock
+          cache-suffix: pre-commit
       - name: Fetch pre-commit cache
         uses: actions/cache@v5
         with:
@@ -58,10 +60,11 @@ jobs:
           restore-keys: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
-      - id: uv-run
-        uses: ComPWA/actions/run-pre-commit@v3
+      - run: |
+          uv tool install --python=${{ inputs.python-version }} poethepoet
+          uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files --color=always
+        run: poe style
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -70,7 +73,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run $hook --all-files --color=always
+            poe style $hook
           done
       - id: diff
         if: always()

@@ -1,0 +1,81 @@
+env:
+  FORCE_COLOR: "1"
+  PYTHONHASHSEED: "0"
+
+on:
+  workflow_call:
+    inputs:
+      coverage-python-version:
+        default: ""
+        required: false
+        type: string
+      macos-python-version:
+        required: false
+        type: string
+      multithreaded:
+        default: true
+        required: false
+        type: boolean
+      skipped-python-versions:
+        required: false
+        type: string
+      test-output-path:
+        required: false
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        description: Token for uploading reports to Codecov. See https://docs.codecov.com/docs/codecov-uploader.
+        required: false
+
+jobs:
+  create-matrix:
+    name: Determine job matrix
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    runs-on: ubuntu-24.04
+    steps:
+      - id: set-matrix
+        uses: ComPWA/actions/create-pytest-matrix@v4
+        with:
+          coverage-python-version: ${{ inputs.coverage-python-version }}
+          macos-python-version: ${{ inputs.macos-python-version }}
+          skipped-python-versions: ${{ inputs.skipped-python-versions }}
+
+  test:
+    name: Run unit tests
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      UV_PYTHON: ${{ matrix.python-version }}
+    needs: create-matrix
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+          cache-suffix: test-${{ matrix.python-version }}
+      - uses: ComPWA/actions/cache-sympy@v4
+      - if: inputs.multithreaded
+        name: Activate pytest multithreading
+        run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
+      - run: uv tool install poethepoet
+      - if: matrix.codecov
+        run: poe cov
+      - if: ${{ !matrix.codecov }}
+        run: poe test
+      - if: matrix.codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/upload-artifact@v6
+        if: inputs.test-output-path
+        with:
+          name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
+          path: ${{ inputs.test-output-path }}
