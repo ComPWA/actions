@@ -218,7 +218,22 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - uses: ComPWA/update-pre-commit@v1
+      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v7
+      - env:
+          FORCE_COLOR: True
+          UV_SYSTEM_PYTHON: True
+        run: uvx --with pre-commit-uv pre-commit autoupdate -j$(nproc)
+        shell: bash
+      - name: Show changes
+        run: git diff --color --unified=0
+        shell: bash
+      - uses: actions/upload-artifact@v6
+        with:
+          if-no-files-found: error
+          include-hidden-files: true
+          name: pre-commit
+          path: .pre-commit-config.yaml
 
   uv-lock:
     name: uv.lock
