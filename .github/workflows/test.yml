@@ -32,7 +32,7 @@ jobs:
     name: Determine job matrix
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: set-matrix
         uses: ComPWA/actions/create-pytest-matrix@v4

@@ -3,7 +3,7 @@ on:
 
 jobs:
   close-milestone:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: mhutchie/update-milestone-on-release@master
         with:

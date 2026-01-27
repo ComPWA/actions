@@ -39,7 +39,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -78,6 +78,7 @@ ignore = [
     "PLW1514",
     "PT001",
     "PTH",
+    "RUF067",
     "SIM108",
     "T201",
 ]
@@ -106,4 +107,3 @@ trailing_comma_inline_array = true
 division-by-zero = "warn"
 possibly-missing-import = "warn"
 possibly-unresolved-reference = "warn"
-unused-ignore-comment = "warn"

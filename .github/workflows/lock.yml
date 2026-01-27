@@ -37,7 +37,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
     outputs:
       exists: ${{ steps.pr-exists.outputs.exists }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
       - name: List open pull requests
@@ -77,7 +77,7 @@ jobs:
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       lock-upgrade: ${{ steps.check.outputs.lock-upgrade }}
     steps:
@@ -122,7 +122,7 @@ jobs:
     needs:
       - pr-has-lock-label
       - pr-exists
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       lock-files: ${{ steps.check.outputs.lock-files }}
     steps:
@@ -150,7 +150,7 @@ jobs:
       - find-lock-files
     outputs:
       matrix: ${{ steps.versions.outputs.matrix }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: versions
         uses: ComPWA/actions/create-python-version-matrix@v4
@@ -257,7 +257,7 @@ jobs:
     if: >-
       always() &&
       needs.pr-has-lock-label.outputs.lock-upgrade == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     needs:
       - julia
       - pip-constraints
@@ -295,7 +295,7 @@ jobs:
 
   create-pr:
     name: Create PR
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     if: >-
       always() &&
       needs.pr-exists.outputs.exists == 'false'

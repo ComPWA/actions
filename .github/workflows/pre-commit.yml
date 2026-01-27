@@ -27,7 +27,7 @@ jobs:
     name: Determine skipped pre-commit hooks
     outputs:
       skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: hooks
         uses: ComPWA/actions/get-skipped-pre-commit-hooks@v4
@@ -107,7 +107,7 @@ jobs:
     name: Push changes
     needs:
       - pre-commit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
