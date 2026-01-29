@@ -63,8 +63,16 @@ jobs:
       - run: |
           uv tool install --python=${{ inputs.python-version }} poethepoet
           uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
+      - name: Determine style-check command
+        id: cmd
+        run: |
+          if [[ -f "pyproject.toml" && $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+            echo "cmd=poe style" >> $GITHUB_OUTPUT
+          else
+            echo "cmd=pre-commit run --all-files" >> $GITHUB_OUTPUT
+          fi
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: poe style
+        run: ${{ steps.cmd.outputs.cmd }}
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -73,7 +81,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            poe style $hook
+            ${{ steps.cmd.outputs.cmd }} $hook
           done
       - id: diff
         if: always()
