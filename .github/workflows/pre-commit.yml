@@ -66,11 +66,22 @@ jobs:
       - name: Determine style-check command
         id: cmd
         run: |
-          if [[ -f "pyproject.toml" && $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
-            echo "cmd=poe style" >> $GITHUB_OUTPUT
-          else
-            echo "cmd=pre-commit run --all-files" >> $GITHUB_OUTPUT
+          cmd="pre-commit run --all-files"
+          if [[ -f pixi.toml && $(grep -c "\[tasks.style\]" pixi.toml) -gt 0 ]]; then
+            cmd="pixi run style"
           fi
+          if [[ -f pyproject.toml ]]; then
+            if [[ $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+              cmd="poe style"
+            elif [[ $(grep -c "\[tool.pixi.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+              cmd="pixi run style"
+            fi
+          fi
+          echo "cmd=$cmd" | tee -a $GITHUB_OUTPUT
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        if: contains(steps.cmd.outputs.cmd, 'pixi')
+        with:
+          cache: true
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
         run: ${{ steps.cmd.outputs.cmd }}
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
