@@ -28,7 +28,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@v3
+        uses: ComPWA/actions/determine-task-runner@v4
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: steps.task-runner.outputs.value == 'poe'
@@ -38,7 +38,7 @@ jobs:
             --group doc \
             --with poethepoet \
             poe linkcheck
-      - uses: prefix-dev/setup-pixi@v0.9.3
+      - uses: prefix-dev/setup-pixi@v0.9.4
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true

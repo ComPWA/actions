@@ -39,17 +39,17 @@ jobs:
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}
           path: |
             ./docs/_build/.jupyter_cache
-      - uses: ComPWA/actions/cache-sympy@v3
+      - uses: ComPWA/actions/cache-sympy@v4
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
-        uses: ComPWA/actions/install-julia@v3
+        uses: ComPWA/actions/install-julia@v4
         with:
           ijulia: true
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@v3
+        uses: ComPWA/actions/determine-task-runner@v4
       - name: Build documentation and run notebooks (poe)
         if: steps.task-runner.outputs.value == 'poe'
         run: |-
@@ -57,7 +57,7 @@ jobs:
             --group doc \
             --with poethepoet \
             poe doc
-      - uses: prefix-dev/setup-pixi@v0.9.3
+      - uses: prefix-dev/setup-pixi@v0.9.4
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true

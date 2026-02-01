@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v3
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v4
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -59,7 +59,7 @@ jobs:
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
       - id: uv-run
-        uses: ComPWA/actions/run-pre-commit@v3
+        uses: ComPWA/actions/run-pre-commit@v4
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
         run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files --color=always
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
