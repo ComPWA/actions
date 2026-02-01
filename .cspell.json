@@ -36,6 +36,7 @@
     "**/.cspell.json",
     ".editorconfig",
     ".envrc",
+    ".github/dependabot.yml",
     ".gitignore",
     ".pre-commit-config.yaml",
     ".prettierignore",
@@ -44,6 +45,7 @@
     "pyproject.toml"
   ],
   "ignoreWords": [
+    "PYTEST_XDIST_WORKER_COUNT",
     "elif",
     "ipynb",
     "mhutchie",

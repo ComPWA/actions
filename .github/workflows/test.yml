@@ -5,15 +5,8 @@ env:
 on:
   workflow_call:
     inputs:
-      additional-extras:
-        description: Space-separated additional extras that need to be installed for the tests.
-        required: false
-        type: string
       coverage-python-version:
-        default: "3.13"
-        required: false
-        type: string
-      coverage-target:
+        default: ""
         required: false
         type: string
       macos-python-version:
@@ -24,9 +17,6 @@ on:
         required: false
         type: boolean
       skipped-python-versions:
-        required: false
-        type: string
-      specific-pip-packages:
         required: false
         type: string
       test-output-path:
@@ -42,17 +32,16 @@ jobs:
     name: Determine job matrix
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: set-matrix
         uses: ComPWA/actions/create-pytest-matrix@v4
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
-          coverage-target: ${{ inputs.coverage-target }}
           macos-python-version: ${{ inputs.macos-python-version }}
           skipped-python-versions: ${{ inputs.skipped-python-versions }}
 
-  pytest:
+  test:
     name: Run unit tests
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,45 +58,32 @@ jobs:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
+          cache-suffix: test-${{ matrix.python-version }}
       - uses: ComPWA/actions/cache-sympy@v4
-      - id: extra
-        if: inputs.additional-extras
-        name: Determine extras to install
-        run: |
-          test_extras=''
-          for extra in ${{ inputs.additional-extras }}; do
-            test_extras="$test_extras --group $extra"
-          done
-          echo "extras=$test_extras" | tee -a $GITHUB_OUTPUT
-      - id: with
-        if: inputs.specific-pip-packages
-        name: Determine additional packages to install
-        run: |
-          additional_packages=''
-          for package in ${{ inputs.specific-pip-packages }}; do
-            additional_packages="$additional_packages --with $package"
-          done
-          echo "packages=$additional_packages" | tee -a $GITHUB_OUTPUT
-      - id: coverage
-        if: matrix.coverage-target
-        name: Determine pytest coverage flags
-        run: echo "flags=--cov-report=xml --cov=${{ matrix.coverage-target }}" | tee -a $GITHUB_OUTPUT
-      - id: multithreaded
-        if: inputs.multithreaded
-        name: Determine pytest multithreading flags
-        run: echo "flags=--numprocesses=auto" | tee -a $GITHUB_OUTPUT
-      - name: Run tests with pytest
-        run: >-
-          uv run \
-            --group test \
-            ${{ steps.extra.outputs.extras }} \
-            --no-dev \
-            ${{ steps.with.outputs.packages }} \
-            pytest \
-              ${{ steps.coverage.outputs.flags }} \
-              ${{ steps.multithreaded.outputs.flags }} \
-              -m "not slow or slow"
-      - if: matrix.coverage-target
+      - if: inputs.multithreaded
+        name: Activate pytest multithreading
+        run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
+      - id: task-runner
+        uses: ComPWA/actions/determine-task-runner@v4
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        if: steps.task-runner.outputs.value == 'pixi'
+        with:
+          cache: true
+      - if: matrix.codecov
+        run: |-
+          ${{ case(
+            steps.task-runner.outputs.value == 'pixi',
+            'pixi run cov',
+            'uvx --from poethepoet poe cov'
+          ) }}
+      - if: ${{ !matrix.codecov }}
+        run: |-
+          ${{ case(
+            steps.task-runner.outputs.value == 'pixi',
+            'pixi run test',
+            'uvx --from poethepoet poe test'
+          ) }}
+      - if: matrix.codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml

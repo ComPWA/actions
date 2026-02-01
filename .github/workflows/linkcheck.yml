@@ -33,11 +33,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: steps.task-runner.outputs.value == 'poe'
         name: Run Sphinx linkcheck (poe)
-        run: |-
-          uv run \
-            --group doc \
-            --with poethepoet \
-            poe linkcheck
+        run: uvx --from poethepoet poe linkcheck
       - uses: prefix-dev/setup-pixi@v0.9.4
         if: steps.task-runner.outputs.value == 'pixi'
         with:
