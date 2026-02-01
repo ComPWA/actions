@@ -28,8 +28,12 @@ PYTHON_VERSION = Literal[
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = ArgumentParser(__doc__)
-    parser.add_argument("--coverage-python-version", choices=PYTHON_VERSION.__args__)
-    parser.add_argument("--macos-python-version", choices=PYTHON_VERSION.__args__)
+    parser.add_argument(
+        "--coverage-python-version", choices=[*PYTHON_VERSION.__args__, ""]
+    )
+    parser.add_argument(
+        "--macos-python-version", choices=[*PYTHON_VERSION.__args__, ""]
+    )
     parser.add_argument("--skipped-python-versions", type=str)
     args = parser.parse_args(argv)
     matrix = create_job_matrix(
@@ -51,7 +55,7 @@ def _format_skipped_version(skipped_python_versions: str) -> set[PYTHON_VERSION]
 
 def create_job_matrix(
     coverage_python_version: PYTHON_VERSION | Literal[""],
-    macos_python_version: PYTHON_VERSION,
+    macos_python_version: PYTHON_VERSION | Literal[""],
     skipped_python_versions: set[PYTHON_VERSION] | None,
 ) -> dict:
     supported_python_versions = get_supported_python_versions()

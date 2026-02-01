@@ -3,7 +3,6 @@ description: Create a run matrix of python versions for pytest workflow.
 
 inputs:
   coverage-python-version:
-    default: ""
     description:
       Python version on which to run the test coverage job. Leave empty to
       skip creating a coverage job.
