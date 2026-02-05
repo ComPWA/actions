@@ -19,6 +19,7 @@ runs:
         cache-dependency-glob: |
           **/.python-version
           **/pyproject.toml
+        cache-python: true
         cache-suffix: update-jupyter-kernel
     - env:
         UV_NO_PROGRESS: 1
