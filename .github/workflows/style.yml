@@ -33,9 +33,11 @@ jobs:
       - uses: actions/checkout@v6
       - id: has-notebooks
         if: hashFiles('**/*.ipynb')
+        name: Check for Jupyter notebooks
         run: echo "value=true" | tee -a $GITHUB_OUTPUT
       - id: has-pre-commit
         if: hashFiles('.pre-commit-config.yaml')
+        name: Check for pre-commit configuration
         run: echo "value=true" | tee -a $GITHUB_OUTPUT
 
   determine-hooks:
