@@ -23,8 +23,25 @@ env:
   PRE_COMMIT_COLOR: always
 
 jobs:
+  determine-checks:
+    name: Determine which style checks to run
+    outputs:
+      has-notebooks: ${{ steps.has-notebooks.outputs.value }}
+      has-pre-commit: ${{ steps.has-pre-commit.outputs.value }}
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - id: has-notebooks
+        if: hashFiles('**/*.ipynb')
+        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+      - id: has-pre-commit
+        if: hashFiles('.pre-commit-config.yaml')
+        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+
   determine-hooks:
+    if: needs.determine-checks.outputs.has-pre-commit == 'true'
     name: Determine skipped pre-commit hooks
+    needs: determine-checks
     outputs:
       skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
     runs-on: ubuntu-slim
@@ -119,9 +136,11 @@ jobs:
 
   jupyter-kernels:
     if: >-
+      needs.determine-checks.outputs.has-notebooks == 'true' &&
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
     name: Update Jupyter kernels
+    needs: determine-checks
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
