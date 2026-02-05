@@ -114,8 +114,23 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
-          name: pre-commit-changes
+          name: style-changes-pre-commit
           path: ${{ steps.diff.outputs.diff }}
+
+  jupyter-kernels:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    name: Update Jupyter kernels
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - if: hashFiles('**/*.ipynb')
+        uses: ComPWA/actions/update-jupyter-kernel@v4
+        with:
+          target-branch: origin/${{ github.event.pull_request.base.ref }}
 
   push:
     if: >-
@@ -125,6 +140,7 @@ jobs:
       contains(join(needs.*.result, ','), 'failure')
     name: Push changes
     needs:
+      - jupyter-kernels
       - pre-commit
     runs-on: ubuntu-slim
     steps:
@@ -136,10 +152,11 @@ jobs:
         with:
           merge-multiple: true
           path: .
-          pattern: pre-commit-changes*
+          pattern: style-changes-*
       - if: always()
         name: Push changes
         run: |
+          rm -f .artifacts/keep-root-dir
           git diff --color
           if [[ $(git status -s) ]]; then
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}

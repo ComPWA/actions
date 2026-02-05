@@ -21,6 +21,7 @@ dev = [
 ]
 style = [
     "PyYAML",
+    "nbformat",
     "packaging",
     "rtoml",
     "ty",
