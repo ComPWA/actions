@@ -16,8 +16,9 @@ runs:
   steps:
     - uses: astral-sh/setup-uv@v7
       with:
+        cache-dependency-glob: ""
         cache-python: true
-        enable-cache: false
+        cache-suffix: skipped-pre-commit-hooks
         ignore-empty-workdir: true
     - uses: actions/checkout@v6
       with:
