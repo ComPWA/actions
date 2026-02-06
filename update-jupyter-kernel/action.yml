@@ -16,11 +16,7 @@ runs:
   steps:
     - uses: astral-sh/setup-uv@v7
       with:
-        cache-dependency-glob: |
-          **/.python-version
-          **/pyproject.toml
-        cache-python: true
-        cache-suffix: update-jupyter-kernel
+        enable-cache: false
     - env:
         UV_NO_PROGRESS: 1
       name: Update Jupyter kernels
