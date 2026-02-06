@@ -7,11 +7,6 @@ inputs:
     default: "3.13"
     description: Python version on which to run the test coverage job.
     required: false
-  coverage-target:
-    description: >-
-      Name of the package over which to compute test coverage. Leave empty if
-      you do not want to compute test coverage.
-    required: false
   macos-python-version:
     description: >-
       Run tests on macOS on a specific version of Python. If left empty, the no
@@ -27,13 +22,13 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - if: hashFiles('pyproject.toml')
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.13"
     - if: hashFiles('pyproject.toml')
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: false
     - env:

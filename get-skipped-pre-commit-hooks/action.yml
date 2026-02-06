@@ -14,19 +14,16 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v7
+      with:
+        cache-dependency-glob: ""
+        cache-python: true
+        cache-suffix: skipped-pre-commit-hooks
+        ignore-empty-workdir: true
+    - uses: actions/checkout@v6
       with:
         sparse-checkout: .pre-commit-config.yaml
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-    - uses: astral-sh/setup-uv@v6
-      with:
-        enable-cache: false
-    - env:
-        UV_SYSTEM_PYTHON: 1
-      id: set-hooks
+    - id: set-hooks
       name: Determine skipped hooks
-      run: |
-        echo "hooks=$(uv run -p3.13 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      run: echo "hooks=$(uv run --no-project --python=3.13 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
       shell: bash

@@ -10,9 +10,9 @@ jobs:
   package-name:
     if: startsWith(github.ref, 'refs/tags')
     name: Determine package name
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       name: ${{ steps.package-name.outputs.name }}
     steps:
-      - uses: ComPWA/actions/get-pypi-name@v3
+      - uses: ComPWA/actions/get-pypi-name@v4
         id: package-name

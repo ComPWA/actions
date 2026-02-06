@@ -26,7 +26,7 @@ jobs:
   check-title:
     if: github.event.pull_request.state == 'open'
     name: Check title
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
       - run: npm install @compwa/commitlint-config

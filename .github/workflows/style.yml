@@ -20,16 +20,36 @@ on:
 env:
   DISABLE_PRE_COMMIT_UV_PATCH: True
   FORCE_COLOR: true
+  PRE_COMMIT_COLOR: always
 
 jobs:
+  determine-checks:
+    name: Determine which style checks to run
+    outputs:
+      has-notebooks: ${{ steps.has-notebooks.outputs.value }}
+      has-pre-commit: ${{ steps.has-pre-commit.outputs.value }}
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - id: has-notebooks
+        if: hashFiles('**/*.ipynb')
+        name: Check for Jupyter notebooks
+        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+      - id: has-pre-commit
+        if: hashFiles('.pre-commit-config.yaml')
+        name: Check for pre-commit configuration
+        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+
   determine-hooks:
+    if: needs.determine-checks.outputs.has-pre-commit == 'true'
     name: Determine skipped pre-commit hooks
+    needs: determine-checks
     outputs:
       skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v3
+        uses: ComPWA/actions/get-skipped-pre-commit-hooks@v4
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -50,6 +70,7 @@ jobs:
             **/.pre-commit-config.yaml
             **/pyproject.toml
             **/uv.lock
+          cache-suffix: pre-commit
       - name: Fetch pre-commit cache
         uses: actions/cache@v5
         with:
@@ -58,10 +79,30 @@ jobs:
           restore-keys: |
             pre-commit-${{ runner.os }}-py${{ inputs.python-version }}
           path: ~/.cache/pre-commit/
-      - id: uv-run
-        uses: ComPWA/actions/run-pre-commit@v3
+      - run: |
+          uv tool install --python=${{ inputs.python-version }} poethepoet
+          uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
+      - name: Determine style-check command
+        id: cmd
+        run: |
+          cmd="pre-commit run --all-files"
+          if [[ -f pixi.toml && $(grep -c "\[tasks.style\]" pixi.toml) -gt 0 ]]; then
+            cmd="pixi run style"
+          fi
+          if [[ -f pyproject.toml ]]; then
+            if [[ $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+              cmd="poe style"
+            elif [[ $(grep -c "\[tool.pixi.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+              cmd="pixi run style"
+            fi
+          fi
+          echo "cmd=$cmd" | tee -a $GITHUB_OUTPUT
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        if: contains(steps.cmd.outputs.cmd, 'pixi')
+        with:
+          cache: true
       - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run --all-files --color=always
+        run: ${{ steps.cmd.outputs.cmd }}
       - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
         name: Run pre-commit hooks that don't work on pre-commit.ci
         run: |-
@@ -70,7 +111,7 @@ jobs:
             export PRETTIER_LEGACY_CLI=1
           fi
           for hook in $skipped_hooks; do
-            ${{ steps.uv-run.outputs.cmd }} --with pre-commit-uv pre-commit run $hook --all-files --color=always
+            ${{ steps.cmd.outputs.cmd }} $hook
           done
       - id: diff
         if: always()
@@ -92,8 +133,25 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
-          name: pre-commit-changes
+          name: style-changes-pre-commit
           path: ${{ steps.diff.outputs.diff }}
+
+  jupyter-kernels:
+    if: >-
+      needs.determine-checks.outputs.has-notebooks == 'true' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    name: Update Jupyter kernels
+    needs: determine-checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - if: hashFiles('**/*.ipynb')
+        uses: ComPWA/actions/update-jupyter-kernel@v4
+        with:
+          target-branch: origin/${{ github.event.pull_request.base.ref }}
 
   push:
     if: >-
@@ -103,8 +161,9 @@ jobs:
       contains(join(needs.*.result, ','), 'failure')
     name: Push changes
     needs:
+      - jupyter-kernels
       - pre-commit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -114,10 +173,11 @@ jobs:
         with:
           merge-multiple: true
           path: .
-          pattern: pre-commit-changes*
+          pattern: style-changes-*
       - if: always()
         name: Push changes
         run: |
+          rm -f .artifacts/keep-root-dir
           git diff --color
           if [[ $(git status -s) ]]; then
             git remote set-url origin https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}
@@ -125,7 +185,7 @@ jobs:
             git config user.email "noreply@github.com"
             git checkout -b ${{ github.head_ref }}
             git add -A
-            git commit -m "MAINT: implement updates from pre-commit hooks"
+            git commit -m "MAINT: implement updates from formatters"
             git config pull.rebase true
             git pull origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
