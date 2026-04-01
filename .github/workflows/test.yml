@@ -65,7 +65,7 @@ jobs:
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
         uses: ComPWA/actions/determine-task-runner@v4
-      - uses: prefix-dev/setup-pixi@v0.9.4
+      - uses: prefix-dev/setup-pixi@v0.9.5
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
@@ -84,12 +84,12 @@ jobs:
             'uvx --from poethepoet poe test'
           ) }}
       - if: matrix.codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: ./coverage.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: inputs.test-output-path
         with:
           name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}
