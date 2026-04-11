@@ -1,7 +1,7 @@
 name: Update
 
 env:
-  COMMIT_TITLE: "MAINT: update lock files"
+  COMMIT_TITLE: "MAINT: upgrade lock files"
   FORCE_COLOR: yes
 
 on:
@@ -182,7 +182,7 @@ jobs:
       - uses: prefix-dev/setup-pixi@v0.9.5
         with:
           run-install: false
-      - name: Update lock files
+      - name: Upgrade lock files
         run: pixi update
       - uses: actions/upload-artifact@v7
         with:
