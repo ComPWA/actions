@@ -52,7 +52,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
         with:
           cache-dependency-glob: |
@@ -65,7 +65,7 @@ jobs:
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
         uses: ComPWA/actions/determine-task-runner@v4
-      - uses: prefix-dev/setup-pixi@v0.9.5
+      - uses: prefix-dev/setup-pixi@v0.10.0
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
@@ -84,7 +84,7 @@ jobs:
             'uvx --from poethepoet poe test'
           ) }}
       - if: matrix.codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           flags: unittests

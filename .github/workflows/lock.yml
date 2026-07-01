@@ -39,7 +39,7 @@ jobs:
       exists: ${{ steps.pr-exists.outputs.exists }}
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: List open pull requests
         id: list-prs
         run: |
@@ -126,7 +126,7 @@ jobs:
     outputs:
       lock-files: ${{ steps.check.outputs.lock-files }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - id: check
         name: Determine available lock files
         run: |
@@ -178,8 +178,8 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: prefix-dev/setup-pixi@v0.9.5
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.10.0
         with:
           run-install: false
       - name: Upgrade lock files
@@ -196,11 +196,11 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - if: hashFiles('pixi.lock') == ''
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
       - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.9.5
+        uses: prefix-dev/setup-pixi@v0.10.0
         with:
           activate-environment: true
       - name: Update Julia Manifest.toml
@@ -217,7 +217,7 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -244,7 +244,7 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
@@ -268,7 +268,7 @@ jobs:
       - uv-lock
       - pr-has-lock-label
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.token || github.token}}
       - uses: actions/download-artifact@v8
@@ -308,7 +308,7 @@ jobs:
       - uv-lock
       - pr-exists
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.token }}
       - uses: actions/download-artifact@v8
