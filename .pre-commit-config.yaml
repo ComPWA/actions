@@ -12,18 +12,9 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/ComPWA/policy
-    rev: 0.8.13
+    rev: 25e781ae72399eead3a5a6c272a601d84fd98f22
     hooks:
       - id: check-dev-files
-        args:
-          - --allow-deprecated-workflows
-          - --keep-pr-linting
-          - --keep-workflow=lock.yml
-          - --no-pypi
-          - --no-version-branches
-          - --repo-name=actions
-          - --repo-title=ComPWA actions and shared workflows
-          - --type-checker=ty
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.20
@@ -78,12 +69,8 @@ repos:
             .*\.py
           )$
 
-  - repo: local
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.57
     hooks:
       - id: ty
-        name: ty
-        entry: ty check
-        args: [--no-progress, --output-format=concise]
-        require_serial: true
-        language: system
-        types_or: [python, pyi, jupyter]
+        args: [--no-default-groups, --group=style]
