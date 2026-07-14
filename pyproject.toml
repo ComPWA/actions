@@ -1,23 +1,19 @@
-[build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools>=61.2"]
-
 [project]
-authors = [{name = "Common Partial Wave Analysis", email = "compwa-admin@ep1.rub.de"}]
-description = "Python scripts used by the ComPWA/actions repository"
-dynamic = ["version"]
-license = {text = "License :: OSI Approved :: MIT License"}
 name = "compwa-actions"
+description = "Python scripts used by the ComPWA/actions repository"
 requires-python = ">=3.13"
+license = "MIT"
+authors = [{ name = "Common Partial Wave Analysis", email = "compwa-admin@ep1.rub.de" }]
+dynamic = ["version"]
 
 [project.readme]
-content-type = "text/markdown"
 file = "README.md"
+content-type = "text/markdown"
 
 [dependency-groups]
 dev = [
     "ruff",
-    {include-group = "style"},
+    { include-group = "style" },
 ]
 style = [
     "PyYAML",
@@ -27,9 +23,9 @@ style = [
     "ty",
 ]
 
-[tool.setuptools]
-include-package-data = false
-license-files = ["LICENSE"]
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
 
 [tool.compwa.policy]
 repo-name = "actions"
@@ -57,16 +53,21 @@ sequence = ["style"]
 
 [tool.poe.tasks.style]
 cmd = "pre-commit run --all-files"
-executor = {group = "style"}
+executor = { group = "style" }
 help = "Perform all linting, formatting, and spelling checks"
 
 [tool.poe.tasks.upgrade]
-executor = {type = "simple"}
+executor = { type = "simple" }
 help = "Upgrade lock files"
-parallel = [
-    {cmd = "pre-commit autoupdate -j8"},
-    {cmd = "uv lock --upgrade"},
-]
+parallel = ["_upgrade-precommit", "_upgrade-uv"]
+
+[tool.poe.tasks._upgrade-precommit]
+cmd = "pre-commit autoupdate -j8"
+executor = { type = "simple" }
+
+[tool.poe.tasks._upgrade-uv]
+cmd = "uv lock --upgrade"
+executor = { type = "simple" }
 
 [tool.ruff]
 preview = true
@@ -114,17 +115,21 @@ split-on-trailing-comma = false
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.tomlsort]
-all = false
-ignore_case = true
-in_place = true
-sort_first = [
-    "build-system",
-    "project",
-    "tool.setuptools",
-]
-spaces_indent_inline_array = 4
-trailing_comma_inline_array = true
+[tool.setuptools]
+include-package-data = false
+license-files = ["LICENSE"]
+
+[tool.tombi.format.rules]
+indent-width = 4
+line-width = 88
+
+[tool.tombi.lint.rules]
+key-empty = "off"
+
+[[tool.tombi.schemas]]
+root = "tool.compwa.policy"
+path = "https://raw.githubusercontent.com/ComPWA/policy/1a1d5e8a13c4f76cee452121b5bafe2286dec2f4/compwa-policy.schema.json"
+include = ["pyproject.toml"]
 
 [tool.ty.rules]
 division-by-zero = "warn"
