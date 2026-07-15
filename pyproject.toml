@@ -3,6 +3,7 @@ name = "compwa-actions"
 description = "Python scripts used by the ComPWA/actions repository"
 requires-python = ">=3.13"
 license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Common Partial Wave Analysis", email = "compwa-admin@ep1.rub.de" }]
 dynamic = ["version"]
 
@@ -117,7 +118,6 @@ convention = "google"
 
 [tool.setuptools]
 include-package-data = false
-license-files = ["LICENSE"]
 
 [tool.tombi.format.rules]
 indent-width = 4
@@ -128,7 +128,7 @@ key-empty = "off"
 
 [[tool.tombi.schemas]]
 root = "tool.compwa.policy"
-path = "https://raw.githubusercontent.com/ComPWA/policy/1a1d5e8a13c4f76cee452121b5bafe2286dec2f4/compwa-policy.schema.json"
+path = "https://raw.githubusercontent.com/ComPWA/policy/0.9.0/compwa-policy.schema.json"
 include = ["pyproject.toml"]
 
 [tool.ty.rules]
