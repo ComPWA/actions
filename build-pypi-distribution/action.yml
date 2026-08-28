@@ -9,17 +9,17 @@ description: >-
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-python@v6
+    - uses: actions/checkout@v7
+    - uses: actions/setup-python@v7
       with:
         python-version: "3.13"
-    - uses: astral-sh/setup-uv@v7
+    - uses: astral-sh/setup-uv@v10.0.1
       with:
         enable-cache: false
     - run: uv pip install --color=always --system build
       shell: bash
     - run: python3 -m build
       shell: bash
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         path: dist/
