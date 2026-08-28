@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v10.0.1
         with:
           cache-dependency-glob: |
             **/pyproject.toml
@@ -65,7 +65,7 @@ jobs:
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
         uses: ComPWA/actions/determine-task-runner@v4
-      - uses: prefix-dev/setup-pixi@v0.10.0
+      - uses: prefix-dev/setup-pixi@v0.10.1
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
