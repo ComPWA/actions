@@ -1,10 +1,43 @@
 on:
   workflow_call:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   close-milestone:
     runs-on: ubuntu-slim
     steps:
-      - uses: mhutchie/update-milestone-on-release@master
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const release = context.payload.release;
+            const version = release.tag_name.match(/\d+\.\d+\.\d+/)?.[0];
+            if (!version) {
+              core.info(`Release tag ${release.tag_name} has no semantic version`);
+              return;
+            }
+            const milestones = await github.paginate(
+              github.rest.issues.listMilestones,
+              { owner, repo, state: "open" },
+            );
+            const matches = milestones.filter(
+              ({ title }) => title.match(/\d+\.\d+\.\d+/)?.[0] === version,
+            );
+            for (const milestone of matches) {
+              const kind = release.prerelease ? "Pre-release" : "Release";
+              await github.rest.issues.updateMilestone({
+                owner,
+                repo,
+                milestone_number: milestone.number,
+                description: `${kind}: [${release.tag_name}](${release.html_url})`,
+                state: release.prerelease ? "open" : "closed",
+              });
+              core.info(`Updated milestone ${milestone.title}`);
+            }
+            if (matches.length === 0) {
+              core.info(`No open milestone matched ${release.tag_name}`);
+            }

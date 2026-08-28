@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@v4
+        uses: ComPWA/actions/create-pytest-matrix@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           macos-python-version: ${{ inputs.macos-python-version }}
@@ -52,20 +52,20 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
           cache-suffix: test-${{ matrix.python-version }}
-      - uses: ComPWA/actions/cache-sympy@v4
+      - uses: ComPWA/actions/cache-sympy@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
       - if: inputs.multithreaded
         name: Activate pytest multithreading
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@v4
-      - uses: prefix-dev/setup-pixi@v0.10.1
+        uses: ComPWA/actions/determine-task-runner@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
@@ -84,12 +84,12 @@ jobs:
             'uvx --from poethepoet poe test'
           ) }}
       - if: matrix.codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: ./coverage.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: inputs.test-output-path
         with:
           name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}

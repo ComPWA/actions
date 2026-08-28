@@ -39,7 +39,7 @@ jobs:
       exists: ${{ steps.pr-exists.outputs.exists }}
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: List open pull requests
         id: list-prs
         run: |
@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Get PR description
         id: pr-labels
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const pr = await github.rest.pulls.get({
@@ -126,7 +126,7 @@ jobs:
     outputs:
       lock-files: ${{ steps.check.outputs.lock-files }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: check
         name: Determine available lock files
         run: |
@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: versions
-        uses: ComPWA/actions/create-python-version-matrix@v4
+        uses: ComPWA/actions/create-python-version-matrix@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
 
   pip-constraints:
     name: pip constraint files
@@ -167,7 +167,7 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - if: matrix.python-version != 'skipped'
-        uses: ComPWA/update-pip-constraints@v1
+        uses: ComPWA/update-pip-constraints@ca39b3fe41dc29bb63fe6253648a564063b76076 # 1.1.1
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -178,13 +178,13 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: prefix-dev/setup-pixi@v0.10.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           run-install: false
       - name: Upgrade lock files
         run: pixi update
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pixi-lock
           path: pixi.lock
@@ -196,16 +196,16 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - if: hashFiles('pixi.lock') == ''
-        uses: julia-actions/setup-julia@v3
+        uses: julia-actions/setup-julia@fa02766e078afaaf09b14210362cee14137e6a32 # v3.0.2
       - if: hashFiles('pixi.lock')
-        uses: prefix-dev/setup-pixi@v0.10.1
+        uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           activate-environment: true
       - name: Update Julia Manifest.toml
         run: julia -e 'using Pkg; Pkg.update()'
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Manifest-toml
           path: Manifest.toml
@@ -217,11 +217,11 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
       - env:
           FORCE_COLOR: True
           UV_SYSTEM_PYTHON: True
@@ -230,7 +230,7 @@ jobs:
       - name: Show changes
         run: git diff --color --unified=0
         shell: bash
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           if-no-files-found: error
           include-hidden-files: true
@@ -244,12 +244,12 @@ jobs:
       - find-lock-files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
       - run: uv lock --upgrade
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: uv-lock
           path: uv.lock
@@ -268,10 +268,10 @@ jobs:
       - uv-lock
       - pr-has-lock-label
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.token || github.token}}
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           merge-multiple: true
           path: .
@@ -308,10 +308,10 @@ jobs:
       - uv-lock
       - pr-exists
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.token }}
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           merge-multiple: true
           path: .
@@ -322,7 +322,7 @@ jobs:
       - name: Show changes
         run: git diff --color --unified=0
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           commit-message: ${{ env.COMMIT_TITLE }}
           committer: GitHub <noreply@github.com>

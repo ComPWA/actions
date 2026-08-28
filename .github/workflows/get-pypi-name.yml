@@ -14,5 +14,5 @@ jobs:
     outputs:
       name: ${{ steps.package-name.outputs.name }}
     steps:
-      - uses: ComPWA/actions/get-pypi-name@v4
+      - uses: ComPWA/actions/get-pypi-name@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
         id: package-name

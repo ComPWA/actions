@@ -20,14 +20,14 @@ jobs:
     name: Execute and build documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
       - name: Fetch Jupyter cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: |
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}-${{ hashFiles('docs/**') }}
@@ -35,21 +35,21 @@ jobs:
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}
           path: |
             ./docs/_build/.jupyter_cache
-      - uses: ComPWA/actions/cache-sympy@v4
+      - uses: ComPWA/actions/cache-sympy@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
-        uses: ComPWA/actions/install-julia@v4
+        uses: ComPWA/actions/install-julia@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
         with:
           ijulia: true
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@v4
+        uses: ComPWA/actions/determine-task-runner@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
       - name: Build documentation and run notebooks (poe)
         if: steps.task-runner.outputs.value == 'poe'
         run: uvx --from poethepoet poe doc
-      - uses: prefix-dev/setup-pixi@v0.10.1
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
@@ -57,6 +57,6 @@ jobs:
         if: steps.task-runner.outputs.value == 'pixi'
         run: pixi run doc
       - if: hashFiles('docs/_build/html')
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: docs/_build/html
