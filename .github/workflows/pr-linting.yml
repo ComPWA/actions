@@ -37,4 +37,4 @@ jobs:
       - uses: JulienKode/pull-request-name-linter-action@8dab22a5f84b07c565ba473f505b0bc5406924dc # v20.5.0
       - if: failure()
         run: >
-          echo "::error::Please use a conventional commit message for the pull request title. See https://compwa.github.io/develop.html#commit-conventions for examples."
+          echo "::error::Please use a conventional commit message for the pull request title. See https://github.com/ComPWA/compwa.github.io/blob/main/docs/develop.md#commit-conventions for examples."
