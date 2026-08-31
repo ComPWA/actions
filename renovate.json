@@ -8,6 +8,12 @@
       "description": "Group GitHub Actions updates",
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "description": "Pin the Python version used by the helper scripts, so that it is upgraded deliberately",
+      "enabled": false,
+      "matchDepNames": ["python"],
+      "matchDepTypes": ["uses-with"]
     }
   ]
 }
