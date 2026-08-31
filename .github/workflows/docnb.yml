@@ -35,17 +35,17 @@ jobs:
             jupyter-cache-${{ hashFiles('.constraints/py3.*.txt', 'src/**.py', 'uv.lock') }}
           path: |
             ./docs/_build/.jupyter_cache
-      - uses: ComPWA/actions/cache-sympy@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+      - uses: $/cache-sympy
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
-        uses: ComPWA/actions/install-julia@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/install-julia
         with:
           ijulia: true
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/determine-task-runner
       - name: Build documentation and run notebooks (poe)
         if: steps.task-runner.outputs.value == 'poe'
         run: uvx --from poethepoet poe doc

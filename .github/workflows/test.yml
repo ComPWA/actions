@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: set-matrix
-        uses: ComPWA/actions/create-pytest-matrix@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/create-pytest-matrix
         with:
           coverage-python-version: ${{ inputs.coverage-python-version }}
           macos-python-version: ${{ inputs.macos-python-version }}
@@ -59,12 +59,12 @@ jobs:
             **/pyproject.toml
             **/uv.lock
           cache-suffix: test-${{ matrix.python-version }}
-      - uses: ComPWA/actions/cache-sympy@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+      - uses: $/cache-sympy
       - if: inputs.multithreaded
         name: Activate pytest multithreading
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
-        uses: ComPWA/actions/determine-task-runner@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/determine-task-runner
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         if: steps.task-runner.outputs.value == 'pixi'
         with:

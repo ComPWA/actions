@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: versions
-        uses: ComPWA/actions/create-python-version-matrix@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/create-python-version-matrix
 
   pip-constraints:
     name: pip constraint files

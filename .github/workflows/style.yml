@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: hooks
-        uses: ComPWA/actions/get-skipped-pre-commit-hooks@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/get-skipped-pre-commit-hooks
 
   pre-commit:
     name: Run local pre-commit hooks
@@ -149,7 +149,7 @@ jobs:
         with:
           fetch-depth: 0
       - if: hashFiles('**/*.ipynb')
-        uses: ComPWA/actions/update-jupyter-kernel@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
+        uses: $/update-jupyter-kernel
         with:
           target-branch: origin/${{ github.event.pull_request.base.ref }}
 
