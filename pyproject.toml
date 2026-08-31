@@ -36,7 +36,6 @@ repo-title = "ComPWA actions and shared workflows"
 allow-deprecated-workflows = true
 keep-pr-linting = true
 keep-workflow = ["lock.yml"]
-no-github-actions = true
 no-pypi = true
 no-version-branches = true
 
@@ -129,7 +128,7 @@ key-empty = "off"
 
 [[tool.tombi.schemas]]
 root = "tool.compwa.policy"
-path = "https://raw.githubusercontent.com/ComPWA/policy/0.9.5/compwa-policy.schema.json"
+path = "https://raw.githubusercontent.com/ComPWA/policy/0.9.6/compwa-policy.schema.json"
 include = ["pyproject.toml"]
 
 [tool.ty.rules]
