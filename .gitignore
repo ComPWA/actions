@@ -5,3 +5,9 @@
 # Temporary files
 node_modules/
 uv.lock
+
+# AI agent configuration
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md

@@ -16,7 +16,7 @@ jobs:
     name: Check labels
     runs-on: ubuntu-24.04
     steps:
-      - uses: docker://agilepathway/pull-request-label-checker:latest # cspell:ignore agilepathway
+      - uses: docker://agilepathway/pull-request-label-checker:v1.6.65@sha256:14f5f3dfda922496d07d53494e2d2b42885165f90677a1c03d600059b7706a61 # cspell:ignore agilepathway
         with:
           any_of: >-
             🐛 Bug,✨ Feature,⚙️ Enhancement,⚠️ Interface,❗ Behavior,📝 Docs,🔨 Maintenance,⬆️ Lock,🖱️ DX
@@ -28,12 +28,13 @@ jobs:
     name: Check title
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm install @compwa/commitlint-config
       - name: Create commitlint config
         run: |
           echo "module.exports = {extends: ['@compwa/commitlint-config']}" > commitlint.config.js
-      - uses: JulienKode/pull-request-name-linter-action@v20.5.0 # cspell:ignore kode
+      # cspell:ignore JulienKode
+      - uses: JulienKode/pull-request-name-linter-action@8dab22a5f84b07c565ba473f505b0bc5406924dc # v20.5.0
       - if: failure()
         run: >
-          echo "::error::Please use a conventional commit message for the pull request title. See https://compwa.github.io/develop.html#commit-conventions for examples."
+          echo "::error::Please use a conventional commit message for the pull request title. See https://github.com/ComPWA/compwa.github.io/blob/main/docs/develop.md#commit-conventions for examples."

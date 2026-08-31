@@ -15,14 +15,14 @@ on:
 
 jobs:
   linkcheck:
-    uses: ./.github/workflows/linkcheck.yml
+    uses: $/.github/workflows/linkcheck.yml
     with:
       apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
 
   docnb:
     name: nb
-    uses: ./.github/workflows/docnb.yml
+    uses: $/.github/workflows/docnb.yml
     with:
       apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
@@ -42,4 +42,4 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
