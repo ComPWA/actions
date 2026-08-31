@@ -36,6 +36,7 @@ repo-title = "ComPWA actions and shared workflows"
 allow-deprecated-workflows = true
 keep-pr-linting = true
 keep-workflow = ["lock.yml"]
+no-github-actions = true
 no-pypi = true
 no-version-branches = true
 

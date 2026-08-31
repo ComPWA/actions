@@ -22,4 +22,4 @@ jobs:
   style:
     secrets:
       token: ${{ secrets.PAT }}
-    uses: ComPWA/actions/.github/workflows/style.yml@5e2706ecd18e46751b50ed3d76b2aa7ee6912fe3
+    uses: $/.github/workflows/style.yml

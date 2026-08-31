@@ -15,14 +15,14 @@ on:
 
 jobs:
   linkcheck:
-    uses: ./.github/workflows/linkcheck.yml
+    uses: $/.github/workflows/linkcheck.yml
     with:
       apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
 
   docnb:
     name: nb
-    uses: ./.github/workflows/docnb.yml
+    uses: $/.github/workflows/docnb.yml
     with:
       apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
