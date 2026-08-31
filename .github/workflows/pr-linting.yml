@@ -16,7 +16,7 @@ jobs:
     name: Check labels
     runs-on: ubuntu-24.04
     steps:
-      - uses: docker://agilepathway/pull-request-label-checker:latest # cspell:ignore agilepathway
+      - uses: docker://agilepathway/pull-request-label-checker:v1.6.65@sha256:14f5f3dfda922496d07d53494e2d2b42885165f90677a1c03d600059b7706a61 # cspell:ignore agilepathway
         with:
           any_of: >-
             🐛 Bug,✨ Feature,⚙️ Enhancement,⚠️ Interface,❗ Behavior,📝 Docs,🔨 Maintenance,⬆️ Lock,🖱️ DX

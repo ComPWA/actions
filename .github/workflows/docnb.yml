@@ -49,7 +49,7 @@ jobs:
       - name: Build documentation and run notebooks (poe)
         if: steps.task-runner.outputs.value == 'poe'
         run: uvx --from poethepoet poe doc
-      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true

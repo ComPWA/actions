@@ -65,7 +65,7 @@ jobs:
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
         uses: ComPWA/actions/determine-task-runner@99e91bcc486218c7dbbb4f2e0319bfcb028562aa # 4.0.1
-      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
