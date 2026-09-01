@@ -1,5 +1,5 @@
 name-template: ComPWA actions and shared workflows $NEXT_PATCH_VERSION
-tag-template: $NEXT_PATCH_VERSION
+tag-template: v$NEXT_PATCH_VERSION
 
 references:
   - main
@@ -36,4 +36,4 @@ sort-direction: ascending
 template: |
   $CHANGES
 
-  _The full changelog as commits can be found [here](https://github.com/ComPWA/actions/compare/$PREVIOUS_TAG...$NEXT_PATCH_VERSION)._
+  _The full changelog as commits can be found [here](https://github.com/ComPWA/actions/compare/$PREVIOUS_TAG...v$NEXT_PATCH_VERSION)._
