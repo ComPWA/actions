@@ -38,6 +38,7 @@ keep-pr-linting = true
 keep-workflow = ["lock.yml"]
 no-pypi = true
 no-version-branches = true
+release-name-template = "{{ TAG_PREFIX }}$NEXT_PATCH_VERSION"
 tag-prefix = "v"
 
 [tool.compwa.policy.python]
