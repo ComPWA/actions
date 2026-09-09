@@ -55,7 +55,7 @@ ignore_fail = "return_non_zero"
 sequence = ["style"]
 
 [tool.poe.tasks.style]
-cmd = "pre-commit run --all-files"
+cmd = "prek run --all-files"
 executor = { group = "style" }
 help = "Perform all linting, formatting, and spelling checks"
 

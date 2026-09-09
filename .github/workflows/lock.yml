@@ -225,7 +225,7 @@ jobs:
       - env:
           FORCE_COLOR: True
           UV_SYSTEM_PYTHON: True
-        run: uvx --with pre-commit-uv pre-commit autoupdate -j$(nproc)
+        run: uvx prek autoupdate -j$(nproc)
         shell: bash
       - name: Show changes
         run: git diff --color --unified=0

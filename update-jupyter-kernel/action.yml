@@ -10,6 +10,13 @@ inputs:
     description: "The target branch to compare against (default: main)"
     default: ${{ github.event.pull_request.base.ref || 'main' }}
     required: false
+  upload-artifact:
+    description: >-
+      Whether to upload the updated notebooks as an artifact and fail the step, so
+      that a follow-up job can push them. Set this to false when an app such as
+      autofix.ci commits the working tree directly.
+    default: "true"
+    required: false
 
 runs:
   using: composite
@@ -28,18 +35,24 @@ runs:
     - run: git diff --color=always
       shell: bash
     - id: updated
+      env:
+        UPLOAD_ARTIFACT: ${{ inputs.upload-artifact }}
       run: |
         if [[ $(git diff --name-only) ]]; then
           delimiter="$(openssl rand -hex 8)"
           echo "notebooks<<${delimiter}" >> $GITHUB_OUTPUT
           echo "$(git diff --name-only)" | tee -a $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
-          mkdir -p .artifacts
-          touch .artifacts/keep-root-dir
-          exit 1
+          # The marker file keeps the archive rooted at the repository, but it must
+          # not be created when the diff is committed straight from the work tree.
+          if [[ $UPLOAD_ARTIFACT == 'true' ]]; then
+            mkdir -p .artifacts
+            touch .artifacts/keep-root-dir
+            exit 1
+          fi
         fi
       shell: bash
-    - if: failure()
+    - if: failure() && inputs.upload-artifact == 'true'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: ${{ inputs.artifact-name }}
