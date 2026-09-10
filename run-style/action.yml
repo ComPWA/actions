@@ -1,0 +1,91 @@
+name: Run style checks
+description: Run the configured Poe or Pixi style task, falling back to prek when no task is configured.
+
+inputs:
+  python-version:
+    description: The Python version used to install style tools. Defaults to Python 3.13.
+    default: "3.13"
+  hooks:
+    description: Space-separated hook IDs to run. Defaults to ALL, which runs the complete style task.
+    default: ALL
+  verify-fixes:
+    description: Run the style task again after a failure to verify automatic fixes. Defaults to false.
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      with:
+        cache-dependency-glob: |
+          **/.pre-commit-config.yaml
+          **/pyproject.toml
+          **/uv.lock
+        cache-suffix: style
+    # Installs prek and restores its hook environments from cache. The action
+    # saves the cache in its post step, so no separate cache step is needed.
+    - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+      with:
+        install-only: true
+    - run: uv tool install --python=${{ inputs.python-version }} poethepoet
+      shell: bash
+    - name: Determine style-check command
+      id: cmd
+      shell: bash
+      run: |
+        cmd="prek run --all-files"
+        if [[ -f pixi.toml && $(grep -c "\[tasks.style\]" pixi.toml) -gt 0 ]]; then
+          cmd="pixi run style"
+        fi
+        if [[ -f pyproject.toml ]]; then
+          if [[ $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+            cmd="poe style"
+          elif [[ $(grep -c "\[tool.pixi.tasks.style\]" pyproject.toml) -gt 0 ]]; then
+            cmd="pixi run style"
+          fi
+        fi
+        echo "cmd=$cmd" | tee -a $GITHUB_OUTPUT
+    # Custom style tasks can still invoke pre-commit instead of prek.
+    - name: Install pre-commit for custom style tasks
+      if: steps.cmd.outputs.cmd != 'prek run --all-files'
+      run: uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
+      shell: bash
+    - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
+      if: contains(steps.cmd.outputs.cmd, 'pixi')
+      with:
+        cache: true
+    - name: Run style checks
+      if: steps.cmd.outputs.cmd != 'prek run --all-files' || hashFiles('.pre-commit-config.yaml')
+      env:
+        DISABLE_PRE_COMMIT_UV_PATCH: true
+        PRE_COMMIT_COLOR: always
+        PREK_COLOR: always
+        STYLE_COMMAND: ${{ steps.cmd.outputs.cmd }}
+        STYLE_HOOKS: ${{ inputs.hooks }}
+        VERIFY_FIXES: ${{ inputs.verify-fixes }}
+        UV_PYTHON: ${{ inputs.python-version }}
+      shell: bash
+      run: |
+        run_style() {
+          if [[ "$STYLE_HOOKS" == 'ALL' ]]; then
+            $STYLE_COMMAND
+          elif [[ "$STYLE_COMMAND" == 'prek run --all-files' ]]; then
+            $STYLE_COMMAND $STYLE_HOOKS
+          else
+            local result=0
+            for hook in $STYLE_HOOKS; do
+              $STYLE_COMMAND "$hook" || result=$?
+            done
+            return "$result"
+          fi
+        }
+        if [[ "$STYLE_HOOKS" == *"prettier"* ]]; then
+          export PRETTIER_LEGACY_CLI=1
+        fi
+        result=0
+        run_style || result=$?
+        if [[ "$result" != 0 && "$VERIFY_FIXES" == 'true' ]]; then
+          run_style
+        else
+          exit "$result"
+        fi

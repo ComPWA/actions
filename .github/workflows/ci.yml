@@ -20,6 +20,4 @@ on:
 
 jobs:
   style:
-    secrets:
-      token: ${{ secrets.PAT }}
     uses: $/.github/workflows/style.yml
