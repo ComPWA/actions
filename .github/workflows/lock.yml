@@ -5,36 +5,31 @@ env:
   FORCE_COLOR: yes
 
 on:
-  pull_request:
-    branches:
-      - main
-      - epic/*
-    paths:
-      - .constraints/
-      - .pre-commit-config.yaml
-      - Manifest.toml
-      - pixi.lock
-      - uv.lock
   workflow_call:
+    inputs:
+      generate-only:
+        description: Generate lock-file artifacts without pushing changes or creating a PR. Defaults to false for existing callers.
+        default: false
+        type: boolean
+    outputs:
+      lock-files:
+        description: Space-separated lock-file paths selected for upgrading, or an empty string when no upgrade is requested.
+        value: ${{ jobs.find-lock-files.outputs.lock-files }}
     secrets:
       token:
         description: >-
-          Personal Access Token for GitHub. This needs to be set as a secret by
-          the host repository in order to rerun checks after pushing to a PR.
-          The default GITHUB_TOKEN does not suffice for that, see here:
-          https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
-
-          This page tells more about creating a PAT:
-          https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-        required: true
+          Personal Access Token used to push changes and create upgrade PRs.
+          Required unless generate-only is true. Omit it when autofix.ci collects
+          the generated artifacts.
+        required: false
   workflow_dispatch:
 
 jobs:
   pr-exists:
     name: Check if PR already exists
     if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch'
+      !inputs.generate-only &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     outputs:
       exists: ${{ steps.pr-exists.outputs.exists }}
     runs-on: ubuntu-slim
@@ -161,15 +156,25 @@ jobs:
     needs:
       - create-matrix
       - find-lock-files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - if: matrix.python-version != 'skipped'
         uses: ComPWA/update-pip-constraints@ca39b3fe41dc29bb63fe6253648a564063b76076 # 1.1.1
         with:
           python-version: ${{ matrix.python-version }}
+      # The pinned updater does not explicitly include hidden directories.
+      - if: matrix.python-version != 'skipped'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pip-constraints-${{ matrix.python-version }}
+          path: .constraints/py${{ matrix.python-version }}.txt
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
 
   pixi-lock:
     name: pixi.lock
@@ -258,6 +263,7 @@ jobs:
     name: Push changes
     if: >-
       always() &&
+      !cancelled() && !failure() && !inputs.generate-only &&
       needs.pr-has-lock-label.outputs.lock-upgrade == 'true'
     runs-on: ubuntu-slim
     needs:
@@ -268,6 +274,14 @@ jobs:
       - uv-lock
       - pr-has-lock-label
     steps:
+      - name: Check publishing token
+        env:
+          PUBLISH_TOKEN: ${{ secrets.token }}
+        run: |
+          if [[ -z "$PUBLISH_TOKEN" ]]; then
+            echo '::error::Pass the token secret for publishing, or use generate-only with autofix.ci.'
+            exit 1
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.token || github.token}}
@@ -300,14 +314,24 @@ jobs:
     runs-on: ubuntu-slim
     if: >-
       always() &&
+      !cancelled() && !failure() && !inputs.generate-only &&
       needs.pr-exists.outputs.exists == 'false'
     needs:
+      - julia
       - pip-constraints
       - pixi-lock
       - pre-commit
       - uv-lock
       - pr-exists
     steps:
+      - name: Check publishing token
+        env:
+          PUBLISH_TOKEN: ${{ secrets.token }}
+        run: |
+          if [[ -z "$PUBLISH_TOKEN" ]]; then
+            echo '::error::Pass the token secret to create an upgrade PR.'
+            exit 1
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.token }}

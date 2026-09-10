@@ -3,12 +3,17 @@
 name: autofix.ci
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-autofix-${{ github.ref }}
   cancel-in-progress: |-
     ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
     branches:
       - main
       - epic/*
@@ -17,35 +22,77 @@ on:
     branches:
       - main
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      python-version:
+        description: The Python version used to install style tools. Defaults to Python 3.13.
+        default: "3.13"
+        type: string
+      upgrade-lock-files:
+        description: Upgrade lock files on same-repository PRs labeled with ⬆️ Lock. Defaults to true.
+        default: true
+        type: boolean
 
 permissions:
   contents: read
+  pull-requests: read
 
 env:
   FORCE_COLOR: true
   PREK_COLOR: always
+  UV_PYTHON: ${{ inputs.python-version || '3.13' }}
 
 jobs:
+  lock:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      toJSON(inputs.upgrade-lock-files) != 'false'
+    uses: $/.github/workflows/lock.yml
+    with:
+      generate-only: true
+
   autofix:
+    if: ${{ !cancelled() && !failure() }}
+    needs: lock
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # the Jupyter kernel update diffs against the base branch
-      - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+      - if: contains(needs.lock.outputs.lock-files, 'uv.lock')
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          install-only: true
-      - id: prek
-        name: Run prek
-        continue-on-error: true
-        run: prek run --all-files
-      # The first run fails as soon as a hook rewrites a file, so it runs again
-      # against the fixed tree. A hook that only reports keeps the job red.
-      - if: steps.prek.outcome == 'failure'
-        name: Verify fixes
-        run: prek run --all-files
+          name: uv-lock
+      - if: contains(needs.lock.outputs.lock-files, 'pixi.lock')
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pixi-lock
+      - if: contains(needs.lock.outputs.lock-files, 'Manifest.toml')
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: Manifest-toml
+      - if: contains(needs.lock.outputs.lock-files, '.pre-commit-config.yaml')
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pre-commit
+      - if: contains(needs.lock.outputs.lock-files, '.constraints/')
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: pip-constraints-*
+          merge-multiple: true
+          path: .constraints
+      - id: collected
+        name: Confirm lock files are collected
+        run: git diff --stat
+      - name: Run and verify style fixes
+        uses: $/run-style
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
+          verify-fixes: "true"
       - if: >-
           always() && !cancelled() &&
+          steps.collected.outcome == 'success' &&
           github.event_name == 'pull_request' &&
           hashFiles('**/*.ipynb')
         name: Update Jupyter kernels
@@ -53,8 +100,8 @@ jobs:
         with:
           target-branch: origin/${{ github.event.pull_request.base.ref }}
           upload-artifact: false
-      - if: always() && !cancelled()
+      - if: always() && !cancelled() && steps.collected.outcome == 'success'
         name: Commit fixes
         uses: autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a # v1.3.4
         with:
-          commit-message: "MAINT: apply automated fixes from `prek`"
+          commit-message: "MAINT: apply automated fixes"

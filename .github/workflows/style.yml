@@ -72,59 +72,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - uses: $/run-style
         with:
-          cache-dependency-glob: |
-            **/.pre-commit-config.yaml
-            **/pyproject.toml
-            **/uv.lock
-          cache-suffix: style
-      # Installs prek and restores its hook environments from cache. The action
-      # saves the cache in its post step, so no separate cache step is needed.
-      - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
-        with:
-          install-only: true
-      - run: uv tool install --python=${{ inputs.python-version }} poethepoet
-      - name: Determine style-check command
-        id: cmd
-        run: |
-          cmd="prek run --all-files"
-          if [[ -f pixi.toml && $(grep -c "\[tasks.style\]" pixi.toml) -gt 0 ]]; then
-            cmd="pixi run style"
-          fi
-          if [[ -f pyproject.toml ]]; then
-            if [[ $(grep -c "\[tool.poe.tasks.style\]" pyproject.toml) -gt 0 ]]; then
-              cmd="poe style"
-            elif [[ $(grep -c "\[tool.pixi.tasks.style\]" pyproject.toml) -gt 0 ]]; then
-              cmd="pixi run style"
-            fi
-          fi
-          echo "cmd=$cmd" | tee -a $GITHUB_OUTPUT
-      # Custom style tasks can still invoke pre-commit instead of prek.
-      - name: Install pre-commit for custom style tasks
-        if: steps.cmd.outputs.cmd != 'prek run --all-files'
-        run: uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
-      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
-        if: contains(steps.cmd.outputs.cmd, 'pixi')
-        with:
-          cache: true
-      - if: needs.determine-hooks.outputs.skipped-hooks == 'ALL'
-        run: ${{ steps.cmd.outputs.cmd }}
-      - if: needs.determine-hooks.outputs.skipped-hooks != 'ALL'
-        name: Run hooks that don't work on pre-commit.ci
-        run: |-
-          export skipped_hooks='${{ needs.determine-hooks.outputs.skipped-hooks }}'
-          if [[ $skipped_hooks == *"prettier"* ]]; then
-            export PRETTIER_LEGACY_CLI=1
-          fi
-          if [[ '${{ steps.cmd.outputs.cmd }}' == 'prek run --all-files' ]]; then
-            ${{ steps.cmd.outputs.cmd }} $skipped_hooks
-          else
-            # pre-commit accepts only one hook ID per invocation.
-            for hook in $skipped_hooks; do
-              ${{ steps.cmd.outputs.cmd }} "$hook"
-            done
-          fi
+          python-version: ${{ inputs.python-version }}
+          hooks: ${{ needs.determine-hooks.outputs.skipped-hooks }}
       - id: diff
         if: always()
         name: Determine changed files
