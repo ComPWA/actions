@@ -12,3 +12,5 @@ This repository hosts [shared workflows for GitHub Actions](https://docs.github.
 Actions and shared workflows provided by this repository presume that the repository to which they are applied follow the same set-up as described on [compwa.github.io/develop](https://compwa.github.io/develop). For example, it assumes source code is located under the `src/` directory and documentation is located under `docs/`.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to develop this repository.
+
+The shared style workflow uses a configured `poe style` or `pixi run style` task, and otherwise runs `prek run --all-files`. Both `prek` and `pre-commit` are available to custom style tasks. Selected hooks are passed to custom tasks one at a time to support tasks that use `pre-commit`.

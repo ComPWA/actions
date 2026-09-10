@@ -18,7 +18,9 @@ on:
         required: false
 
 env:
+  DISABLE_PRE_COMMIT_UV_PATCH: true
   FORCE_COLOR: true
+  PRE_COMMIT_COLOR: always
   PREK_COLOR: always
 
 jobs:
@@ -98,6 +100,10 @@ jobs:
             fi
           fi
           echo "cmd=$cmd" | tee -a $GITHUB_OUTPUT
+      # Custom style tasks can still invoke pre-commit instead of prek.
+      - name: Install pre-commit for custom style tasks
+        if: steps.cmd.outputs.cmd != 'prek run --all-files'
+        run: uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
         if: contains(steps.cmd.outputs.cmd, 'pixi')
         with:
@@ -111,7 +117,14 @@ jobs:
           if [[ $skipped_hooks == *"prettier"* ]]; then
             export PRETTIER_LEGACY_CLI=1
           fi
-          ${{ steps.cmd.outputs.cmd }} $skipped_hooks
+          if [[ '${{ steps.cmd.outputs.cmd }}' == 'prek run --all-files' ]]; then
+            ${{ steps.cmd.outputs.cmd }} $skipped_hooks
+          else
+            # pre-commit accepts only one hook ID per invocation.
+            for hook in $skipped_hooks; do
+              ${{ steps.cmd.outputs.cmd }} "$hook"
+            done
+          fi
       - id: diff
         if: always()
         name: Determine changed files
