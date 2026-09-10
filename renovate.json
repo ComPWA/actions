@@ -1,8 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "assignees": ["redeboer"],
   "enabledManagers": ["github-actions"],
   "ignorePaths": [".github/workflows/**"],
+  "semanticCommits": "enabled",
+  "semanticCommitType": "MAINT",
+  "semanticCommitScope": "",
+  "commitMessageAction": "update",
+  "commitMessageLowerCase": "never",
+  "pinDigest": { "commitMessageAction": "pin" },
   "packageRules": [
     {
       "description": "Group GitHub Actions updates",
