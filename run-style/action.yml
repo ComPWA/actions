@@ -1,0 +1,55 @@
+name: Run style tasks
+description: Run the caller's Poe or Pixi style task, falling back to prek when no style task is configured.
+
+inputs:
+  python-version:
+    default: "3.13"
+    description: Python version used to install task runners. The default is Python 3.13.
+    required: false
+  hooks:
+    default: ALL
+    description: Space-separated hook IDs to run. The default ALL runs the complete style task.
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Install Poe
+      run: uv tool install --python=${{ inputs.python-version }} poethepoet
+      shell: bash
+    - name: Determine style-check command
+      id: cmd
+      run: uv run --python 3.13 "$GITHUB_ACTION_PATH/main.py"
+      shell: bash
+    # Custom tasks may need pre-commit even when their main command is prek.
+    - name: Install pre-commit for custom style tasks
+      if: steps.cmd.outputs.cmd != 'prek run --all-files'
+      run: uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
+      shell: bash
+    - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
+      if: contains(steps.cmd.outputs.cmd, 'pixi')
+      with:
+        cache: true
+    - name: Run style checks
+      env:
+        STYLE_COMMAND: ${{ steps.cmd.outputs.cmd }}
+        BATCH_HOOKS: ${{ steps.cmd.outputs.batch-hooks }}
+        HOOKS: ${{ inputs.hooks }}
+      run: |
+        read -r -a command <<< "$STYLE_COMMAND"
+        if [[ "$HOOKS" == ALL ]]; then
+          "${command[@]}"
+        else
+          read -r -a hooks <<< "$HOOKS"
+          if [[ "$HOOKS" == *prettier* ]]; then
+            export PRETTIER_LEGACY_CLI=1
+          fi
+          if [[ "$BATCH_HOOKS" == true ]]; then
+            "${command[@]}" "${hooks[@]}"
+          else
+            for hook in "${hooks[@]}"; do
+              "${command[@]}" "$hook"
+            done
+          fi
+        fi
+      shell: bash
