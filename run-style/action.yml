@@ -21,9 +21,8 @@ runs:
       id: cmd
       run: uv run --python 3.13 "$GITHUB_ACTION_PATH/main.py"
       shell: bash
-    # Custom tasks may need pre-commit even when their main command is prek.
-    - name: Install pre-commit for custom style tasks
-      if: steps.cmd.outputs.cmd != 'prek run --all-files'
+    - name: Install pre-commit for unrecognized style tasks
+      if: steps.cmd.outputs.batch-hooks != 'true'
       run: uv tool install --python=${{ inputs.python-version }} --with pre-commit-uv pre-commit
       shell: bash
     - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
