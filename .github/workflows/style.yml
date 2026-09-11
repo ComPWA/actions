@@ -36,17 +36,23 @@ jobs:
       # A repository with an autofix.ci workflow lets that app commit the fixes,
       # so this workflow must not push them a second time.
       - id: has-autofix-ci
-        if: hashFiles('.github/workflows/autofix.ci.yml')
         name: Check for an autofix.ci workflow
-        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+        run: |
+          if [[ -f .github/workflows/autofix.ci.yml ]]; then
+            echo "value=true" | tee -a "$GITHUB_OUTPUT"
+          fi
       - id: has-notebooks
-        if: hashFiles('**/*.ipynb')
         name: Check for Jupyter notebooks
-        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+        run: |
+          if [[ -n $(git ls-files -- '*.ipynb') ]]; then
+            echo "value=true" | tee -a "$GITHUB_OUTPUT"
+          fi
       - id: has-pre-commit
-        if: hashFiles('.pre-commit-config.yaml')
         name: Check for pre-commit configuration
-        run: echo "value=true" | tee -a $GITHUB_OUTPUT
+        run: |
+          if [[ -f .pre-commit-config.yaml ]]; then
+            echo "value=true" | tee -a "$GITHUB_OUTPUT"
+          fi
 
   determine-hooks:
     if: needs.determine-checks.outputs.has-pre-commit == 'true'
@@ -124,8 +130,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - if: hashFiles('**/*.ipynb')
-        uses: $/update-jupyter-kernel
+      - uses: $/update-jupyter-kernel
         with:
           target-branch: origin/${{ github.event.pull_request.base.ref }}
 
