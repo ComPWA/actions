@@ -25,5 +25,5 @@ runs:
         sparse-checkout: .pre-commit-config.yaml
     - id: set-hooks
       name: Determine skipped hooks
-      run: echo "hooks=$(uv run --no-project --python=3.13 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
+      run: echo "hooks=$(uv run --no-project --python=3.14 $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
       shell: bash

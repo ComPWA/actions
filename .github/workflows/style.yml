@@ -2,7 +2,7 @@ on:
   workflow_call:
     inputs:
       python-version:
-        default: "3.13"
+        default: "3.14"
         required: false
         type: string
     secrets:
