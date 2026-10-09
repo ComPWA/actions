@@ -4,7 +4,7 @@ description: >-
 
 inputs:
   coverage-python-version:
-    default: "3.13"
+    default: "3.14"
     description: Python version on which to run the test coverage job.
     required: false
   macos-python-version:
@@ -26,7 +26,7 @@ runs:
     - if: hashFiles('pyproject.toml')
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
-        python-version: "3.13"
+        python-version: "3.14"
     - if: hashFiles('pyproject.toml')
       uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
@@ -39,6 +39,6 @@ runs:
       run: |
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-        uv run -p3.13 $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
+        uv run -p3.14 $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash

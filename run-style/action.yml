@@ -3,8 +3,8 @@ description: Run the caller's Poe or Pixi style task, falling back to prek when 
 
 inputs:
   python-version:
-    default: "3.13"
-    description: Python version used to install task runners. The default is Python 3.13.
+    default: "3.14"
+    description: Python version used to install task runners. The default is Python 3.14.
     required: false
   hooks:
     default: ALL
@@ -19,7 +19,7 @@ runs:
       shell: bash
     - name: Determine style-check command
       id: cmd
-      run: uv run --python 3.13 "$GITHUB_ACTION_PATH/main.py"
+      run: uv run --python 3.14 "$GITHUB_ACTION_PATH/main.py"
       shell: bash
     - name: Install pre-commit for unrecognized style tasks
       if: steps.cmd.outputs.batch-hooks != 'true'
