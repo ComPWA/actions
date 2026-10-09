@@ -29,7 +29,6 @@ requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.compwa.policy]
-dev-python-version = "3.14"
 repo-name = "actions"
 repo-title = "ComPWA actions and shared workflows"
 
