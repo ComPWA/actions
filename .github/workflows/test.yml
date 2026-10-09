@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           cache-dependency-glob: |
             **/pyproject.toml
@@ -65,7 +65,7 @@ jobs:
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
       - id: task-runner
         uses: $/determine-task-runner
-      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e # v0.10.2
+      - uses: prefix-dev/setup-pixi@9dabb60412d3d2d967a8d682f7ce01317af40514 # v0.11.0
         if: steps.task-runner.outputs.value == 'pixi'
         with:
           cache: true
@@ -84,12 +84,12 @@ jobs:
             'uvx --from poethepoet poe test'
           ) }}
       - if: matrix.codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: ./coverage.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: inputs.test-output-path
         with:
           name: test-output-${{ matrix.runs-on }}-${{ matrix.python-version }}

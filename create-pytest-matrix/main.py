@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 PYTHON_VERSION = Literal[
-    "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"
+    "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"
 ]
 
 
