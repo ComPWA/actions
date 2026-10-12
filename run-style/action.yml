@@ -10,6 +10,10 @@ inputs:
     default: ALL
     description: Space-separated hook IDs to run. The default ALL runs the complete style task.
     required: false
+  verify-fixes:
+    default: "false"
+    description: Run the style task again after a failure to verify automatic fixes. The default is false.
+    required: false
 
 runs:
   using: composite
@@ -30,25 +34,38 @@ runs:
       with:
         cache: true
     - name: Run style checks
+      if: steps.cmd.outputs.cmd != 'prek run --all-files' || hashFiles('.pre-commit-config.yaml')
       env:
         STYLE_COMMAND: ${{ steps.cmd.outputs.cmd }}
         BATCH_HOOKS: ${{ steps.cmd.outputs.batch-hooks }}
         HOOKS: ${{ inputs.hooks }}
+        VERIFY_FIXES: ${{ inputs.verify-fixes }}
       run: |
         read -r -a command <<< "$STYLE_COMMAND"
-        if [[ "$HOOKS" == ALL ]]; then
-          "${command[@]}"
-        else
-          read -r -a hooks <<< "$HOOKS"
-          if [[ "$HOOKS" == *prettier* ]]; then
-            export PRETTIER_LEGACY_CLI=1
-          fi
-          if [[ "$BATCH_HOOKS" == true ]]; then
+        read -r -a hooks <<< "$HOOKS"
+        if [[ "$HOOKS" == *prettier* ]]; then
+          export PRETTIER_LEGACY_CLI=1
+        fi
+        run_style() {
+          if [[ "$HOOKS" == ALL ]]; then
+            "${command[@]}"
+          elif [[ "$BATCH_HOOKS" == true ]]; then
             "${command[@]}" "${hooks[@]}"
           else
+            local result=0
             for hook in "${hooks[@]}"; do
-              "${command[@]}" "$hook"
+              "${command[@]}" "$hook" || result=$?
             done
+            return "$result"
           fi
+        }
+        result=0
+        run_style || result=$?
+        # The first run fails as soon as a hook rewrites a file, so it runs again
+        # against the fixed tree. A hook that only reports keeps the step red.
+        if [[ "$result" != 0 && "$VERIFY_FIXES" == true ]]; then
+          run_style
+        else
+          exit "$result"
         fi
       shell: bash
