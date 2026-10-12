@@ -29,7 +29,9 @@ runs:
       name: Update Jupyter kernels
       run: |
         for notebook in $(git diff --name-only --diff-filter=AMR ${{ inputs.target-branch }} ${{ github.sha }} | grep -E '\.ipynb$'); do
-          uv run --directory=$(dirname "$notebook") $GITHUB_ACTION_PATH/main.py "$(basename $notebook)"
+          # Run in the notebook's own project, so that its requires-python determines the
+          # Python version, but without syncing the project dependencies.
+          uv run --directory=$(dirname "$notebook") --isolated --no-sync --with=nbformat python $GITHUB_ACTION_PATH/main.py "$(basename $notebook)"
         done
       shell: bash
     - run: git diff --color=always
