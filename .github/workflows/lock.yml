@@ -254,8 +254,6 @@ jobs:
           name: uv-lock
           path: uv.lock
 
-  # This job always runs and fails if any job it depends on failed, so that it
-  # is the only job of this workflow that a repository has to mark as required.
   push:
     name: Push changes
     if: always()

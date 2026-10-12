@@ -134,8 +134,6 @@ jobs:
         with:
           target-branch: origin/${{ github.event.pull_request.base.ref }}
 
-  # This job always runs and fails if any other job failed, so that it is the
-  # only job of this workflow that a repository has to mark as required.
   push:
     if: always()
     name: Push changes
