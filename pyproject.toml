@@ -76,6 +76,7 @@ cmd = "uv lock --upgrade"
 executor = { type = "simple" }
 
 [tool.ruff]
+per-file-target-version = { "update-jupyter-kernel/main.py" = "py39" }
 preview = true
 show-fixes = true
 
