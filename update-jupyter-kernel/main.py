@@ -3,15 +3,20 @@
 # dependencies = [
 #   "nbformat",
 # ]
-# requires-python = ">=3.13"
+# requires-python = ">=3.9"
 # ///
+
+from __future__ import annotations
 
 import sys
 from argparse import ArgumentParser
-from collections.abc import Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import nbformat
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def main(argv: Sequence[str] | None = None) -> None:
