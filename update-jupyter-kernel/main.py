@@ -3,7 +3,7 @@
 # dependencies = [
 #   "nbformat",
 # ]
-# requires-python = ">=3.13"
+# requires-python = ">=3.9"
 # ///
 
 from __future__ import annotations
