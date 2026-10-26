@@ -13,8 +13,6 @@ Actions and shared workflows provided by this repository presume that the reposi
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to develop this repository.
 
-The shared PR linting workflow waits briefly before checking labels and the title, so a burst of metadata edits can settle. A newer run for the same PR and caller workflow cancels the older run, including its wait. Each event still creates a workflow run and cancelled runs remain visible in Actions; only the surviving run proceeds to the checks. Callers that configure concurrency should use a different group from the shared workflow to avoid cancelling their own run.
-
 The shared style workflow uses a configured `poe style` or `pixi run style` task, and otherwise runs `prek run --all-files`. The `run-style` action inspects Poe tasks in `pyproject.toml` and Pixi tasks in `pixi.toml` or `pyproject.toml`. Direct `prek run` command tasks without argument templates receive selected hook IDs together and skip installation of `pre-commit` and `pre-commit-uv`. Recognized options are `--all-files` (`-a`), `--show-diff-on-failure`, and `--verbose` (`-v`). Tasks using `pre-commit`, wrappers, other options, or Pixi task overrides retain one invocation per hook and install both compatibility packages. The configured task runner still executes the task with its own environment.
 
 The `run-style` action requires checkout, `uv`, and `prek` to be set up first. Its optional `hooks` input accepts space-separated hook IDs and defaults to `ALL`, which runs the complete style task. Its optional `python-version` input defaults to `3.14` and selects the Python version used to install task runners.
