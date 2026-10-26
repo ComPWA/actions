@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       # cspell:ignore agilepathway
-      - uses: agilepathway/label-checker@63e8b6bac74e868b08dbc478124a6c3084721411 # v2.0.35
+      - uses: agilepathway/label-checker@4c9ac452d37ed7c95024603468bd9de06e566a13 # v2.0.64
         with:
           any_of: >-
             🐛 Bug,✨ Feature,⚙️ Enhancement,⚠️ Interface,❗ Behavior,📝 Docs,🔨 Maintenance,⬆️ Lock,🖱️ DX
