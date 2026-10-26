@@ -10,11 +10,23 @@ on:
       - synchronize
       - unlabeled
 
+concurrency:
+  group: pr-linting-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  settle:
+    if: github.event.pull_request.state == 'open'
+    name: Wait for PR changes
+    runs-on: ubuntu-slim
+    steps:
+      - run: sleep 10
+
   check-labels:
+    needs: settle
     if: github.event.pull_request.state == 'open'
     name: Check labels
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       # cspell:ignore agilepathway
       - uses: agilepathway/label-checker@4c9ac452d37ed7c95024603468bd9de06e566a13 # v2.0.64
@@ -25,6 +37,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   check-title:
+    needs: settle
     if: github.event.pull_request.state == 'open'
     name: Check title
     runs-on: ubuntu-slim
