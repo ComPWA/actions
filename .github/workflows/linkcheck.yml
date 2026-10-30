@@ -1,45 +1,24 @@
 on:
   workflow_call:
-    inputs:
-      apt-packages:
-        required: false
-        type: string
-      python-version:
-        default: "3.14"
-        required: false
-        type: string
 
 jobs:
   linkcheck:
-    env:
-      FORCE_COLOR: yes
-      UV_PYTHON: ${{ inputs.python-version }}
     name: Check external links
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          cache-dependency-glob: |
-            **/pyproject.toml
-            **/uv.lock
-      - if: inputs.apt-packages
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ${{ inputs.apt-packages }}
-      - id: task-runner
-        uses: $/determine-task-runner
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.task-runner.outputs.value == 'poe'
-        name: Check links (Poe the Poet)
-        run: uvx --from poethepoet poe linkcheck
-      - uses: prefix-dev/setup-pixi@ad1da6449d9e506fd127fd67ab2d054a769f6a94 # v0.11.2
-        if: steps.task-runner.outputs.value == 'pixi'
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: lychee-
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          cache: true
-      - env:
+          args: --no-progress .
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        name: Check links (Pixi)
-        if: steps.task-runner.outputs.value == 'pixi'
-        run: pixi run linkcheck
+      - if: always() && hashFiles('.lycheecache') != ''
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}-${{ github.run_attempt }}
