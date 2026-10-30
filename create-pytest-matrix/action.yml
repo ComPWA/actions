@@ -12,8 +12,19 @@ inputs:
       Run tests on macOS on a specific version of Python. If left empty, the no
       macOS job will be created.
     required: false
+  macos-runner:
+    description:
+      Runner label for the macOS job, for instance `macos-26` (arm64) or
+      `macos-26-intel` (x64). Defaults to `macos-15`. Larger runners are billed, even
+      for public repositories.
+    required: false
   skipped-python-versions:
     description: Do not run tests on the following supported Python versions.
+    required: false
+  ubuntu-runner:
+    description:
+      Runner label for all Linux jobs, including the coverage job, for instance
+      `ubuntu-26.04` or `ubuntu-26.04-arm`. Defaults to `ubuntu-24.04`.
     required: false
 
 outputs:
@@ -41,7 +52,9 @@ runs:
         uv run -p3.14 $GITHUB_ACTION_PATH/main.py \
           --coverage-python-version=${{ inputs.coverage-python-version }} \
           --macos-python-version=${{ inputs.macos-python-version }} \
+          --macos-runner='${{ inputs.macos-runner }}' \
           --skipped-python-versions='${{ inputs.skipped-python-versions }}' \
+          --ubuntu-runner='${{ inputs.ubuntu-runner }}' \
           | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash

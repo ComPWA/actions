@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 PYTHON_VERSION = Literal[
     "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"
 ]
+DEFAULT_UBUNTU_RUNNER = "ubuntu-24.04"
+DEFAULT_MACOS_RUNNER = "macos-15"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -35,11 +37,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--macos-python-version", choices=[*PYTHON_VERSION.__args__, ""]
     )
     parser.add_argument("--skipped-python-versions", type=str)
+    parser.add_argument("--ubuntu-runner", default="")
+    parser.add_argument("--macos-runner", default="")
     args = parser.parse_args(argv)
     matrix = create_job_matrix(
         args.coverage_python_version,
         args.macos_python_version,
         _format_skipped_version(args.skipped_python_versions),
+        ubuntu_runner=args.ubuntu_runner or DEFAULT_UBUNTU_RUNNER,
+        macos_runner=args.macos_runner or DEFAULT_MACOS_RUNNER,
     )
     print(json.dumps(matrix, indent=2))
     return 0
@@ -57,6 +63,8 @@ def create_job_matrix(
     coverage_python_version: PYTHON_VERSION | Literal[""],
     macos_python_version: PYTHON_VERSION | Literal[""],
     skipped_python_versions: set[PYTHON_VERSION] | None,
+    ubuntu_runner: str = DEFAULT_UBUNTU_RUNNER,
+    macos_runner: str = DEFAULT_MACOS_RUNNER,
 ) -> dict:
     supported_python_versions = get_supported_python_versions()
     if skipped_python_versions is None:
@@ -70,35 +78,23 @@ def create_job_matrix(
         if coverage_python_version in python_versions:
             python_versions.remove(coverage_python_version)
     includes = []
-    if "3.6" in python_versions:
-        python_versions.remove("3.6")
-        includes.append({
-            "python-version": "3.6",
-            "runs-on": "ubuntu-20.04",
-        })
-    if "3.7" in python_versions:
-        python_versions.remove("3.7")
-        includes.append({
-            "python-version": "3.7",
-            "runs-on": "ubuntu-22.04",
-        })
     if coverage_python_version:
         includes.append({
             "codecov": "codecov",
             "python-version": coverage_python_version,
-            "runs-on": "ubuntu-24.04",
+            "runs-on": ubuntu_runner,
         })
     if macos_python_version:
         _is_version_allowed(macos_python_version, supported_python_versions)
         includes.append({
             "python-version": macos_python_version,
-            "runs-on": "macos-15",
+            "runs-on": macos_runner,
         })
     matrix = {}
     if python_versions:
         matrix = {
             "python-version": python_versions,
-            "runs-on": ["ubuntu-24.04"],
+            "runs-on": [ubuntu_runner],
         }
     if includes:
         matrix["include"] = includes
