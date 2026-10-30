@@ -48,6 +48,23 @@ type-checker = ["ty"]
 docstring-trailing-line = false
 format-python-code-blocks = false
 
+[tool.lychee]
+cache = true
+extensions = ["json", "md", "py", "toml", "yaml", "yml"]
+include_fragments = "anchor-only"
+include_verbatim = true
+max_cache_age = "2d"
+max_redirects = 0
+max_retries = 3
+remap = [
+    '^(https[:]//(?:docs\.astral\.sh|prek\.j178\.dev)/[^?#]*[^/?#])([?#].*)?$ $1/$2',  # Documentation paths on these hosts require a trailing slash.
+    '^https[:]//github\.dev/(.+)$ https://vscode.dev/github/$1',  # The policy-managed contribution template uses the redirecting editor URL.
+    '^https[:]//julialang-s3\.julialang\.org/bin/linux/x64/\$%7Bmajor_version%7D/\$%7Bfilename%7D$ https://julialang-s3.julialang.org/bin/versions.json',  # Check release metadata because the caller determines the download version.
+    "^(.+)/n$ $1",  # Lychee reads notebook JSON as text and normalizes escaped newlines to /n.
+]
+retry_wait_time = 5
+timeout = 30
+
 [tool.poe.executor]
 isolated = true
 no-group = "dev"
@@ -56,7 +73,7 @@ type = "uv"
 [tool.poe.tasks.all]
 help = "Run all continuous integration (CI) tasks locally"
 ignore_fail = "return_non_zero"
-sequence = ["style"]
+sequence = ["style", "linkcheck"]
 
 [tool.poe.tasks.style]
 cmd = "prek run --all-files"
@@ -78,6 +95,14 @@ executor = { type = "simple" }
 [tool.poe.tasks._upgrade-uv]
 cmd = "uv lock --upgrade"
 executor = { type = "simple" }
+
+[tool.poe.groups.doc]
+heading = "Documentation"
+
+[tool.poe.groups.doc.tasks.linkcheck]
+cmd = "uvx --from lychee-bin lychee . --quiet"
+executor = { type = "simple" }
+help = "Check links and fragments in repository sources (requires internet connection)"
 
 [tool.ruff]
 per-file-target-version = { "update-jupyter-kernel/main.py" = "py39" }

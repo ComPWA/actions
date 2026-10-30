@@ -3,6 +3,7 @@
 .eggs/
 
 # Temporary files
+.lycheecache
 node_modules/
 uv.lock
 
