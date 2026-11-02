@@ -50,7 +50,12 @@ format-python-code-blocks = false
 
 [tool.lychee]
 cache = true
+exclude = [
+    '^https[:]//github\.com/ComPWA/actions/compare/\$PREVIOUS_TAG',  # Release Drafter fills in the tags when it renders the notes.
+    "^https[:]//x-access-token/$",  # Lychee mistakes the token-authenticated remote URL for a host.
+]
 extensions = ["json", "md", "py", "toml", "yaml", "yml"]
+hidden = true  # Include the workflows under .github/
 include_fragments = "anchor-only"
 include_verbatim = true
 max_cache_age = "2d"
@@ -163,7 +168,7 @@ key-empty = "off"
 
 [[tool.tombi.schemas]]
 root = "tool.compwa.policy"
-path = "https://raw.githubusercontent.com/ComPWA/policy/0.10.2/compwa-policy.schema.json"
+path = "https://raw.githubusercontent.com/ComPWA/policy/0.10.3/compwa-policy.schema.json"
 include = ["pyproject.toml"]
 
 [tool.ty.rules]
