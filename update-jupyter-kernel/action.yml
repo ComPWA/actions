@@ -1,5 +1,5 @@
 name: Update Jupyter kernels
-description: Update the Python version in Jupyter notebooks that have been modified in a PR.
+description: Update the Python version in Jupyter notebooks that have been modified in a PR. Expects the repository to be checked out with enough history to diff against the target branch and uv to be available.
 
 inputs:
   artifact-name:
@@ -21,9 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      with:
-        enable-cache: false
     - env:
         UV_NO_PROGRESS: 1
       name: Update Jupyter kernels

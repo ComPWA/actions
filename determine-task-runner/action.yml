@@ -1,5 +1,5 @@
 name: Determine task runner
-description: Determine which task runner the repository is using.
+description: Determine which task runner the repository is using. Expects the repository to be checked out and uv to be available.
 
 outputs:
   value:
@@ -9,10 +9,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      with:
-        enable-cache: false
     - id: task-runner
       name: Determine task runner
       run: echo "value=$(uv run --python='>=3.11' $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
