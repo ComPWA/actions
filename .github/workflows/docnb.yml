@@ -39,7 +39,7 @@ jobs:
       - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y ${{ inputs.apt-packages }}
+          sudo apt-get install -y --no-install-recommends ${{ inputs.apt-packages }}
       - if: hashFiles('**/Project.toml')
         uses: $/install-julia
         with:
