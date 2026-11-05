@@ -3,23 +3,19 @@
 # dependencies = [
 #   "packaging",
 # ]
-# requires-python = ">=3.13"
+# requires-python = ">=3.11"
 # ///
-
-from __future__ import annotations
 
 import json
 import os
 import tomllib
 from argparse import ArgumentParser
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 PYTHON_VERSION = Literal[
     "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"

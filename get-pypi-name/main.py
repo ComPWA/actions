@@ -1,4 +1,7 @@
-"""Print job matrix for a GitHub Actions workflow that runs `pytest`."""
+"""Print the name of the Python package defined in pyproject.toml."""
+# /// script
+# requires-python = ">=3.11"
+# ///
 
 import os
 import tomllib
