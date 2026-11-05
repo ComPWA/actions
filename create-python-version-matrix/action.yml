@@ -33,6 +33,6 @@ runs:
       run: |
         delimiter="$(openssl rand -hex 8)"
         echo "matrix<<${delimiter}" >> $GITHUB_OUTPUT
-        uv run --python='>=3.13' $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
+        uv run --python='>=3.11' $GITHUB_ACTION_PATH/main.py | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash
