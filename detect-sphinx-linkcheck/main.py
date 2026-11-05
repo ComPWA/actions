@@ -1,4 +1,4 @@
-"""Select lychee for recognized linkcheck tasks, otherwise keep task execution."""
+"""Check whether a Poe or Pixi linkcheck task of the repository runs Sphinx."""
 # /// script
 # requires-python = ">=3.11"
 # ///
@@ -10,16 +10,16 @@ from typing import Any
 
 
 def main() -> int:
-    value = determine_linkchecker()
+    value = runs_sphinx_linkcheck()
     output = os.environ.get("GITHUB_OUTPUT")
     if output is not None:
         with open(output, "a") as stream:
-            print(f"value={value}", file=stream)
-    print(f"Link checker: {value}")
+            print(f"value={str(value).lower()}", file=stream)
+    print(f"Sphinx linkcheck task: {value}")
     return 0
 
 
-def determine_linkchecker() -> str:
+def runs_sphinx_linkcheck() -> bool:
     pyproject = _load("pyproject.toml")
     tool = pyproject.get("tool", {})
     pixi = tool.get("pixi", {}) or _load("pixi.toml")
@@ -31,16 +31,7 @@ def determine_linkchecker() -> str:
         *(feature.get("tasks", {}) for feature in pixi.get("feature", {}).values()),
     ]
     tasks = [table["linkcheck"] for table in task_tables if "linkcheck" in table]
-    commands = [
-        task.get("cmd", task.get("shell", "")) if isinstance(task, dict) else task
-        for task in tasks
-    ]
-    if commands and all(
-        isinstance(cmd, str) and "lychee" in cmd and "sphinx" not in cmd
-        for cmd in commands
-    ):
-        return "lychee"
-    return "task"
+    return any("sphinx" in str(task) for task in tasks)
 
 
 def _load(path: str) -> dict[str, Any]:
