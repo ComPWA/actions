@@ -19,31 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: sphinx
-        name: Check whether the linkcheck task runs Sphinx
-        shell: python3 {0}
-        run: |
-          import os
-          import tomllib
-          from pathlib import Path
-
-          def load(path: str) -> dict:
-              file = Path(path)
-              return tomllib.loads(file.read_text()) if file.exists() else {}
-
-          pyproject = load("pyproject.toml")
-          pixi = pyproject.get("tool", {}).get("pixi", {}) or load("pixi.toml")
-          poe = pyproject.get("tool", {}).get("poe", {})
-          task_tables = [
-              poe.get("tasks", {}),
-              *(group.get("tasks", {}) for group in poe.get("groups", {}).values()),
-              pixi.get("tasks", {}),
-              *(feature.get("tasks", {}) for feature in pixi.get("feature", {}).values()),
-          ]
-          tasks = [table["linkcheck"] for table in task_tables if "linkcheck" in table]
-          value = any("sphinx" in str(task) for task in tasks)
-          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-              print(f"value={str(value).lower()}", file=output)
-          print(f"Sphinx linkcheck task: {value}")
+        uses: $/detect-sphinx-linkcheck
       - if: steps.sphinx.outputs.value == 'true'
         uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
