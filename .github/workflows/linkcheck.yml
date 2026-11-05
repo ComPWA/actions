@@ -8,6 +8,11 @@ on:
         default: "3.14"
         required: false
         type: string
+      task-runner:
+        default: poe
+        description: The task runner of the repository, either `poe` or `pixi`. Use `none` for a repository without tasks.
+        required: false
+        type: string
 
 jobs:
   linkcheck:
@@ -18,32 +23,26 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - id: sphinx
-        uses: $/detect-sphinx-linkcheck
-      - if: steps.sphinx.outputs.value == 'true'
-        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
-      - if: steps.sphinx.outputs.value == 'true' && inputs.apt-packages
+      - if: inputs.apt-packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends ${{ inputs.apt-packages }}
-      - id: task-runner
-        if: steps.sphinx.outputs.value == 'true'
-        uses: $/determine-task-runner
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.task-runner.outputs.value == 'poe'
+        if: inputs.task-runner == 'poe'
         name: Check links (Poe the Poet)
         run: uvx --from poethepoet poe linkcheck
       - uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
-        if: steps.task-runner.outputs.value == 'pixi'
+        if: inputs.task-runner == 'pixi'
         with:
           cache: true
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         name: Check links (Pixi)
-        if: steps.task-runner.outputs.value == 'pixi'
+        if: inputs.task-runner == 'pixi'
         run: pixi run linkcheck

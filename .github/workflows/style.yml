@@ -1,6 +1,21 @@
 on:
   workflow_call:
     inputs:
+      autofix-ci:
+        default: false
+        description: Whether the repository has an autofix.ci workflow that commits fixes, so that this workflow must not push them a second time.
+        required: false
+        type: boolean
+      hooks:
+        default: ALL
+        description: Space-separated IDs of the pre-commit hooks to run, or `ALL` to run the complete style task. Leave empty to run no hooks.
+        required: false
+        type: string
+      notebooks:
+        default: false
+        description: Whether the repository contains Jupyter notebooks, whose kernels should be updated when a PR modifies them.
+        required: false
+        type: boolean
       python-version:
         default: "3.14"
         required: false
@@ -24,55 +39,13 @@ env:
   PREK_COLOR: always
 
 jobs:
-  determine-checks:
-    name: Determine which style checks to run
-    outputs:
-      has-autofix-ci: ${{ steps.has-autofix-ci.outputs.value }}
-      has-notebooks: ${{ steps.has-notebooks.outputs.value }}
-      has-pre-commit: ${{ steps.has-pre-commit.outputs.value }}
-    runs-on: ubuntu-slim
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # A repository with an autofix.ci workflow lets that app commit the fixes,
-      # so this workflow must not push them a second time.
-      - id: has-autofix-ci
-        name: Check for an autofix.ci workflow
-        run: |
-          if [[ -f .github/workflows/autofix.ci.yml ]]; then
-            echo "value=true" | tee -a "$GITHUB_OUTPUT"
-          fi
-      - id: has-notebooks
-        name: Check for Jupyter notebooks
-        run: |
-          if [[ -n $(git ls-files -- '*.ipynb') ]]; then
-            echo "value=true" | tee -a "$GITHUB_OUTPUT"
-          fi
-      - id: has-pre-commit
-        name: Check for pre-commit configuration
-        run: |
-          if [[ -f .pre-commit-config.yaml ]]; then
-            echo "value=true" | tee -a "$GITHUB_OUTPUT"
-          fi
-
-  determine-hooks:
-    if: needs.determine-checks.outputs.has-pre-commit == 'true'
-    name: Determine skipped pre-commit hooks
-    needs: determine-checks
-    outputs:
-      skipped-hooks: ${{ steps.hooks.outputs.skipped-hooks }}
-    runs-on: ubuntu-slim
-    steps:
-      - id: hooks
-        uses: $/get-skipped-pre-commit-hooks
-
   pre-commit:
     name: Run local pre-commit hooks
     env:
       FORCE_COLOR: 1
       TERM: xterm-256color
       UV_PYTHON: ${{ inputs.python-version }}
-    if: needs.determine-hooks.outputs.skipped-hooks
-    needs: determine-hooks
+    if: inputs.hooks != '' || inputs.notebooks
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -90,10 +63,19 @@ jobs:
       - uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
         with:
           install-only: true
-      - uses: $/run-style
+      - if: inputs.hooks != ''
+        uses: $/run-style
         with:
           python-version: ${{ inputs.python-version }}
-          hooks: ${{ needs.determine-hooks.outputs.skipped-hooks }}
+          hooks: ${{ inputs.hooks }}
+      - if: >-
+          always() && !inputs.autofix-ci && inputs.notebooks &&
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: $/update-jupyter-kernel
+        with:
+          target-branch: origin/${{ github.event.pull_request.base.ref }}
+          upload-artifact: false
       - id: diff
         if: always()
         name: Determine changed files
@@ -116,23 +98,10 @@ jobs:
           if-no-files-found: error
           name: style-changes-pre-commit
           path: ${{ steps.diff.outputs.diff }}
-
-  jupyter-kernels:
-    if: >-
-      needs.determine-checks.outputs.has-notebooks == 'true' &&
-      needs.determine-checks.outputs.has-autofix-ci != 'true' &&
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
-    name: Update Jupyter kernels
-    needs: determine-checks
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - uses: $/update-jupyter-kernel
-        with:
-          target-branch: origin/${{ github.event.pull_request.base.ref }}
+      # Hooks fail when they rewrite a file, but the kernel update does not.
+      - if: steps.diff.outputs.diff != ''
+        name: Fail on changed files
+        run: exit 1
 
   push:
     if: always()
@@ -140,16 +109,12 @@ jobs:
     env:
       PUSH: >-
         ${{
-          needs.determine-checks.outputs.has-autofix-ci != 'true' &&
+          !inputs.autofix-ci &&
           github.event_name == 'pull_request' &&
           github.event.pull_request.head.repo.full_name == github.repository &&
           contains(join(needs.*.result, ','), 'failure')
         }}
-    needs:
-      - determine-checks
-      - determine-hooks
-      - jupyter-kernels
-      - pre-commit
+    needs: pre-commit
     runs-on: ubuntu-slim
     steps:
       - if: env.PUSH == 'true'
