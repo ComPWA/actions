@@ -1,8 +1,73 @@
 on:
   workflow_call:
+    inputs:
+      apt-packages:
+        description: Space-separated APT packages to install before running the `linkcheck` task. Ignored when the repository is checked with lychee.
+        required: false
+        type: string
+      python-version:
+        default: "3.14"
+        description: Python version for running the `linkcheck` task. Ignored when the repository is checked with lychee.
+        required: false
+        type: string
 
 jobs:
+  detect:
+    name: Detect link checker
+    outputs:
+      lychee: ${{ steps.detect.outputs.lychee }}
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: detect
+        name: Check for a lychee configuration
+        run: |
+          if [ -n "$(git ls-files lychee.toml .lychee.toml)" ] \
+            || { [ -f pyproject.toml ] && grep -Eq '^\[tool\.lychee\]' pyproject.toml; }; then
+            echo "lychee=true" | tee -a "$GITHUB_OUTPUT"
+          else
+            echo "lychee=false" | tee -a "$GITHUB_OUTPUT"
+          fi
+
   linkcheck:
+    env:
+      FORCE_COLOR: yes
+      UV_PYTHON: ${{ inputs.python-version }}
+    if: needs.detect.outputs.lychee != 'true'
+    needs: detect
+    name: Check external links
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+      - if: inputs.apt-packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends ${{ inputs.apt-packages }}
+      - id: task-runner
+        uses: $/determine-task-runner
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.task-runner.outputs.value == 'poe'
+        name: Check links (Poe the Poet)
+        run: uvx --from poethepoet poe linkcheck
+      - uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
+        if: steps.task-runner.outputs.value == 'pixi'
+        with:
+          cache: true
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: Check links (Pixi)
+        if: steps.task-runner.outputs.value == 'pixi'
+        run: pixi run linkcheck
+
+  lychee:
+    if: needs.detect.outputs.lychee == 'true'
+    needs: detect
     name: Check external links
     runs-on: ubuntu-slim
     steps:
