@@ -1,0 +1,28 @@
+name: Detect Sphinx linkcheck
+description: Check whether the repository defines a Poe or Pixi linkcheck task that runs Sphinx. Expects the repository to be checked out.
+
+outputs:
+  value:
+    description: The string "true" if a linkcheck task runs Sphinx, otherwise "false".
+    value: ${{ steps.sphinx.outputs.value }}
+
+runs:
+  using: composite
+  steps:
+    - id: system-python
+      name: Check whether the system Python provides tomllib
+      run: |
+        if python3 -c "import tomllib" 2>/dev/null; then
+          echo "usable=true" | tee -a "$GITHUB_OUTPUT"
+        else
+          echo "usable=false" | tee -a "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+    - if: steps.system-python.outputs.usable != 'true'
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version: "3.14"
+    - id: sphinx
+      name: Check whether the linkcheck task runs Sphinx
+      run: python3 "$GITHUB_ACTION_PATH/main.py"
+      shell: bash
