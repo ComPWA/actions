@@ -1,0 +1,21 @@
+name: Run lychee
+description: Check repository links with lychee and cache its results. Expects the repository to be checked out and uses its lychee configuration.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .lycheecache
+        key: lychee-${{ github.run_id }}-${{ github.run_attempt }}
+        restore-keys: lychee-
+    - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        args: --no-progress .
+    - if: always() && hashFiles('.lycheecache') != ''
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .lycheecache
+        key: lychee-${{ github.run_id }}-${{ github.run_attempt }}
