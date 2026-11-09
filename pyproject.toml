@@ -14,13 +14,13 @@ content-type = "text/markdown"
 [dependency-groups]
 dev = [
     "ruff",
+    "ty",
     { include-group = "style" },
 ]
 style = [
     "PyYAML",
     "nbformat",
     "packaging",
-    "ty",
 ]
 
 [build-system]
@@ -49,25 +49,20 @@ format-python-code-blocks = false
 
 [tool.lychee]
 cache = true
+cache_exclude_status = "400.."
+# [:] keeps Lychee from extracting regex patterns as URLs.
 exclude = [
-    '^https[:]//github\.com/ComPWA/actions/compare/\$PREVIOUS_TAG',  # Release Drafter fills in the tags when it renders the notes.
+    '^https[:]//github\.com/ComPWA/actions/compare/\$PREVIOUS_TAG\.\.\.v\$NEXT_PATCH_VERSION$',  # Release Drafter fills in the tags when it renders the notes.
     "^https[:]//x-access-token/$",  # Lychee mistakes the token-authenticated remote URL for a host.
 ]
 extensions = ["json", "md", "py", "toml", "yaml", "yml"]
 hidden = true  # Include the workflows under .github/
 include_fragments = "anchor-only"
 include_verbatim = true
-max_cache_age = "2d"
-max_redirects = 0
-max_retries = 3
+max_cache_age = "7d"
 remap = [
-    '^(https[:]//(?:docs\.astral\.sh|prek\.j178\.dev)/[^?#]*[^/?#])([?#].*)?$ $1/$2',  # Documentation paths on these hosts require a trailing slash.
-    '^https[:]//github\.dev/(.+)$ https://vscode.dev/github/$1',  # The policy-managed contribution template uses the redirecting editor URL.
     '^https[:]//julialang-s3\.julialang\.org/bin/linux/x64/\$%7Bmajor_version%7D/\$%7Bfilename%7D$ https://julialang-s3.julialang.org/bin/versions.json',  # Check release metadata because the caller determines the download version.
-    "^(.+)/n$ $1",  # Lychee reads notebook JSON as text and normalizes escaped newlines to /n.
 ]
-retry_wait_time = 5
-timeout = 30
 
 [tool.poe.executor]
 isolated = true
@@ -167,7 +162,7 @@ key-empty = "off"
 
 [[tool.tombi.schemas]]
 root = "tool.compwa.policy"
-path = "https://raw.githubusercontent.com/ComPWA/policy/0.10.3/compwa-policy.schema.json"
+path = "https://raw.githubusercontent.com/ComPWA/policy/0.10.4/compwa-policy.schema.json"
 include = ["pyproject.toml"]
 
 [tool.ty.rules]
