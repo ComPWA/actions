@@ -23,7 +23,7 @@ runs:
       shell: bash
     - name: Determine style-check command
       id: cmd
-      run: uv run --python 3.14 "$GITHUB_ACTION_PATH/main.py"
+      run: uv run --python='>=3.11' "$GITHUB_ACTION_PATH/main.py"
       shell: bash
     - name: Install pre-commit for unrecognized style tasks
       if: steps.cmd.outputs.batch-hooks != 'true'

@@ -20,7 +20,6 @@ style = [
     "PyYAML",
     "nbformat",
     "packaging",
-    "rtoml",
     "ty",
 ]
 

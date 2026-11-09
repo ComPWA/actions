@@ -1,20 +1,16 @@
 """Determine which task runner a repository uses."""
 # /// script
-# dependencies = [
-#   "rtoml",
-# ]
-# requires-python = ">=3.13"
+# requires-python = ">=3.11"
 # ///
 
 import os
-
-import rtoml
+import tomllib
 
 
 def main() -> int:
     if os.path.exists("pyproject.toml"):
-        with open("pyproject.toml") as f:
-            pyproject = rtoml.load(f)
+        with open("pyproject.toml", "rb") as f:
+            pyproject = tomllib.load(f)
         if pyproject.get("tool", {}).get("poe", {}).get("tasks"):
             print("poe")
             return 0
@@ -22,8 +18,8 @@ def main() -> int:
             print("pixi")
             return 0
     if os.path.exists("pixi.toml"):
-        with open("pixi.toml") as f:
-            pixi = rtoml.load(f)
+        with open("pixi.toml", "rb") as f:
+            pixi = tomllib.load(f)
         if pixi.get("tasks"):
             print("pixi")
             return 0
