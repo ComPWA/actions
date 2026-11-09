@@ -15,4 +15,31 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to develop this repository.
 
 The shared style workflow uses a configured `poe style` or `pixi run style` task, and otherwise runs `prek run --all-files`. The `run-style` action inspects Poe tasks in `pyproject.toml` and Pixi tasks in `pixi.toml` or `pyproject.toml`. Direct `prek run` command tasks without argument templates receive selected hook IDs together and skip installation of `pre-commit` and `pre-commit-uv`. Recognized options are `--all-files` (`-a`), `--show-diff-on-failure`, and `--verbose` (`-v`). Tasks using `pre-commit`, wrappers, other options, or Pixi task overrides retain one invocation per hook and install both compatibility packages. The configured task runner still executes the task with its own environment.
 
-The `run-style` action requires checkout, `uv`, and `prek` to be set up first. Its optional `hooks` input accepts space-separated hook IDs and defaults to `ALL`, which runs the complete style task. Its optional `python-version` input defaults to `3.14` and selects the Python version used to install task runners.
+The [`run-style`](./run-style/action.yml) action requires checkout, `uv`, and `prek` to be set up first. With `verify-fixes`, a failing style task runs a second time, so the step only fails if a hook still fails after its fixes are applied.
+
+## Automated fixes without a personal access token
+
+Commits pushed with the default `GITHUB_TOKEN` [do not trigger new workflow runs](https://docs.github.com/en/actions/concepts/security/github_token), which is why the [style](./.github/workflows/style.yml) and [lock](./.github/workflows/lock.yml) workflows push with a personal access token. The [`autofix.ci`](./.github/workflows/autofix.ci.yml) workflow avoids that token: it lets the [autofix.ci GitHub App](https://autofix.ci) commit the fixes. To use it, install the app for the repository and add this caller, which must be [named `autofix.ci`](https://autofix.ci/security).
+
+```yaml
+name: autofix.ci
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  autofix:
+    uses: ComPWA/actions/.github/workflows/autofix.ci.yml@v4.2.0
+```
+
+On same-repository PRs labeled `⬆️ Lock`, the workflow upgrades the lock files. It then runs the repository's style task against them, updates the Jupyter kernels of modified notebooks, and submits everything as a single commit. Other PRs, including those from forks, and push or manual runs get only style and notebook fixes. If any lock job fails, nothing is submitted. Set `upgrade-lock-files: false` to skip the upgrades.
+
+Repositories managed by [ComPWA/policy](https://compwa.github.io/policy) [0.10.4](https://github.com/ComPWA/policy/releases/tag/0.10.4) or later migrate by setting [`autofix-ci = true`](https://compwa.github.io/policy/check-dev-files/configuration.html#tool.compwa.policy.github.autofix-ci-toml) under [`[tool.compwa.policy.github]`](https://compwa.github.io/policy/check-dev-files/configuration.html#tool.compwa.policy.github-toml). Policy then writes this caller, removes the `token` secret from the `style.yml` call, removes the PR trigger from `lock.yml`, and sets pre-commit.ci's [`autofix_prs`](https://pre-commit.ci/#configuration-autofix_prs) to `false`. Scheduled and manual upgrade PRs still call `lock.yml` with the `token` secret, and the style workflow still runs its checks but leaves commits to the app. The app cannot commit changes under `.github/`, so fix workflow files by hand.

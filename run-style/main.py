@@ -1,7 +1,7 @@
 """Inspect style tasks without executing caller configuration."""
 # cspell:ignore shlex
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.11"
 # dependencies = []
 # ///
 
