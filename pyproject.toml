@@ -33,9 +33,9 @@ repo-title = "ComPWA actions and shared workflows"
 
 [tool.compwa.policy.github]
 allow-deprecated-workflows = true
+autofix-ci = true
 keep-pr-linting = true
-keep-workflow = ["lock.yml"]
-no-github-actions = true  # This repository owns its workflows; policy templates still add a style PAT
+keep-workflow = ["autofix.ci.yml", "lock.yml"]
 no-pypi = true
 no-version-branches = true
 release-name-template = "{{ TAG_PREFIX }}$NEXT_PATCH_VERSION"
