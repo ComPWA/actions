@@ -16,7 +16,7 @@ on:
         type: boolean
       task-runner:
         default: poe
-        description: The task runner of the repository, either `poe` or `pixi`.
+        description: The task runner of the repository, either `poe` or `pixi`. Use `none` for a repository without tasks.
         required: false
         type: string
       test-output-path:

@@ -45,7 +45,10 @@ jobs:
       FORCE_COLOR: 1
       TERM: xterm-256color
       UV_PYTHON: ${{ inputs.python-version }}
-    if: inputs.hooks != '' || inputs.notebooks
+    # Without hooks, the job only updates Jupyter kernels, which happens on PRs only.
+    if: >-
+      inputs.hooks != '' ||
+      (inputs.notebooks && !inputs.autofix-ci && github.event_name == 'pull_request')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
