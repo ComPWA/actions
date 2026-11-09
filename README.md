@@ -19,7 +19,7 @@ The [`run-style`](./run-style/action.yml) action requires checkout, `uv`, and `p
 
 ## Automated fixes without a personal access token
 
-Commits pushed with the default `GITHUB_TOKEN` [do not trigger new workflow runs](https://docs.github.com/en/actions/concepts/security/github_token), which is why the [style](./.github/workflows/style.yml) and [lock](./.github/workflows/lock.yml) workflows push with a personal access token. The [`autofix.ci`](./.github/workflows/autofix.ci.yml) workflow avoids that token: it lets the [autofix.ci GitHub App](https://autofix.ci) commit the fixes. To use it, install the app for the repository and add this caller. The workflow name [must be `autofix.ci`](https://autofix.ci/security). Pin the call to a release once one includes this workflow.
+Commits pushed with the default `GITHUB_TOKEN` [do not trigger new workflow runs](https://docs.github.com/en/actions/concepts/security/github_token), which is why the [style](./.github/workflows/style.yml) and [lock](./.github/workflows/lock.yml) workflows push with a personal access token. The [`autofix.ci`](./.github/workflows/autofix.ci.yml) workflow avoids that token: it lets the [autofix.ci GitHub App](https://autofix.ci) commit the fixes. To use it, install the app for the repository and add this caller, which must be [named `autofix.ci`](https://autofix.ci/security).
 
 ```yaml
 name: autofix.ci
@@ -37,9 +37,9 @@ permissions:
 
 jobs:
   autofix:
-    uses: ComPWA/actions/.github/workflows/autofix.ci.yml@main
+    uses: ComPWA/actions/.github/workflows/autofix.ci.yml@v4.2.0
 ```
 
 On same-repository PRs labeled `⬆️ Lock`, the workflow upgrades the lock files. It then runs the repository's style task against them, updates the Jupyter kernels of modified notebooks, and submits everything as a single commit. Other PRs, including those from forks, and push or manual runs get only style and notebook fixes. If any lock job fails, nothing is submitted. Set `upgrade-lock-files: false` to skip the upgrades.
 
-To migrate, remove the PR trigger from the caller's `lock.yml` and the `token` secret from its `style.yml` call. The style workflow still runs its checks, and it leaves commits to the app when `.github/workflows/autofix.ci.yml` exists. Scheduled or manual upgrade PRs still call `lock.yml` with the `token` secret. If [pre-commit.ci](https://pre-commit.ci) is enabled, set [`autofix_prs: false`](https://pre-commit.ci/#configuration-autofix_prs) so that it does not commit the same fixes. The app cannot commit changes under `.github/`, so fix workflow files by hand. ComPWA/policy templates still insert the style token ([ComPWA/policy#697](https://github.com/ComPWA/policy/issues/697)).
+Repositories managed by [ComPWA/policy](https://github.com/ComPWA/policy) 0.10.4 or later migrate by setting `autofix-ci = true` under `[tool.compwa.policy.github]`. Policy then writes this caller, removes the `token` secret from the `style.yml` call, removes the PR trigger from `lock.yml`, and sets pre-commit.ci's [`autofix_prs`](https://pre-commit.ci/#configuration-autofix_prs) to `false`. Scheduled and manual upgrade PRs still call `lock.yml` with the `token` secret, and the style workflow still runs its checks but leaves commits to the app. The app cannot commit changes under `.github/`, so fix workflow files by hand.
