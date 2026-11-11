@@ -52,9 +52,24 @@ jobs:
     with:
       generate-only: true
 
+  determine-hooks:
+    name: Determine hooks that pre-commit.ci skips
+    outputs:
+      skipped-hooks: ${{ steps.hooks.outcome == 'skipped' && 'ALL' || steps.hooks.outputs.skipped-hooks }}
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .pre-commit-config.yaml
+      - id: hooks
+        if: hashFiles('.pre-commit-config.yaml') != ''
+        uses: $/get-skipped-pre-commit-hooks
+
   autofix:
     if: ${{ !cancelled() && !failure() }}
-    needs: lock
+    needs:
+      - determine-hooks
+      - lock
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,12 +109,15 @@ jobs:
           cache-suffix: style
       # Installs prek and restores its hook environments from cache. The action
       # saves the cache in its post step, so no separate cache step is needed.
-      - uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
+      - if: needs.determine-hooks.outputs.skipped-hooks
+        uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
         with:
           install-only: true
-      - name: Run and verify style fixes
+      - if: needs.determine-hooks.outputs.skipped-hooks
+        name: Run and verify style fixes
         uses: $/run-style
         with:
+          hooks: ${{ needs.determine-hooks.outputs.skipped-hooks }}
           python-version: ${{ inputs.python-version || '3.14' }}
           verify-fixes: "true"
       - if: >-

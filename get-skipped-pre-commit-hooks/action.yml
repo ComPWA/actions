@@ -22,6 +22,7 @@ runs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         sparse-checkout: .pre-commit-config.yaml
+        sparse-checkout-cone-mode: false
     - id: set-hooks
       name: Determine skipped hooks
       run: echo "hooks=$(uv run --no-project --python='>=3.11' $GITHUB_ACTION_PATH/main.py)" | tee -a $GITHUB_OUTPUT
