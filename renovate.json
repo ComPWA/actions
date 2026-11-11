@@ -1,21 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "assignees": ["redeboer"],
-  "labels": ["⬆️ Lock"],
-  "mode": "full",
-  "dependencyDashboard": false,
-  "enabledManagers": ["github-actions"],
-  "ignorePaths": [".github/workflows/**"],
-  "semanticCommits": "enabled",
-  "semanticCommitType": "MAINT",
-  "semanticCommitScope": "",
   "commitMessageAction": "update",
   "commitMessageLowerCase": "never",
-  "rebaseWhen": "never",
-  "reviewers": ["redeboer"],
-  "separateMajorMinor": false,
-  "pinDigest": { "commitMessageAction": "pin" },
+  "dependencyDashboard": false,
+  "enabledManagers": ["github-actions"],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "ignorePaths": [".github/workflows/**"],
+  "labels": ["⬆️ Lock"],
+  "mode": "full",
   "packageRules": [
     {
       "description": "Group GitHub Actions updates",
@@ -29,5 +22,14 @@
       "matchDepNames": ["python"],
       "matchDepTypes": ["uses-with"]
     }
-  ]
+  ],
+  "pinDigest": {
+    "commitMessageAction": "pin"
+  },
+  "rebaseWhen": "never",
+  "reviewers": ["redeboer"],
+  "semanticCommits": "enabled",
+  "semanticCommitScope": "",
+  "semanticCommitType": "MAINT",
+  "separateMajorMinor": false
 }
