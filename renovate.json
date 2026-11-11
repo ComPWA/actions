@@ -3,6 +3,7 @@
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "assignees": ["redeboer"],
   "labels": ["⬆️ Lock"],
+  "mode": "full",
   "dependencyDashboard": false,
   "enabledManagers": ["github-actions"],
   "ignorePaths": [".github/workflows/**"],
