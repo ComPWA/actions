@@ -5,35 +5,21 @@ env:
 on:
   workflow_call:
     inputs:
-      coverage-python-version:
-        default: ""
-        required: false
-        type: string
-      macos-python-version:
-        required: false
-        type: string
-      macos-runner:
-        description:
-          Runner label for the macOS job, for instance `macos-26` (arm64) or
-          `macos-26-intel` (x64). Defaults to `macos-15`. Larger runners are
-          billed, even for public repositories.
-        required: false
+      matrix:
+        description: >-
+          JSON object for `jobs.test.strategy.matrix`, with `python-version`, `runs-on` and optionally `include` keys. An include entry with a `codecov` key runs the coverage job. ComPWA/policy derives this object from the Python versions that the repository supports.
+        required: true
         type: string
       multithreaded:
         default: true
         required: false
         type: boolean
-      skipped-python-versions:
+      task-runner:
+        default: poe
+        description: The task runner of the repository, either `poe` or `pixi`. Use `none` for a repository without tasks.
         required: false
         type: string
       test-output-path:
-        required: false
-        type: string
-      ubuntu-runner:
-        description:
-          Runner label for all Linux jobs, including the coverage job, for
-          instance `ubuntu-26.04` or `ubuntu-26.04-arm`. Defaults to
-          `ubuntu-24.04`.
         required: false
         type: string
     secrets:
@@ -42,31 +28,15 @@ on:
         required: false
 
 jobs:
-  create-matrix:
-    name: Determine job matrix
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    runs-on: ubuntu-slim
-    steps:
-      - id: set-matrix
-        uses: $/create-pytest-matrix
-        with:
-          coverage-python-version: ${{ inputs.coverage-python-version }}
-          macos-python-version: ${{ inputs.macos-python-version }}
-          macos-runner: ${{ inputs.macos-runner }}
-          skipped-python-versions: ${{ inputs.skipped-python-versions }}
-          ubuntu-runner: ${{ inputs.ubuntu-runner }}
-
   test:
     name: Run unit tests
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       UV_PYTHON: ${{ matrix.python-version }}
-    needs: create-matrix
     runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(inputs.matrix) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
@@ -79,23 +49,21 @@ jobs:
       - if: inputs.multithreaded
         name: Activate pytest multithreading
         run: echo "PYTEST_XDIST_WORKER_COUNT=auto" | tee -a $GITHUB_ENV
-      - id: task-runner
-        uses: $/determine-task-runner
       - uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
-        if: steps.task-runner.outputs.value == 'pixi'
+        if: inputs.task-runner == 'pixi'
         with:
           cache: true
       - if: matrix.codecov
         run: |-
           ${{ case(
-            steps.task-runner.outputs.value == 'pixi',
+            inputs.task-runner == 'pixi',
             'pixi run cov',
             'uvx --from poethepoet poe cov'
           ) }}
       - if: ${{ !matrix.codecov }}
         run: |-
           ${{ case(
-            steps.task-runner.outputs.value == 'pixi',
+            inputs.task-runner == 'pixi',
             'pixi run test',
             'uvx --from poethepoet poe test'
           ) }}

@@ -12,20 +12,20 @@ on:
         default: "3.14"
         required: false
         type: string
+      task-runner:
+        default: poe
+        description: The task runner of the repository, either `poe` or `pixi`. Use `none` for a repository without tasks.
+        required: false
+        type: string
 
 jobs:
-  linkcheck:
-    uses: $/.github/workflows/linkcheck.yml
-    with:
-      apt-packages: ${{ inputs.apt-packages }}
-      python-version: ${{ inputs.python-version }}
-
   docnb:
     name: nb
     uses: $/.github/workflows/docnb.yml
     with:
       apt-packages: ${{ inputs.apt-packages }}
       python-version: ${{ inputs.python-version }}
+      task-runner: ${{ inputs.task-runner }}
 
   gh-pages:
     name: Upload to GitHub Pages
@@ -33,9 +33,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     if: inputs.gh-pages && github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-    needs:
-      - docnb
-      - linkcheck
+    needs: docnb
     permissions:
       pages: write
       id-token: write

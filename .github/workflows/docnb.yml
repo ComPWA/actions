@@ -8,6 +8,11 @@ on:
         default: "3.14"
         required: false
         type: string
+      task-runner:
+        default: poe
+        description: The task runner of the repository, either `poe` or `pixi`. Use `none` for a repository without tasks.
+        required: false
+        type: string
 
 jobs:
   docnb:
@@ -44,17 +49,15 @@ jobs:
         uses: $/install-julia
         with:
           ijulia: true
-      - id: task-runner
-        uses: $/determine-task-runner
       - name: Build documentation and run notebooks (poe)
-        if: steps.task-runner.outputs.value == 'poe'
+        if: inputs.task-runner == 'poe'
         run: uvx --from poethepoet poe doc
       - uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
-        if: steps.task-runner.outputs.value == 'pixi'
+        if: inputs.task-runner == 'pixi'
         with:
           cache: true
       - name: Build documentation and run notebooks (Pixi)
-        if: steps.task-runner.outputs.value == 'pixi'
+        if: inputs.task-runner == 'pixi'
         run: pixi run doc
       - if: hashFiles('docs/_build/html')
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
