@@ -37,7 +37,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--ubuntu-runner", default="")
     parser.add_argument("--macos-runner", default="")
     parser.add_argument(
-        "--windows-python-version", choices=[*PYTHON_VERSION.__args__, ""]
+        "--windows-python-version",
+        choices=[*PYTHON_VERSION.__args__, ""],
     )
     parser.add_argument("--windows-runner", default="")
     args = parser.parse_args(argv)
@@ -62,13 +63,12 @@ def _format_skipped_version(skipped_python_versions: str) -> set[PYTHON_VERSION]
     return set(skipped_python_versions.split(" "))  # ty:ignore[invalid-explicit-return]
 
 
-def create_job_matrix(  # ruff: ignore[too-many-arguments]
+def create_job_matrix(  # ruff: ignore[too-many-arguments,too-many-positional-arguments]
     coverage_python_version: PYTHON_VERSION | Literal[""],
     macos_python_version: PYTHON_VERSION | Literal[""],
     skipped_python_versions: set[PYTHON_VERSION] | None,
     ubuntu_runner: str = DEFAULT_UBUNTU_RUNNER,
     macos_runner: str = DEFAULT_MACOS_RUNNER,
-    *,
     windows_python_version: PYTHON_VERSION | Literal[""] = "",
     windows_runner: str = DEFAULT_WINDOWS_RUNNER,
 ) -> dict:
