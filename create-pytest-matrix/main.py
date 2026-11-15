@@ -59,7 +59,7 @@ def _format_skipped_version(skipped_python_versions: str) -> set[PYTHON_VERSION]
         return None
     if not skipped_python_versions:
         return set()
-    return set(skipped_python_versions.split(" "))  # ty:ignore[invalid-return-type]
+    return set(skipped_python_versions.split(" "))  # ty:ignore[invalid-explicit-return]
 
 
 def create_job_matrix(  # ruff: ignore[too-many-arguments]
@@ -171,7 +171,7 @@ def _determine_python_versions_from_classifiers(
     if not versions:
         return None
     prefix = version_identifier[:-2]
-    return [s.replace(prefix, "") for s in versions]  # ty:ignore[invalid-return-type]
+    return [s.replace(prefix, "") for s in versions]  # ty:ignore[invalid-explicit-return]
 
 
 def __get_allowed_versions(version_range: str) -> list[PYTHON_VERSION]:
@@ -183,7 +183,7 @@ def __get_allowed_versions(version_range: str) -> list[PYTHON_VERSION]:
     specifier = SpecifierSet(version_range)
     allowed_versions = [f"3.{v}" for v in range(6, 15)]
     versions_to_check = [Version(v) for v in sorted(allowed_versions)]
-    return [str(v) for v in versions_to_check if v in specifier]  # ty:ignore[invalid-return-type]
+    return [str(v) for v in versions_to_check if v in specifier]  # ty:ignore[invalid-explicit-return]
 
 
 if __name__ == "__main__":
