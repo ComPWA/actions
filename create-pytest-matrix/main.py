@@ -22,6 +22,7 @@ PYTHON_VERSION = Literal[
 ]
 DEFAULT_UBUNTU_RUNNER = "ubuntu-24.04"
 DEFAULT_MACOS_RUNNER = "macos-15"
+DEFAULT_WINDOWS_RUNNER = "windows-latest"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -35,6 +36,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--skipped-python-versions", type=str)
     parser.add_argument("--ubuntu-runner", default="")
     parser.add_argument("--macos-runner", default="")
+    parser.add_argument(
+        "--windows-python-version",
+        choices=[*PYTHON_VERSION.__args__, ""],
+    )
+    parser.add_argument("--windows-runner", default="")
     args = parser.parse_args(argv)
     matrix = create_job_matrix(
         args.coverage_python_version,
@@ -42,6 +48,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         _format_skipped_version(args.skipped_python_versions),
         ubuntu_runner=args.ubuntu_runner or DEFAULT_UBUNTU_RUNNER,
         macos_runner=args.macos_runner or DEFAULT_MACOS_RUNNER,
+        windows_python_version=args.windows_python_version,
+        windows_runner=args.windows_runner or DEFAULT_WINDOWS_RUNNER,
     )
     print(json.dumps(matrix, indent=2))
     return 0
@@ -52,15 +60,17 @@ def _format_skipped_version(skipped_python_versions: str) -> set[PYTHON_VERSION]
         return None
     if not skipped_python_versions:
         return set()
-    return set(skipped_python_versions.split(" "))  # ty:ignore[invalid-return-type]
+    return set(skipped_python_versions.split(" "))  # ty:ignore[invalid-explicit-return]
 
 
-def create_job_matrix(
+def create_job_matrix(  # ruff: ignore[too-many-arguments,too-many-positional-arguments]
     coverage_python_version: PYTHON_VERSION | Literal[""],
     macos_python_version: PYTHON_VERSION | Literal[""],
     skipped_python_versions: set[PYTHON_VERSION] | None,
     ubuntu_runner: str = DEFAULT_UBUNTU_RUNNER,
     macos_runner: str = DEFAULT_MACOS_RUNNER,
+    windows_python_version: PYTHON_VERSION | Literal[""] = "",
+    windows_runner: str = DEFAULT_WINDOWS_RUNNER,
 ) -> dict:
     supported_python_versions = get_supported_python_versions()
     if skipped_python_versions is None:
@@ -85,6 +95,12 @@ def create_job_matrix(
         includes.append({
             "python-version": macos_python_version,
             "runs-on": macos_runner,
+        })
+    if windows_python_version:
+        _is_version_allowed(windows_python_version, supported_python_versions)
+        includes.append({
+            "python-version": windows_python_version,
+            "runs-on": windows_runner,
         })
     matrix = {}
     if python_versions:
@@ -155,7 +171,7 @@ def _determine_python_versions_from_classifiers(
     if not versions:
         return None
     prefix = version_identifier[:-2]
-    return [s.replace(prefix, "") for s in versions]  # ty:ignore[invalid-return-type]
+    return [s.replace(prefix, "") for s in versions]  # ty:ignore[invalid-explicit-return]
 
 
 def __get_allowed_versions(version_range: str) -> list[PYTHON_VERSION]:
@@ -167,7 +183,7 @@ def __get_allowed_versions(version_range: str) -> list[PYTHON_VERSION]:
     specifier = SpecifierSet(version_range)
     allowed_versions = [f"3.{v}" for v in range(6, 15)]
     versions_to_check = [Version(v) for v in sorted(allowed_versions)]
-    return [str(v) for v in versions_to_check if v in specifier]  # ty:ignore[invalid-return-type]
+    return [str(v) for v in versions_to_check if v in specifier]  # ty:ignore[invalid-explicit-return]
 
 
 if __name__ == "__main__":

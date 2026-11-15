@@ -27,6 +27,16 @@ inputs:
       `ubuntu-26.04` or `ubuntu-26.04-arm`. Defaults to `ubuntu-24.04`.
     required: false
 
+  windows-python-version:
+    description:
+      Run tests on Windows on a specific version of Python. If left empty, no
+      Windows job will be created.
+    required: false
+  windows-runner:
+    description: Runner label for the Windows job, for instance `windows-2025`.
+      Defaults to `windows-latest`.
+    required: false
+
 outputs:
   matrix:
     description: A JSON object that can be used for setting `jobs.<job_id>.strategy`.
@@ -50,6 +60,8 @@ runs:
           --macos-runner='${{ inputs.macos-runner }}' \
           --skipped-python-versions='${{ inputs.skipped-python-versions }}' \
           --ubuntu-runner='${{ inputs.ubuntu-runner }}' \
+          --windows-python-version=${{ inputs.windows-python-version }} \
+          --windows-runner='${{ inputs.windows-runner }}' \
           | tee -a $GITHUB_OUTPUT
         echo "${delimiter}" >> $GITHUB_OUTPUT
       shell: bash

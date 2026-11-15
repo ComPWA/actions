@@ -36,6 +36,15 @@ on:
           `ubuntu-24.04`.
         required: false
         type: string
+      windows-python-version:
+        required: false
+        type: string
+      windows-runner:
+        description:
+          Runner label for the Windows job, for instance `windows-2025`.
+          Defaults to `windows-latest`.
+        required: false
+        type: string
     secrets:
       CODECOV_TOKEN:
         description: Token for uploading reports to Codecov. See https://docs.codecov.com/docs/codecov-uploader.
@@ -56,9 +65,14 @@ jobs:
           macos-runner: ${{ inputs.macos-runner }}
           skipped-python-versions: ${{ inputs.skipped-python-versions }}
           ubuntu-runner: ${{ inputs.ubuntu-runner }}
+          windows-python-version: ${{ inputs.windows-python-version }}
+          windows-runner: ${{ inputs.windows-runner }}
 
   test:
     name: Run unit tests
+    defaults:
+      run:
+        shell: bash
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       UV_PYTHON: ${{ matrix.python-version }}
