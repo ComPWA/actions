@@ -21,6 +21,12 @@ on:
           repository become previews. Requires the `readthedocs-token` secret.
         required: false
         type: boolean
+      readthedocs-project:
+        description: >-
+          Slug of the Read the Docs project. Defaults to the repository name in
+          lower case.
+        required: false
+        type: string
     secrets:
       readthedocs-token:
         description: >-
@@ -79,10 +85,14 @@ jobs:
           mkdir html
           tar -xf artifact.tar -C html
       - id: version
-        name: Determine version name
+        name: Determine project and version name
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          PROJECT: ${{ inputs.readthedocs-project }}
+          REPOSITORY: ${{ github.event.repository.name }}
         run: |
+          PROJECT="${PROJECT:-$REPOSITORY}"
+          echo "project=${PROJECT,,}" | tee -a "$GITHUB_OUTPUT"
           if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == "refs/heads/$DEFAULT_BRANCH" ]]; then
             echo "name=latest" | tee -a "$GITHUB_OUTPUT"
             echo "type=branch" | tee -a "$GITHUB_OUTPUT"
@@ -91,6 +101,7 @@ jobs:
         with:
           html: html
           privacy-level: public
+          project-slug: ${{ steps.version.outputs.project }}
           token: ${{ secrets.readthedocs-token }}
           version-name: ${{ steps.version.outputs.name }}
           version-type: ${{ steps.version.outputs.type }}
@@ -100,6 +111,7 @@ jobs:
         with:
           html: html
           privacy-level: public
+          project-slug: ${{ steps.version.outputs.project }}
           token: ${{ secrets.readthedocs-token }}
           version-name: stable
           version-type: branch
